@@ -14,6 +14,7 @@ The Java version of Ureka framework.
 ```git push -u <new_branch_name>```
 5. 在github遠端庫上pull request, merge自己的branch到main後在本地端切回main : 
 ```git pull```
+注意 : 是將new branch merge到 -> main
 6. 重複step 1-5
 
 ### 其他指令
