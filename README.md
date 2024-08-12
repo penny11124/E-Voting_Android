@@ -2,6 +2,7 @@
 The Java version of Ureka framework.
 
 <details><summary>git小抄</summary>
+
 1. 一開始先記得checkout自己所在branch, 一定要跳回main再新創branch
 ```git branch <new_branch_name>```
 2. 切換到新創的那個branch
