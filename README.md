@@ -1,4 +1,4 @@
-# Ureka_Java_Android
+# E-Voting_Android
 The Java version of Ureka framework.
 
 <details><summary>git小抄</summary>
