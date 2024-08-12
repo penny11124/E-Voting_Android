@@ -27,15 +27,15 @@ public class ECC {
     //////////////////////////////////////////////////////
     // ECC Key Factory
     //////////////////////////////////////////////////////
-    public static KeyPair generate_key_pair()
+    public static KeyPair generateKeyPair()
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         try {
-            return SimpleMeasurer.measureResourceFunc(ECC::_generate_key_pair);
+            return SimpleMeasurer.measureResourceFunc(ECC::_generateKeyPair);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    private static KeyPair _generate_key_pair()
+    private static KeyPair _generateKeyPair()
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
         ECGenParameterSpec ecSpec = new ECGenParameterSpec("secp256k1");

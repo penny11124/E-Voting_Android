@@ -69,7 +69,7 @@ public class MsgGeneratorUTicket {
             SimpleLogger.simpleLog("info", successMsg);
         } else if (Objects.equals(newUTicket.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET) ||
                 Objects.equals(newUTicket.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)) {
-            newUTicket = _addIssuerSignatureOnUTicket(newUTicket, this.thisPerson.getPersonPrivKey());
+            newUTicket =this._addIssuerSignatureOnUTicket(newUTicket, this.thisPerson.getPersonPrivKey());
             SimpleLogger.simpleLog("info", successMsg);
         } else {
             throw new RuntimeException("Shouldn't Reach Here");

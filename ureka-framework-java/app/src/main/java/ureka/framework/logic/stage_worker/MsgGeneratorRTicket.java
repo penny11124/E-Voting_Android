@@ -80,12 +80,12 @@ public class MsgGeneratorRTicket {
                 Objects.equals(newRTicket.getRTicketType(), RTicket.TYPE_CRKE1_RTICKET) ||
                 Objects.equals(newRTicket.getRTicketType(), RTicket.TYPE_CRKE3_RTICKET) ||
                 Objects.equals(newRTicket.getRTicketType(), UTicket.TYPE_ACCESS_END_UTOKEN)) {
-            newRTicket = _addIssuerSignatureOnRTicket(newRTicket,this.thisDevice.getDevicePrivKey());
+            newRTicket = this._addIssuerSignatureOnRTicket(newRTicket,this.thisDevice.getDevicePrivKey());
             SimpleLogger.simpleLog("info", successMsg);
         }
         // "holder"
         else if (Objects.equals(newRTicket.getRTicketType(), RTicket.TYPE_CRKE2_RTICKET)) {
-            newRTicket = _addIssuerSignatureOnRTicket(newRTicket,this.thisPerson.getPersonPrivKey());
+            newRTicket = this._addIssuerSignatureOnRTicket(newRTicket,this.thisPerson.getPersonPrivKey());
             SimpleLogger.simpleLog("info", successMsg);
         }
         // "device"

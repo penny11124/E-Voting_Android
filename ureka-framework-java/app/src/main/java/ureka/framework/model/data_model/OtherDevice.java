@@ -30,10 +30,10 @@ public class OtherDevice {
         this.deviceRTicketForOwner = deviceRTicketForOwner;
         this.ticketOrder = ticketOrder;
     }
-    public OtherDevice(String deviceId, String deviceUTicketForOwner, Integer ticketOrder) {
+    public OtherDevice(String deviceId, String deviceUTicketForOwner, String deviceRTicketForOwner) {
         this.deviceId = deviceId;
         this.deviceUTicketForOwner = deviceUTicketForOwner;
-        this.ticketOrder = ticketOrder;
+        this.deviceRTicketForOwner = deviceRTicketForOwner;
     }
     public OtherDevice(String deviceId, String deviceUTicketForOwner) {
         this.deviceId = deviceId;
