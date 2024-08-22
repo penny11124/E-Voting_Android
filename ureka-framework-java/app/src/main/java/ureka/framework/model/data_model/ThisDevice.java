@@ -87,7 +87,7 @@ public class ThisDevice {
         if (this.devicePrivKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.devicePrivKey, "ecc-private-key");
+        return SerializationUtil.keyToStr(this.devicePrivKey, "eccPrivateKey");
     }
 
     public void setDevicePrivKey(ECPrivateKey devicePrivKey) {
@@ -103,7 +103,7 @@ public class ThisDevice {
         if (this.devicePubKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.devicePubKey, "ecc-public-key");
+        return SerializationUtil.keyToStr(this.devicePubKey, "eccPublicKey");
     }
 
     public void setDevicePubKey(ECPublicKey devicePubKey) {
@@ -119,7 +119,7 @@ public class ThisDevice {
         if (this.devicePrivKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.ownerPubKey, "ecc-public-key");
+        return SerializationUtil.keyToStr(this.ownerPubKey, "eccPublicKey");
     }
 
     public void setOwnerPubKey(ECPublicKey ownerPubKey) {
@@ -141,17 +141,17 @@ public class ThisDevice {
         if (thisDevice.getDevicePrivKey() == null) {
             thisDeviceDict.put("devicePrivKey", null);
         } else {
-            thisDeviceDict.put("devicePrivKey", SerializationUtil.keyToStr(thisDevice.getDevicePrivKey(), "ecc-private-key"));
+            thisDeviceDict.put("devicePrivKey", SerializationUtil.keyToStr(thisDevice.getDevicePrivKey(), "eccPrivateKey"));
         }
         if (thisDevice.getDevicePubKey() == null) {
             thisDeviceDict.put("devicePubKey", null);
         } else {
-            thisDeviceDict.put("devicePubKey", SerializationUtil.keyToStr(thisDevice.getDevicePubKey(), "ecc-public-key"));
+            thisDeviceDict.put("devicePubKey", SerializationUtil.keyToStr(thisDevice.getDevicePubKey(), "eccPublicKey"));
         }
         if (thisDevice.getOwnerPubKey() == null) {
             thisDeviceDict.put("ownerPubKey", null);
         } else {
-            thisDeviceDict.put("ownerPubKey", SerializationUtil.keyToStr(thisDevice.getOwnerPubKey(), "ecc-public-key"));
+            thisDeviceDict.put("ownerPubKey", SerializationUtil.keyToStr(thisDevice.getOwnerPubKey(), "eccPublicKey"));
         }
 
         return thisDeviceDict;
@@ -172,17 +172,17 @@ public class ThisDevice {
         if (thisDeviceDict.get("devicePrivKey") == null) {
             thisDevice.setDevicePrivKey(null);
         } else {
-            thisDevice.setDevicePrivKey((ECPrivateKey) SerializationUtil.strToKey(thisDeviceDict.get("devicePrivKey"), "ecc-private-key"));
+            thisDevice.setDevicePrivKey((ECPrivateKey) SerializationUtil.strToKey(thisDeviceDict.get("devicePrivKey"), "eccPrivateKey"));
         }
         if (thisDeviceDict.get("devicePubKey") == null) {
             thisDevice.setDevicePubKey(null);
         } else {
-            thisDevice.setDevicePubKey((ECPublicKey) SerializationUtil.strToKey(thisDeviceDict.get("devicePubKey"), "ecc-public-key"));
+            thisDevice.setDevicePubKey((ECPublicKey) SerializationUtil.strToKey(thisDeviceDict.get("devicePubKey"), "eccPublicKey"));
         }
         if (thisDeviceDict.get("ownerPubKey") == null) {
             thisDevice.setOwnerPubKey(null);
         } else {
-            thisDevice.setOwnerPubKey((ECPublicKey) SerializationUtil.strToKey(thisDeviceDict.get("ownerPubKey"), "ecc-public-key"));
+            thisDevice.setOwnerPubKey((ECPublicKey) SerializationUtil.strToKey(thisDeviceDict.get("ownerPubKey"), "eccPublicKey"));
         }
 
         return thisDevice;

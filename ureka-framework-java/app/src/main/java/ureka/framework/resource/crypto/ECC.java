@@ -46,24 +46,11 @@ public class ECC {
     //////////////////////////////////////////////////////
     // Sign ECC Signature
     //////////////////////////////////////////////////////
-    public static byte[] signSignature(byte[] message, ECPrivateKey privateKey)
-        throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
-        return SimpleMeasurer.measureWorkerFunc((message1, privateKey1) -> {
-            try {
-                _signSignature(message1, privateKey1);
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchProviderException e) {
-                throw new RuntimeException(e);
-            } catch (InvalidKeyException e) {
-                throw new RuntimeException(e);
-            } catch (SignatureException e) {
-                throw new RuntimeException(e);
-            }
-        }, message, privateKey);
+    public static byte[] signSignature(byte[] message, ECPrivateKey privateKey) throws Exception {
+        return SimpleMeasurer.measureResourceFunc(ECC::_sign_signature, message, privateKey);
     }
-    private static byte[] _signSignature(byte[] message, ECPrivateKey privateKey)
-        throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
+    private static byte[] _sign_signature(byte[] message, ECPrivateKey privateKey)
+            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
         Signature signer = Signature.getInstance("SHA256withECDSA", "BC");
         signer.initSign(privateKey);
         signer.update(message);
@@ -75,7 +62,11 @@ public class ECC {
     //////////////////////////////////////////////////////
     public static boolean verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey)
         throws NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
-        return SimpleMeasurer.measureWorkerFunc(ECC::_verifySignature, signatureIn, messageIn, publicKey);
+        try {
+            return SimpleMeasurer.measureResourceFunc(ECC::_verifySignature, signatureIn, messageIn, publicKey);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     private static boolean _verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey)
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {

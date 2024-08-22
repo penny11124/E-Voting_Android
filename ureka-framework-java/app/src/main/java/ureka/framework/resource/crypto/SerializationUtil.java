@@ -58,9 +58,9 @@ public class SerializationUtil {
     ////////// ECPublicKey/ECPrivateKey <-> Byte //////////
     public static byte[] _keyToByte(Object keyObj, String keyType) {
         try {
-            if (keyType.equals("ecc-public-key") && keyObj instanceof ECPublicKey) {
+            if (keyType.equals("eccPublicKey") && keyObj instanceof ECPublicKey) {
                 return ((ECPublicKey) keyObj).getEncoded();
-            } else if (keyType.equals("ecc-private-key") && keyObj instanceof ECPrivateKey) {
+            } else if (keyType.equals("eccPrivateKey") && keyObj instanceof ECPrivateKey) {
                 return ((ECPrivateKey) keyObj).getEncoded();
             } else {
                 throw new RuntimeException("_keyToByte: Ket type not supported.");
@@ -73,10 +73,10 @@ public class SerializationUtil {
     public static Object _byteToKey(byte[] keyByte, String keyType) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
-            if (keyType.equals("ecc-public-key")) {
+            if (keyType.equals("eccPublicKey")) {
                 X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyByte);
                 return keyFactory.generatePublic(keySpec);
-            } else if (keyType.equals("ecc-private-key")) {
+            } else if (keyType.equals("eccPrivateKey")) {
                 PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyByte);
                 return keyFactory.generatePrivate(keySpec);
             } else {
@@ -97,7 +97,7 @@ public class SerializationUtil {
     }
     public static String keyToStr(Object keyObj) {
         if (keyObj instanceof ECPrivateKey || keyObj instanceof ECPublicKey) {
-            return byteToBase64Str(_keyToByte(keyObj, "ecc-public-key"));
+            return byteToBase64Str(_keyToByte(keyObj, "eccPublicKey"));
         } else {
             throw new IllegalArgumentException("keyToStr: Illegal argument.");
         }
@@ -107,6 +107,6 @@ public class SerializationUtil {
         return (ECPublicKey) _byteToKey(base64StrBackToByte(keyStr), keyType);
     }
     public static ECPublicKey strToKey(String keyStr) {
-        return (ECPublicKey) _byteToKey(base64StrBackToByte(keyStr), "ecc-public-key");
+        return (ECPublicKey) _byteToKey(base64StrBackToByte(keyStr), "eccPublicKey");
     }
 }

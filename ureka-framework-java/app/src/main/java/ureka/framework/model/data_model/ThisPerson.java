@@ -27,7 +27,7 @@ public class ThisPerson {
         if (this.personPrivKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.personPrivKey, "ecc-private-key");
+        return SerializationUtil.keyToStr(this.personPrivKey, "eccPrivateKey");
     }
 
     public void setPersonPrivKey(ECPrivateKey personPrivKey) {
@@ -43,7 +43,7 @@ public class ThisPerson {
         if (this.personPubKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.personPubKey, "ecc-public-key");
+        return SerializationUtil.keyToStr(this.personPubKey, "eccPublicKey");
     }
 
     public void setPersonPubKey(ECPublicKey personPubKey) {
@@ -56,12 +56,12 @@ public class ThisPerson {
         if (thisPerson.getPersonPrivKey() == null) {
             thisPersonDict.put("personPrivKey", null);
         } else {
-            thisPersonDict.put("personPrivKey", SerializationUtil.keyToStr(thisPerson.getPersonPrivKey(), "ecc-private-key"));
+            thisPersonDict.put("personPrivKey", SerializationUtil.keyToStr(thisPerson.getPersonPrivKey(), "eccPrivateKey"));
         }
         if (thisPerson.getPersonPubKey() == null) {
             thisPersonDict.put("personPubKey", null);
         } else {
-            thisPersonDict.put("personPubKey", SerializationUtil.keyToStr(thisPerson.getPersonPubKey(), "ecc-public-key"));
+            thisPersonDict.put("personPubKey", SerializationUtil.keyToStr(thisPerson.getPersonPubKey(), "eccPublicKey"));
         }
 
         return thisPersonDict;
@@ -73,12 +73,12 @@ public class ThisPerson {
         if (thisPersonDict.get("personPrivKey") == null) {
             thisPerson.setPersonPrivKey(null);
         } else {
-            thisPerson.setPersonPrivKey((ECPrivateKey) SerializationUtil.strToKey(thisPersonDict.get("personPrivKey"), "ecc-private-key"));
+            thisPerson.setPersonPrivKey((ECPrivateKey) SerializationUtil.strToKey(thisPersonDict.get("personPrivKey"), "eccPrivateKey"));
         }
         if (thisPersonDict.get("personPubKey") == null) {
             thisPerson.setPersonPubKey(null);
         } else {
-            thisPerson.setPersonPubKey((ECPublicKey) SerializationUtil.strToKey(thisPersonDict.get("personPubKey"), "ecc-public-key"));
+            thisPerson.setPersonPubKey((ECPublicKey) SerializationUtil.strToKey(thisPersonDict.get("personPubKey"), "eccPublicKey"));
         }
 
         return thisPerson;
