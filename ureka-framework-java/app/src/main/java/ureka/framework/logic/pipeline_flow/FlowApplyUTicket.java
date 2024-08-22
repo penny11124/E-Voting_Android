@@ -122,11 +122,11 @@ public class FlowApplyUTicket {
     // holderApplyUTicket() -> _deviceRecvUTicket()
     // _holderRecvRTicket() <- _deviceSendRTicket()
     //////////////////////////////////////////////////////
-    void holderApplyUTicket(String deviceId) {
+    public void holderApplyUTicket(String deviceId) {
         holderApplyUTicket(deviceId, "");
     }
 
-    void holderApplyUTicket(String deviceId, String cmd) {
+    public void holderApplyUTicket(String deviceId, String cmd) {
         //////////////////////////////////////////////////////
         // Start Process Measurement
         //////////////////////////////////////////////////////
@@ -149,13 +149,13 @@ public class FlowApplyUTicket {
             if (Objects.equals(storedUTicket.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
                 || Objects.equals(storedUTicket.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)) {
                 // [STAGE: (C)]
-                this.executor._change_state(ThisDevice.STATE_AGENT_WAIT_FOR_RT);
+                this.executor.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_RT);
             } else if (Objects.equals(storedUTicket.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)
                 || Objects.equals(storedUTicket.getUTicketType(), UTicket.TYPE_SELFACCESS_UTICKET)) {
                 // [STAGE: (E)]
-                this.executor._execute_cr_ke(storedUTicket, "holder", cmd);
+                this.executor.executeCRKE(storedUTicket, "holder", cmd);
                 // [STAGE: (C)]
-                this.executor._change_state(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE1);
+                this.executor.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE1);
             } else {
                 throw new RuntimeException("FlowApplyUTicket-holderApplyUTicket: storedUTicket type error.");
             }
@@ -168,12 +168,12 @@ public class FlowApplyUTicket {
             ////////////////////////////////////////////////////////////////////////
             // Start Comm Measurement
             ////////////////////////////////////////////////////////////////////////
-            if (!Objects.equals(this.sharedData.getThisDevice().getDeviceName(), "iot_device")) {
+            if (!Objects.equals(this.sharedData.getThisDevice().getDeviceName(), "iotDevice")) {
                 this.measureHelper.measureCommPerfStart();
             }
 
             // [STAGE: (S)]
-            this.msgSender._sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE
+            this.msgSender.sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE
                 , UTicket.MESSAGE_TYPE, storedUTicketJson);
 
         } catch (RuntimeException e) {
@@ -184,7 +184,7 @@ public class FlowApplyUTicket {
         }
     }
 
-    void _deviceRecvUTicket(UTicket receivedUTicket) {
+    public void _deviceRecvUTicket(UTicket receivedUTicket) {
         try {
             // [STAGE: (R)(VR)]
 
@@ -199,17 +199,17 @@ public class FlowApplyUTicket {
             if (Objects.equals(receivedUTicket.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
                 || Objects.equals(receivedUTicket.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)) {
                 // [STAGE: (EO)]
-                this.executor._execute_xxx_u_ticket(receivedUTicket);
+                this.executor.executeXxxUTicket(receivedUTicket);
                 // [STAGE: (C)]
-                this.executor._change_state(ThisDevice.STATE_DEVICE_WAIT_FOR_UT);
+                this.executor.changeState(ThisDevice.STATE_DEVICE_WAIT_FOR_UT);
             }
             // CR-KE
             else if (Objects.equals(receivedUTicket.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)
                 || Objects.equals(receivedUTicket.getUTicketType(), UTicket.TYPE_SELFACCESS_UTICKET)) {
                 // [STAGE: (E)]
-                this.executor._execute_xxx_u_ticket(receivedUTicket);
+                this.executor.executeXxxUTicket(receivedUTicket);
                 // [STAGE: (C)]
-                this.executor._change_state(ThisDevice.STATE_DEVICE_WAIT_FOR_CRKE2);
+                this.executor.changeState(ThisDevice.STATE_DEVICE_WAIT_FOR_CRKE2);
             } else {
                 throw new RuntimeException("FlowApplyUTicket-_deviceRecvUTicket: receivedUTicket type error.");
             }
@@ -218,7 +218,7 @@ public class FlowApplyUTicket {
             this.sharedData.setResultMessage("error");
 
             // [STAGE: (C)]
-            this.executor._change_state(ThisDevice.STATE_DEVICE_WAIT_FOR_UT);
+            this.executor.changeState(ThisDevice.STATE_DEVICE_WAIT_FOR_UT);
 
             // UT-RT
             if (Objects.equals(receivedUTicket.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
@@ -244,7 +244,7 @@ public class FlowApplyUTicket {
             else if (Objects.equals(receivedUTicket.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)
                 || Objects.equals(receivedUTicket.getUTicketType(), UTicket.TYPE_SELFACCESS_UTICKET)) {
                 // [STAGE: (G)(S)]
-                this.flowOpenSession._device_send_cr_ke_1(this.sharedData.getResultMessage());
+                this.flowOpenSession._deviceSendCrKe1(this.sharedData.getResultMessage());
             }
             // else {
             //     // pragma: no cover -> Shouldn't Reach Here
@@ -253,35 +253,35 @@ public class FlowApplyUTicket {
         }
     }
 
-    void _deviceSendRTicket(String uTicketType, String uTicketId, String resultMessage) {
+    public void _deviceSendRTicket(String uTicketType, String uTicketId, String resultMessage) {
         try {
             Map<String, String> rTicketRequest = new HashMap<>();
             // [STAGE: (G)]
             if (Objects.equals(uTicketType, UTicket.TYPE_INITIALIZATION_UTICKET)
                 || Objects.equals(uTicketType, UTicket.TYPE_OWNERSHIP_UTICKET)) {
                 if (resultMessage.contains("SUCCESS")) {
-                    rTicketRequest.put("r_ticket_type", uTicketType);
-                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    rTicketRequest.put("rTicketType", uTicketType);
+                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
-                    rTicketRequest.put("audit_start", uTicketId);
+                    rTicketRequest.put("auditStart", uTicketId);
                 } else {
-                    rTicketRequest.put("r_ticket_type", uTicketType);
-                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    rTicketRequest.put("rTicketType", uTicketType);
+                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
                 }
 
             } else if (Objects.equals(uTicketType, UTicket.TYPE_ACCESS_END_UTOKEN)) {
                 if (resultMessage.contains("SUCCESS")) {
-                    // audit_start has already stored when receiving Access UTicket
-                    rTicketRequest.put("r_ticket_type", uTicketType);
-                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    // auditStart has already stored when receiving Access UTicket
+                    rTicketRequest.put("rTicketType", uTicketType);
+                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
-                    rTicketRequest.put("audit_start", this.sharedData.getCurrentSession().getCurrentUTicketId());
-                    rTicketRequest.put("audit_end", "ACCESS END");
+                    rTicketRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
+                    rTicketRequest.put("auditEnd", "ACCESS END");
                 } else {
                     // pragma: no cover -> Weird U-Token
-                    rTicketRequest.put("r_ticket_type", uTicketType);
-                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    rTicketRequest.put("rTicketType", uTicketType);
+                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
                 }
             } else {
@@ -296,12 +296,12 @@ public class FlowApplyUTicket {
             //////////////////////////////////////////////////////
             // End Process Measurement
             //////////////////////////////////////////////////////
-            this.measureHelper.measureRecvMsgPerfTime("_device_recv_u_ticket_and_send_r_ticket");
+            this.measureHelper.measureRecvMsgPerfTime("_deviceRecvUTicketAndSendRTicket");
 
             ////////////////////////////////////////////////////////////////////////
             // Start Comm Measurement
             ////////////////////////////////////////////////////////////////////////
-            if (!Objects.equals(this.sharedData.getThisDevice().getDeviceName(), "iot_device")) {
+            if (!Objects.equals(this.sharedData.getThisDevice().getDeviceName(), "iotDevice")) {
                 this.measureHelper.measureCommPerfStart();
             }
 
@@ -319,12 +319,12 @@ public class FlowApplyUTicket {
         }
     }
 
-    void _holderRecvRTicket(RTicket receivedRTicket) {
+    public void _holderRecvRTicket(RTicket receivedRTicket) {
         try {
             // [STAGE: (R)(VR)]
 
             // [STAGE: (SR)]
-            this.receivedMsgStorer._store_received_xxx_r_ticket(receivedRTicket);
+            this.receivedMsgStorer.storeReceivedXxxRTicket(receivedRTicket);
 
             if (Objects.equals(receivedRTicket.getRTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
                 || Objects.equals(receivedRTicket.getRTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)
@@ -346,15 +346,14 @@ public class FlowApplyUTicket {
                 UTicket storedUTicket = this.msgVerifier._classify_u_ticket_is_defined_type(storedUTicketJson);
 
                 // [STAGE: (VRT)]
-                this.msgVerifier.verify_u_ticket_has_executed_through_r_ticket(
-                    receivedRTicket, storedUTicket, null);
+                this.msgVerifier.verify_u_ticket_has_executed_through_r_ticket(receivedRTicket, storedUTicket, null);
 
                 //[STAGE: (E)(O)]
-                this.executor._execute_xxx_r_ticket(receivedRTicket, "holder-or-device");
+                this.executor.executeXxxRTicket(receivedRTicket, "holder-or-device");
                 this.sharedData.setResultMessage("-> SUCCESS: VERIFY_UT_HAS_EXECUTED");
 
                 // [STAGE: (C)]
-                this.executor._change_state(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT);
+                this.executor.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT);
             } else {
                 // pragma: no cover -> TODO: Revocation UTicket
                 // Query Corresponding UTicket(s)
@@ -376,7 +375,7 @@ public class FlowApplyUTicket {
             ////////////////////////////////////////////////////////////////////////
             // Start Comm Measurement
             ////////////////////////////////////////////////////////////////////////
-            if (!Objects.equals(this.sharedData.getThisDevice().getDeviceName(), "iot_device")) {
+            if (!Objects.equals(this.sharedData.getThisDevice().getDeviceName(), "iotDevice")) {
                 this.measureHelper.measureCommPerfStart();
             }
         }

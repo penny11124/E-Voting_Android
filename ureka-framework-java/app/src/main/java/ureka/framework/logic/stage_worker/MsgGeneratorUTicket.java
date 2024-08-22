@@ -5,10 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.util.Map;
 import java.util.Objects;
@@ -88,8 +84,7 @@ public class MsgGeneratorUTicket {
         byte[] signatureByte;
         try {
             signatureByte = ECC.signSignature(unsignedUTicketByte, privateKey);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException |
-                 SignatureException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
