@@ -101,7 +101,7 @@ public class UTicket {
         return uTicketType;
     }
 
-    public void setuTicketType(String uTicketType) {
+    public void setUTicketType(String uTicketType) {
         this.uTicketType = uTicketType;
     }
 
