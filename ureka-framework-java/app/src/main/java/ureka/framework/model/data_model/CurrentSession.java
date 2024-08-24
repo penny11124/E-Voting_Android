@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import java.util.Map;
 
 public class CurrentSession {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     // Access UT
     private String currentUTicketId;
     private String currentDeviceId;
@@ -206,12 +207,10 @@ public class CurrentSession {
     }
 
     public static String currentSessionToJsonstr(CurrentSession currentSession) {
-        Gson gson = new GsonBuilder().serializeNulls().create();
         return gson.toJson(currentSession);
     }
 
     public static CurrentSession jsonstrToCurrentSession(String json) {
-        Gson gson = new GsonBuilder().create();
         try {
             return gson.fromJson(json, CurrentSession.class);
         } catch (Exception e) {

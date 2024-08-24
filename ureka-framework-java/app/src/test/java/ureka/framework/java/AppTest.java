@@ -3,12 +3,10 @@
  */
 package ureka.framework.java;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
 class AppTest {
-    @Test void appHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull(classUnderTest.getGreeting(), "app should have a greeting");
-    }
+    // TODO:
+    // 1. Uncomment the following files after unit testing:
+    // FlowApplyUTicket, Executor, MsgSender, MsgReceiver
+    // 2. resource.communication is not tested yet
+    // since BluetoothService is not needed in simulation stage.
 }

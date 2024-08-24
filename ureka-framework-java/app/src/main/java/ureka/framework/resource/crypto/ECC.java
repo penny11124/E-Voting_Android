@@ -47,9 +47,9 @@ public class ECC {
     // Sign ECC Signature
     //////////////////////////////////////////////////////
     public static byte[] signSignature(byte[] message, ECPrivateKey privateKey) throws Exception {
-        return SimpleMeasurer.measureResourceFunc(ECC::_sign_signature, message, privateKey);
+        return SimpleMeasurer.measureResourceFunc(ECC::_signSignature, message, privateKey);
     }
-    private static byte[] _sign_signature(byte[] message, ECPrivateKey privateKey)
+    private static byte[] _signSignature(byte[] message, ECPrivateKey privateKey)
             throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
         Signature signer = Signature.getInstance("SHA256withECDSA", "BC");
         signer.initSign(privateKey);
@@ -60,13 +60,8 @@ public class ECC {
     //////////////////////////////////////////////////////
     // Verify ECC Signature
     //////////////////////////////////////////////////////
-    public static boolean verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey)
-        throws NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
-        try {
-            return SimpleMeasurer.measureResourceFunc(ECC::_verifySignature, signatureIn, messageIn, publicKey);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public static boolean verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey) throws Exception {
+        return SimpleMeasurer.measureResourceFunc(ECC::_verifySignature, signatureIn, messageIn, publicKey);
     }
     private static boolean _verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey)
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {

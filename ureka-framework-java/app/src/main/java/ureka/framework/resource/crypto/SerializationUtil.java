@@ -103,10 +103,10 @@ public class SerializationUtil {
         }
     }
 
-    public static ECPublicKey strToKey(String keyStr, String keyType) {
-        return (ECPublicKey) _byteToKey(base64StrBackToByte(keyStr), keyType);
+    public static Object strToKey(String keyStr, String keyType) {
+        return _byteToKey(base64StrBackToByte(keyStr), keyType);
     }
-    public static ECPublicKey strToKey(String keyStr) {
-        return (ECPublicKey) _byteToKey(base64StrBackToByte(keyStr), "eccPublicKey");
+    public static Object strToKey(String keyStr) {
+        return _byteToKey(base64StrBackToByte(keyStr), "ecc-public-key");
     }
 }

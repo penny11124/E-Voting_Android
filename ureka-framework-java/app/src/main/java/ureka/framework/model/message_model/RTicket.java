@@ -9,6 +9,7 @@ import com.google.gson.GsonBuilder;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 public class RTicket {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     //////////////////////////////////////////////////////
     // Message Type
     //////////////////////////////////////////////////////
@@ -268,12 +269,10 @@ public class RTicket {
         return SimpleMeasurer.measureWorkerFunc(RTicket::_rTicketToJsonStr, rTicket);
     }
     private static String _rTicketToJsonStr(RTicket rTicket) {
-        Gson gson = new GsonBuilder().serializeNulls().create();
         return gson.toJson(rTicket);
     }
 
     public static RTicket jsonStrToRTicket(String json) {
-        Gson gson = new GsonBuilder().create();
         try {
             return gson.fromJson(json, RTicket.class);
         } catch (Exception e) {

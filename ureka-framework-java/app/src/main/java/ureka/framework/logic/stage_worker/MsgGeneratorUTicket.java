@@ -86,6 +86,8 @@ public class MsgGeneratorUTicket {
             signatureByte = ECC.signSignature(unsignedUTicketByte, privateKey);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         // Add Signature on New Signed UTicket, but Prevent side effect on Unsigned UTicket

@@ -35,7 +35,7 @@ public class ECDH {
 
     //////////////////////////////////////////////////////
     // Random Number Generation
-    // pyca/cryptography recommends using operating system’s provided random number generator
+    // pyca/cryptography recommends using operating system's provided random number generator
     //////////////////////////////////////////////////////
     public static byte[] generateRandomByte(int bytesNum) throws Exception {
         return SimpleMeasurer.measureResourceFunc(ECDH::_generateRandomByte, bytesNum);
@@ -84,7 +84,7 @@ public class ECDH {
     }
     private static String _generateSha256HashStr(String messageStr)
         throws NoSuchAlgorithmException, NoSuchProviderException {
-        byte[] messageBytes = SerializationUtil.strToByte(String.valueOf(StandardCharsets.UTF_8));
+        byte[] messageBytes = SerializationUtil.strToByte(messageStr);
         byte[] hashBytes = _generateSha256HashBytes(messageBytes);
         return SerializationUtil.byteToBase64Str(hashBytes);
     }

@@ -5,14 +5,19 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
 
+import java.lang.reflect.Field;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+import ureka.framework.model.message_model.Message;
+import ureka.framework.model.message_model.RTicket;
 import ureka.framework.resource.crypto.SerializationUtil;
 
 public class ThisDevice {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     // Device Type (can be refactored by Inheritance)
     public static final String IOT_DEVICE = "IOT_DEVICE";
     public static final String USER_AGENT_OR_CLOUD_SERVER = "USER_AGENT_OR_CLOUD_SERVER";
@@ -45,6 +50,30 @@ public class ThisDevice {
     private ECPublicKey ownerPubKey = null;
 
     public ThisDevice() {}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Class<?> thisDeviceClass = this.getClass();
+
+        for (Field field : thisDeviceClass.getDeclaredFields()) {
+            try {
+                Object value1 = field.get(this), value2 = field.get(obj);
+                if (value1 == null && value2 != null) {
+                    return false;
+                } else if (value1 != null && value2 == null) {
+                    return false;
+                } else if (value1 != null && !value1.equals(value2)) {
+                    return false;
+                }
+            } catch (IllegalAccessException e) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public String getDeviceType() {
         return deviceType;
@@ -126,97 +155,83 @@ public class ThisDevice {
         this.ownerPubKey = ownerPubKey;
     }
 
-    private static Map<String, String> _thisDeviceToMap(ThisDevice thisDevice) {
-        Map<String, String> thisDeviceDict = new HashMap<>();
+    public static Map<String, String> _thisDeviceToMap(ThisDevice thisDevice) throws IllegalAccessException {
+        Map<String, String> thisDeviceMap = new HashMap<>();
+        Class<?> otherDeviceClass = thisDevice.getClass();
 
-        thisDeviceDict.put("deviceType", thisDevice.getDeviceType());
-        thisDeviceDict.put("deviceName", thisDevice.getDeviceName());
-        thisDeviceDict.put("hasDeviceType", String.valueOf(thisDevice.getHasDeviceType()));
-        if (thisDevice.getTicketOrder() == null) {
-            thisDeviceDict.put("ticketOrder", null);
-        } else {
-            thisDeviceDict.put("ticketOrder",thisDevice.getTicketOrder().toString());
-        }
+        for (Field field : otherDeviceClass.getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                Object value = field.get(thisDevice);
 
-        if (thisDevice.getDevicePrivKey() == null) {
-            thisDeviceDict.put("devicePrivKey", null);
-        } else {
-            thisDeviceDict.put("devicePrivKey", SerializationUtil.keyToStr(thisDevice.getDevicePrivKey(), "eccPrivateKey"));
+                if (value != null) {
+                    if (field.getType().equals(Integer.class)) {
+                        thisDeviceMap.put(field.getName(), value.toString());
+                    } else if (field.getType().equals(String.class)) {
+                        thisDeviceMap.put(field.getName(), (String) value);
+                    } else if (field.getType().equals(ECPrivateKey.class)) {
+                        thisDeviceMap.put(field.getName(), SerializationUtil.keyToStr(value));
+                    } else if (field.getType().equals(ECPublicKey.class)) {
+                        thisDeviceMap.put(field.getName(), SerializationUtil.keyToStr(value));
+                    }
+                } else {
+                    thisDeviceMap.put(field.getName(), null);
+                }
+            } catch (IllegalAccessException e) {
+                String failureMsg = "ThisDevice._thisDeviceToMap: IllegalAccessException occurs.";
+                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                throw e;
+            }
         }
-        if (thisDevice.getDevicePubKey() == null) {
-            thisDeviceDict.put("devicePubKey", null);
-        } else {
-            thisDeviceDict.put("devicePubKey", SerializationUtil.keyToStr(thisDevice.getDevicePubKey(), "eccPublicKey"));
-        }
-        if (thisDevice.getOwnerPubKey() == null) {
-            thisDeviceDict.put("ownerPubKey", null);
-        } else {
-            thisDeviceDict.put("ownerPubKey", SerializationUtil.keyToStr(thisDevice.getOwnerPubKey(), "eccPublicKey"));
-        }
-
-        return thisDeviceDict;
+        return thisDeviceMap;
     }
 
-    public static ThisDevice _mapToThisDevice(Map<String, String> thisDeviceDict) {
+    public static ThisDevice _mapToThisDevice(Map<String, String> thisDeviceMap)
+        throws NoSuchFieldException, IllegalAccessException {
         ThisDevice thisDevice = new ThisDevice();
+      
+        Class<?> thisDeviceClass = thisDevice.getClass();
 
-        thisDevice.setDeviceType(thisDeviceDict.get("deviceType"));
-        thisDevice.setDeviceName(thisDeviceDict.get("deviceName"));
-        thisDevice.setHasDeviceType(Boolean.parseBoolean(thisDeviceDict.get("hasDeviceType")));
-        if (thisDeviceDict.get("ticketOrder") == null) {
-            thisDevice.setTicketOrder(null);
-        } else {
-            thisDevice.setTicketOrder(Integer.parseInt(thisDeviceDict.get(("ticketOrder"))));
-        }
+        for (Map.Entry<String, String> entry : thisDeviceMap.entrySet()) {
+            try {
+                Field field = thisDeviceClass.getDeclaredField(entry.getKey());
+                field.setAccessible(true);
 
-        if (thisDeviceDict.get("devicePrivKey") == null) {
-            thisDevice.setDevicePrivKey(null);
-        } else {
-            thisDevice.setDevicePrivKey((ECPrivateKey) SerializationUtil.strToKey(thisDeviceDict.get("devicePrivKey"), "eccPrivateKey"));
+                String value = entry.getValue();
+                if (value == null) {
+                    field.set(thisDevice, null);
+                } else if (field.getType().equals(String.class)) {
+                    field.set(thisDevice, value);
+                } else if (field.getType().equals(Integer.class)) {
+                    field.set(thisDevice, Integer.valueOf(value));
+                } else if (field.getType().equals(ECPrivateKey.class)) {
+                    field.set(thisDevice, SerializationUtil.strToKey(value, "ecc-private-key"));
+                } else if (field.getType().equals(ECPublicKey.class)) {
+                    field.set(thisDevice, SerializationUtil.strToKey(value, "ecc-public-key"));
+                }
+            } catch (NoSuchFieldException e) {
+                String failureMsg = "ThisDevice._mapToThisDevice: NoSuchFieldException occurs.";
+                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                throw e;
+            } catch (IllegalAccessException e) {
+                String failureMsg = "ThisDevice._mapToThisDevice: IllegalAccessException occurs.";
+                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                throw e;
+            }
         }
-        if (thisDeviceDict.get("devicePubKey") == null) {
-            thisDevice.setDevicePubKey(null);
-        } else {
-            thisDevice.setDevicePubKey((ECPublicKey) SerializationUtil.strToKey(thisDeviceDict.get("devicePubKey"), "eccPublicKey"));
-        }
-        if (thisDeviceDict.get("ownerPubKey") == null) {
-            thisDevice.setOwnerPubKey(null);
-        } else {
-            thisDevice.setOwnerPubKey((ECPublicKey) SerializationUtil.strToKey(thisDeviceDict.get("ownerPubKey"), "eccPublicKey"));
-        }
-
         return thisDevice;
     }
 
     public static String thisDeviceToJsonstr(ThisDevice thisDevice) {
-        Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .registerTypeAdapter(ThisDevice.class, (JsonSerializer<ThisDevice>) (src, typeOfSrc, context) -> {
-                return context.serialize(_thisDeviceToMap(src));
-            })
-            .create();
-
+        // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
         return gson.toJson(thisDevice);
     }
 
     public static ThisDevice jsonStrToThisDevice(String jsonStr) {
-        Gson gson = new GsonBuilder()
-            .registerTypeAdapter(ThisDevice.class, (JsonDeserializer<ThisDevice>) (json, typeOfT, context) -> {
-                Map<String, String> map = context.deserialize(json, Map.class);
-                try {
-                    return _mapToThisDevice(map);
-                } catch (Exception e) {
-                    String failureMsg = "NOT VALID JSON or VALID SCHEMA";
-                    // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-                    throw new RuntimeException(failureMsg);
-                }
-            })
-            .create();
-
         try {
             return gson.fromJson(jsonStr, ThisDevice.class);
         } catch (Exception e) {
-            String failureMsg = "NOT VALID JSON or VALID SCHEMA";
+            String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
             // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
             throw new RuntimeException(failureMsg);
         }

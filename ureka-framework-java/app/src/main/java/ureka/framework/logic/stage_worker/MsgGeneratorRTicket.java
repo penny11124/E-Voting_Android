@@ -114,6 +114,8 @@ public class MsgGeneratorRTicket {
             signatureByte = ECC.signSignature(unsignedRTicketByte, privateKey);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         // Add Signature on New Signed RTicket, but Prevent side effect on Unsigned RTicket
