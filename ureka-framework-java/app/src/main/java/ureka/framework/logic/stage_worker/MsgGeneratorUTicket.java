@@ -91,6 +91,8 @@ public class MsgGeneratorUTicket {
         } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException |
                  SignatureException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         // Add Signature on New Signed UTicket, but Prevent side effect on Unsigned UTicket

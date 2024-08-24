@@ -39,7 +39,7 @@ public class MsgSender {
         }
     }
 
-    // Resource (Bluetooth Comm)
+//    // Resource (Bluetooth Comm)
     public void startBluetoothComm() {
         this.sharedData.setBluetoothCommCompletedFlag(false);
     }

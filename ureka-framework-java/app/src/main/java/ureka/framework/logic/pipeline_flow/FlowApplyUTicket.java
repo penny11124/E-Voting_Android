@@ -115,13 +115,13 @@ public class FlowApplyUTicket {
         this.flowOpenSession = flowOpenSession;
     }
 
-    //////////////////////////////////////////////////////
-    // [PIPELINE FLOW]
-    //
-    // APY (No CR):
-    // holderApplyUTicket() -> _deviceRecvUTicket()
-    // _holderRecvRTicket() <- _deviceSendRTicket()
-    //////////////////////////////////////////////////////
+//    //////////////////////////////////////////////////////
+//    // [PIPELINE FLOW]
+//    //
+//    // APY (No CR):
+//    // holderApplyUTicket() -> _deviceRecvUTicket()
+//    // _holderRecvRTicket() <- _deviceSendRTicket()
+//    //////////////////////////////////////////////////////
     void holderApplyUTicket(String deviceId) {
         holderApplyUTicket(deviceId, "");
     }

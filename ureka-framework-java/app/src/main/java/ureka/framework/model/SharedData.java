@@ -7,6 +7,7 @@ import ureka.framework.model.data_model.CurrentSession;
 import ureka.framework.model.data_model.OtherDevice;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.data_model.ThisPerson;
+import ureka.framework.resource.communication.bluetooth.BluetoothService;
 import ureka.framework.resource.communication.simulated_comm.SimulatedCommChannel;
 
 public class SharedData {
@@ -32,9 +33,9 @@ public class SharedData {
     private Boolean simulatedCommCompletedFlag = null;
 
     // Resource (Bluetooth Comm)
-    private AcceptSocket acceptSocket = null;
-    private ConnectingWorker connectingWorker = null;
-    private ConnectionSocket connectionSocket = null;
+    private BluetoothService.AcceptSocket acceptSocket = null;
+    private BluetoothService.ConnectingWorker connectingWorker = null;
+    private BluetoothService.ConnectionSocket connectionSocket = null;
     private Boolean bluetoothCommCompletedFlag = null;
 
     public ThisDevice getThisDevice() {
@@ -117,11 +118,11 @@ public class SharedData {
         this.simulatedCommReceiverThread = simulatedCommReceiverThread;
     }
 
-    public AcceptSocket getAcceptSocket() {
+    public BluetoothService.AcceptSocket getAcceptSocket() {
         return acceptSocket;
     }
 
-    public void setAcceptSocket(AcceptSocket acceptSocket) {
+    public void setAcceptSocket(BluetoothService.AcceptSocket acceptSocket) {
         this.acceptSocket = acceptSocket;
     }
 
@@ -133,19 +134,19 @@ public class SharedData {
         this.simulatedCommCompletedFlag = simulatedCommCompletedFlag;
     }
 
-    public ConnectingWorker getConnectingWorker() {
+    public BluetoothService.ConnectingWorker getConnectingWorker() {
         return connectingWorker;
     }
 
-    public void setConnectingWorker(ConnectingWorker connectingWorker) {
+    public void setConnectingWorker(BluetoothService.ConnectingWorker connectingWorker) {
         this.connectingWorker = connectingWorker;
     }
 
-    public ConnectionSocket getConnectionSocket() {
+    public BluetoothService.ConnectionSocket getConnectionSocket() {
         return connectionSocket;
     }
 
-    public void setConnectionSocket(ConnectionSocket connectionSocket) {
+    public void setConnectionSocket(BluetoothService.ConnectionSocket connectionSocket) {
         this.connectionSocket = connectionSocket;
     }
 

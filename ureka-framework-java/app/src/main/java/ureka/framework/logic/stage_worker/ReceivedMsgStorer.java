@@ -118,5 +118,4 @@ public class ReceivedMsgStorer {
             throw new RuntimeException("Shouldn't Reach Here", e);
         }
     }
-    }
 }

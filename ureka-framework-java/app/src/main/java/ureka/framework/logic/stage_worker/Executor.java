@@ -24,8 +24,8 @@ public class Executor {
         this.msgVerifier = msgVerifier;
     }
 
-    // [STAGE: (E)] Execute
-    // Initialize state based on device type
+//    // [STAGE: (E)] Execute
+//    // Initialize state based on device type
     public boolean initializeState() {
         // [STAGE: (C)]
         if(this.sharedData.getThisDevice().getDeviceType().equals(ThisDevice.IOT_DEVICE)) {

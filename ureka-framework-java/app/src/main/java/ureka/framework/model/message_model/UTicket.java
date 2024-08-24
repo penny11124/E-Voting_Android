@@ -1,5 +1,6 @@
 package ureka.framework.model.message_model;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
@@ -9,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 public class UTicket {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     //////////////////////////////////////////////////////
     // Protocol Version
     //////////////////////////////////////////////////////
@@ -71,11 +73,24 @@ public class UTicket {
         this.gcmAuthenticationTagCmd = values.getOrDefault("gcmAuthenticationTagCmd", null);
         this.ivData = values.getOrDefault("ivData", null);
     }
+    public UTicket(UTicket uTicket) {
+        Class<?> uTicketClass = this.getClass();
+
+        for (Field field : uTicketClass.getDeclaredFields()) {
+            try {
+                field.setAccessible(true);
+                Object value = field.get(uTicket);
+                field.set(this, value);
+            } catch (IllegalAccessException e) {
+                String failure_msg = "UTicket copy constructor: IllegalAccessException.";
+                throw new RuntimeException(failure_msg);
+            }
+        }
+    }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof UTicket) {
-            UTicket ut = (UTicket) obj;
+        if (obj instanceof UTicket ut) {
             return Objects.equals(this.uTicketId, ut.uTicketId);
         }
         return false;
@@ -181,12 +196,10 @@ public class UTicket {
         return SimpleMeasurer.measureWorkerFunc(UTicket::_uTicketToJsonStr, uTicket);
     }
     private static String _uTicketToJsonStr(UTicket uTicket) {
-        Gson gson = new GsonBuilder().serializeNulls().create();
         return gson.toJson(uTicket);
     }
 
     public static UTicket jsonStrToUTicket(String json) {
-        Gson gson = new GsonBuilder().create();
         try {
             return gson.fromJson(json, UTicket.class);
         } catch (Exception e) {

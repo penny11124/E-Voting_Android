@@ -3,9 +3,12 @@ package ureka.framework.model.message_model;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Objects;
 
 public class Message {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     //////////////////////////////////////////////////////
     // Message Operation
     //////////////////////////////////////////////////////
@@ -16,10 +19,35 @@ public class Message {
     private String messageType;
     private String messageStr;
 
+    public Message() {}
     public Message(Map<String, String> values) {
         this.messageOperation = values.getOrDefault("messageOperation", null);
         this.messageType = values.getOrDefault("messageType", null);
         this.messageStr = values.getOrDefault("messageStr", null);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Class<?> messageClass = this.getClass();
+
+        for (Field field : messageClass.getDeclaredFields()) {
+            try {
+                Object value1 = field.get(this), value2 = field.get(obj);
+                if (value1 == null && value2 != null) {
+                    return false;
+                } else if (value1 != null && value2 == null) {
+                    return false;
+                } else if (value1 != null && !value1.equals(value2)) {
+                    return false;
+                }
+            } catch (IllegalAccessException e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getMessageOperation() {
@@ -47,12 +75,10 @@ public class Message {
     }
 
     public static String messageToJsonstr(Message messageObj) {
-        Gson gson = new GsonBuilder().serializeNulls().create();
         return gson.toJson(messageObj);
     }
 
     public static Message jsonstrToMessage(String json) {
-        Gson gson = new GsonBuilder().create();
         try {
             return gson.fromJson(json, Message.class);
         } catch (Exception e) {

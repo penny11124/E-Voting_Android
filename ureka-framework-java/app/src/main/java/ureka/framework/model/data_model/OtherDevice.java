@@ -10,7 +10,12 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.crypto.dsig.SignatureMethod;
+
+import ureka.framework.resource.logger.SimpleLogger;
+
 public class OtherDevice {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     private String deviceId = null;
     private Integer ticketOrder = null;
     // URequest, UTicket, UReject, etc.
@@ -38,6 +43,30 @@ public class OtherDevice {
     public OtherDevice(String deviceId, String deviceUTicketForOwner) {
         this.deviceId = deviceId;
         this.deviceUTicketForOwner = deviceUTicketForOwner;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Class<?> otherDeviceClass = this.getClass();
+
+        for (Field field : otherDeviceClass.getDeclaredFields()) {
+            try {
+                Object value1 = field.get(this), value2 = field.get(obj);
+                if (value1 == null && value2 != null) {
+                    return false;
+                } else if (value1 != null && value2 == null) {
+                    return false;
+                } else if (value1 != null && !value1.equals(value2)) {
+                    return false;
+                }
+            } catch (IllegalAccessException e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getDeviceId() {
@@ -104,64 +133,80 @@ public class OtherDevice {
         this.deviceAccessEndRTicketForOthers = deviceAccessEndRTicketForOthers;
     }
 
-    public Map<String, String> _otherDeviceToMap() {
+    public static Map<String, String> _otherDeviceToMap(OtherDevice otherDevice) throws IllegalAccessException {
         Map<String, String> otherDeviceMap = new HashMap<>();
-        Field[] fields = OtherDevice.class.getDeclaredFields();
-        for (Field field : fields) {
+        Class<?> otherDeviceClass = otherDevice.getClass();
+
+        for (Field field : otherDeviceClass.getDeclaredFields()) {
             try {
-                field.setAccessible(true); // Ensure private fields are accessible
-                Object value = field.get(this);
-                otherDeviceMap.put(field.getName(), value != null ? value.toString() : null);
+                field.setAccessible(true);
+                Object value = field.get(otherDevice);
+
+                if (value != null) {
+                    if (field.getType().equals(Integer.class)) {
+                        otherDeviceMap.put(field.getName(), value.toString());
+                    } else if (field.getType().equals(String.class)) {
+                        otherDeviceMap.put(field.getName(), (String) value);
+                    }
+                } else {
+                    otherDeviceMap.put(field.getName(), null);
+                }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                String failureMsg = "OtherDevice._otherDeviceToMap: IllegalAccessException occurs.";
+                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                throw e;
             }
         }
+
         return otherDeviceMap;
     }
 
-    public static OtherDevice _mapToOtherDevice(Map<String, String> otherDeviceMap) {
+    public static OtherDevice _mapToOtherDevice(Map<String, String> otherDeviceMap)
+        throws NoSuchFieldException, IllegalAccessException {
         OtherDevice otherDevice = new OtherDevice();
-        Field[] fields = OtherDevice.class.getDeclaredFields();
-        for (Field field : fields) {
-            if (otherDeviceMap.containsKey(field.getName())) {
-                try {
-                    field.setAccessible(true);
-                    Object value = otherDeviceMap.get(field.getName());
-                    if (field.getType() == Integer.class) {
-                        value = Integer.valueOf((String) value);
-                    }
+        Class<?> otherDeviceClass = otherDevice.getClass();
+
+        for (Map.Entry<String, String> entry : otherDeviceMap.entrySet()) {
+            try {
+                Field field = otherDeviceClass.getDeclaredField(entry.getKey());
+                field.setAccessible(true);
+
+                String value = entry.getValue();
+                if (value == null) {
+                    field.set(otherDevice, null);
+                } else if (field.getType().equals(String.class)) {
                     field.set(otherDevice, value);
-                } catch (IllegalAccessException | IllegalArgumentException e) {
-                    e.printStackTrace();
+                } else if (field.getType().equals(Integer.class)) {
+                    field.set(otherDevice, Integer.valueOf(value));
                 }
+            } catch (NoSuchFieldException e) {
+                String failureMsg = "OtherDevice._mapToOtherDevice: NoSuchFieldException occurs.";
+                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                throw e;
+            } catch (IllegalAccessException e) {
+                String failureMsg = "OtherDevice._mapToOtherDevice: IllegalAccessException occurs.";
+                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                throw e;
             }
         }
+
         return otherDevice;
     }
 
     public static String deviceTableToJsonstr(Map<String, OtherDevice> otherDeviceMap) {
-        Map<String, Map<String, String>> convertedMap = new HashMap<>();
-        for (Map.Entry<String, OtherDevice> entry : otherDeviceMap.entrySet()) {
-            convertedMap.put(entry.getKey(), entry.getValue()._otherDeviceToMap());
-        }
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(convertedMap);
+        // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
+        return gson.toJson(otherDeviceMap);
     }
 
     public static Map<String, OtherDevice> jsonstrToDeviceTable(String jsonStr) {
-        Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, Map<String, Object>>>() {}.getType();
+        Type mapType = new TypeToken<Map<String, OtherDevice>>(){}.getType();
+
         try {
-            Map<String, Map<String, String>> rawMap = gson.fromJson(jsonStr, type);
-            Map<String, OtherDevice> deviceTable = new HashMap<>();
-            for (Map.Entry<String, Map<String, String>> entry : rawMap.entrySet()) {
-                deviceTable.put(entry.getKey(), OtherDevice._mapToOtherDevice(entry.getValue()));
-            }
-            return deviceTable;
+            return gson.fromJson(jsonStr, mapType);
         } catch (JsonParseException e) {
-            String failureMsg = "NOT VALID JSON or VALID SCHEMA";
+            String failureMsg = "OtherDevice._mapToOtherDevice: NoSuchFieldException occurs.";
             // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw new RuntimeException(failureMsg);
+            throw e;
         }
     }
 }

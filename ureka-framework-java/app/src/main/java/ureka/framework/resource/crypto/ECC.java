@@ -46,21 +46,8 @@ public class ECC {
     //////////////////////////////////////////////////////
     // Sign ECC Signature
     //////////////////////////////////////////////////////
-    public static byte[] signSignature(byte[] message, ECPrivateKey privateKey)
-        throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
-        return SimpleMeasurer.measureWorkerFunc((message1, privateKey1) -> {
-            try {
-                _signSignature(message1, privateKey1);
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchProviderException e) {
-                throw new RuntimeException(e);
-            } catch (InvalidKeyException e) {
-                throw new RuntimeException(e);
-            } catch (SignatureException e) {
-                throw new RuntimeException(e);
-            }
-        }, message, privateKey);
+    public static byte[] signSignature(byte[] message, ECPrivateKey privateKey) throws Exception {
+        return SimpleMeasurer.measureResourceFunc(ECC::_signSignature, message, privateKey);
     }
     private static byte[] _signSignature(byte[] message, ECPrivateKey privateKey)
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
@@ -73,9 +60,8 @@ public class ECC {
     //////////////////////////////////////////////////////
     // Verify ECC Signature
     //////////////////////////////////////////////////////
-    public static boolean verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey)
-        throws NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
-        return SimpleMeasurer.measureWorkerFunc(ECC::_verifySignature, signatureIn, messageIn, publicKey);
+    public static boolean verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey) throws Exception {
+        return SimpleMeasurer.measureResourceFunc(ECC::_verifySignature, signatureIn, messageIn, publicKey);
     }
     private static boolean _verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey)
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
