@@ -112,8 +112,7 @@ public class MsgGeneratorRTicket {
         byte[] signatureByte;
         try {
             signatureByte = ECC.signSignature(unsignedRTicketByte, privateKey);
-        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException |
-                 SignatureException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);

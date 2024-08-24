@@ -158,12 +158,12 @@ public class MsgReceiver implements Runnable{
                 // IOT_DEVICE
                 String state = this.sharedData.getState();
                 if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_UT)) {
-                    this.flowApplyUTicket._device_recv_u_ticket(receivedMessage);
+                    this.flowApplyUTicket._deviceRecvUTicket((UTicket) receivedMessage);
                 } else if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_CRKE2)) {
-                    this.flowOpenSession._device_recv_cr_ke_2(receivedMessage);
+                    this.flowOpenSession._deviceRecvCrKe2((RTicket) receivedMessage);
                     SimpleLogger.simpleLog("cli", "plaintextCmd in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextCmd());
                 } else if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_CMD)) {
-                    this.flowIssueUToken._device_recv_cmd(receivedMessage);
+                    this.flowIssueUToken._deviceRecvCmd((UTicket) receivedMessage);
                     SimpleLogger.simpleLog("cli", "plaintextCmd in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextCmd());
                 }
                 // USER_AGENT_OR_CLOUD_SERVER
@@ -174,15 +174,15 @@ public class MsgReceiver implements Runnable{
                         this.flowIssueUTicket._issuer_recv_r_ticket(receivedMessage);
                     }
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_RT)) {
-                    this.flowApplyUTicket._holder_recv_r_ticket(receivedMessage);
+                    this.flowApplyUTicket._holderRecvRTicket(receivedMessage);
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE1)) {
-                    this.flowOpenSession._holder_recv_cr_ke_1(receivedMessage);
+                    this.flowOpenSession._holderRecvCrKe1(receivedMessage);
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE3)) {
-                    this.flowOpenSession._holder_recv_cr_ke_3(receivedMessage);
+                    this.flowOpenSession._holderRecvCrKe3(receivedMessage);
                     SimpleLogger.simpleLog("cli", "plaintextData in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextData());
                     SimpleLogger.simpleLog("cli", "+++Session is Constructed+++");
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_DATA)) {
-                    this.flowIssueUToken._holder_recv_data(receivedMessage);
+                    this.flowIssueUToken._holderRecvData(receivedMessage);
                     SimpleLogger.simpleLog("cli", "plaintextData in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextData());
                 } else { // pragma: no cover -> Shouldn't Reach Here
                     throw new RuntimeException("Shouldn't Reach Here");

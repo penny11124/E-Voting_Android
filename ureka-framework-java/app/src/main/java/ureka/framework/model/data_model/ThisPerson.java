@@ -53,7 +53,7 @@ public class ThisPerson {
         if (this.personPrivKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.personPrivKey, "ecc-private-key");
+        return SerializationUtil.keyToStr(this.personPrivKey, "eccPrivateKey");
     }
 
     public void setPersonPrivKey(ECPrivateKey personPrivKey) {
@@ -69,7 +69,7 @@ public class ThisPerson {
         if (this.personPubKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.personPubKey, "ecc-public-key");
+        return SerializationUtil.keyToStr(this.personPubKey, "eccPublicKey");
     }
 
     public void setPersonPubKey(ECPublicKey personPubKey) {

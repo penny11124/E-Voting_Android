@@ -50,7 +50,7 @@ public class ECC {
         return SimpleMeasurer.measureResourceFunc(ECC::_signSignature, message, privateKey);
     }
     private static byte[] _signSignature(byte[] message, ECPrivateKey privateKey)
-        throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
+            throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
         Signature signer = Signature.getInstance("SHA256withECDSA", "BC");
         signer.initSign(privateKey);
         signer.update(message);

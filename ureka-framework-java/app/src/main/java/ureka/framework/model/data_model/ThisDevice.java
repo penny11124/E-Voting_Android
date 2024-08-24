@@ -116,7 +116,7 @@ public class ThisDevice {
         if (this.devicePrivKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.devicePrivKey, "ecc-private-key");
+        return SerializationUtil.keyToStr(this.devicePrivKey, "eccPrivateKey");
     }
 
     public void setDevicePrivKey(ECPrivateKey devicePrivKey) {
@@ -132,7 +132,7 @@ public class ThisDevice {
         if (this.devicePubKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.devicePubKey, "ecc-public-key");
+        return SerializationUtil.keyToStr(this.devicePubKey, "eccPublicKey");
     }
 
     public void setDevicePubKey(ECPublicKey devicePubKey) {
@@ -148,7 +148,7 @@ public class ThisDevice {
         if (this.devicePrivKey == null) {
             return null;
         }
-        return SerializationUtil.keyToStr(this.ownerPubKey, "ecc-public-key");
+        return SerializationUtil.keyToStr(this.ownerPubKey, "eccPublicKey");
     }
 
     public void setOwnerPubKey(ECPublicKey ownerPubKey) {
@@ -189,6 +189,7 @@ public class ThisDevice {
     public static ThisDevice _mapToThisDevice(Map<String, String> thisDeviceMap)
         throws NoSuchFieldException, IllegalAccessException {
         ThisDevice thisDevice = new ThisDevice();
+      
         Class<?> thisDeviceClass = thisDevice.getClass();
 
         for (Map.Entry<String, String> entry : thisDeviceMap.entrySet()) {

@@ -67,7 +67,7 @@ public class MsgSender {
     public void sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) {
         SimpleMeasurer.measureWorkerFunc(this::_sendXxxMessage, messageOperation, messageType, sentMessageJson); // something to fixed
     }
-    public void _sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws Exception {
+    private void _sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws Exception {
         // Generate Message
         if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) ||
                 messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&

@@ -105,7 +105,7 @@ public class RTicket {
         this.protocolVersion = protocolVersion;
     }
 
-    public String getrTicketId() {
+    public String getRTicketId() {
         return rTicketId;
     }
 
@@ -117,7 +117,7 @@ public class RTicket {
         return rTicketType;
     }
 
-    public void setrTicketType(String rTicketType) {
+    public void setRTicketType(String rTicketType) {
         this.rTicketType = rTicketType;
     }
 
