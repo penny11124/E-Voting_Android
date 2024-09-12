@@ -11,12 +11,12 @@ public final class Pair {
         this.second = second;
     }
 
-    public Object first() {
-        return first;
+    public Object getPairFirst() {
+        return this.first;
     }
 
-    public Object second() {
-        return second;
+    public Object getPairSecond() {
+        return this.second;
     }
 
     @Override

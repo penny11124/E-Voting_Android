@@ -206,15 +206,15 @@ public class CurrentSession {
         this.gcmAuthenticationTagData = gcmAuthenticationTagData;
     }
 
-    public static String currentSessionToJsonstr(CurrentSession currentSession) {
+    public static String currentSessionToJsonStr(CurrentSession currentSession) {
         return gson.toJson(currentSession);
     }
 
-    public static CurrentSession jsonstrToCurrentSession(String json) {
+    public static CurrentSession jsonStrToCurrentSession(String json) {
         try {
             return gson.fromJson(json, CurrentSession.class);
         } catch (Exception e) {
-            String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
+            String failureMsg = "NOT VALID JSON or VALID R TICKET SCHEMA";
             // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
             throw new RuntimeException(failureMsg);
         }
