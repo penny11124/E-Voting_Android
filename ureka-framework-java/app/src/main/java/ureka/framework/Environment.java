@@ -6,14 +6,14 @@ public class Environment {
     //////////////////////////////////////////////////////
     // "TEST": Test Mode (e.g., logging, etc.)
     // "PRODUCTION": Production Mode (e.g., print, etc.)
-    public static final String DEPLOYMENT_ENV = "TEST";
+    public static String DEPLOYMENT_ENV = "TEST";
 
     //////////////////////////////////////////////////////
     // Communication Channel
     //////////////////////////////////////////////////////
     // "SIMULATED": Exchange message through shared memory
     // "BLUETOOTH": Exchange message through bluetooth communication
-    public static final String COMMUNICATION_CHANNEL = "SIMULATED";
+    public static String COMMUNICATION_CHANNEL = "SIMULATED";
 
     // "TEST": No Delay (complete tests faster)
     // "PRODUCTION": With Delay (make local simulation interactive)
@@ -32,11 +32,11 @@ public class Environment {
     //////////////////////////////////////////////////////
     // "OPEN": Print Log
     // "CLOSED": Not Print Log
-    public static final String DEBUG_LOG = "OPEN";
-    public static final String CLI_LOG = "OPEN";
-    public static final String MEASURE_LOG = "CLOSED";
-    public static final String MORE_MEASURE_WORKER_LOG = "CLOSED";
-    public static final String MORE_MEASURE_RESOURCE_LOG = "CLOSED";
+    public static String DEBUG_LOG = "OPEN";
+    public static String CLI_LOG = "OPEN";
+    public static String MEASURE_LOG = "CLOSED";
+    public static String MORE_MEASURE_WORKER_LOG = "CLOSED";
+    public static String MORE_MEASURE_RESOURCE_LOG = "CLOSED";
 
     //////////////////////////////////////////////////////
     // Measurement
