@@ -1,5 +1,7 @@
 package ureka.framework.model.message_model;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
 
@@ -65,28 +67,52 @@ public class RTicket {
     // RT
     private String deviceSignature;
 
+    public RTicket() {}
     public RTicket(Map<String, String> values) {
-        this.protocolVersion = values.getOrDefault("protocolVersion", UTicket.PROTOCOL_VERSION);
-        this.rTicketId = values.getOrDefault("rTicketId", null);
-        this.rTicketType = values.getOrDefault("rTicketType", null);
-        this.deviceId = values.getOrDefault("deviceId", null);
-        this.result = values.getOrDefault("result", null);
-        this.ticketOrder = Integer.valueOf(values.getOrDefault("ticketOrder", null));
-        this.auditStart = values.getOrDefault("auditStart", null);
-        this.auditEnd = values.getOrDefault("auditEnd", null);
-        this.challenge1 = values.getOrDefault("challenge1", null);
-        this.challenge2 = values.getOrDefault("challenge2", null);
-        this.keyExchangeSalt1 = values.getOrDefault("keyExchangeSalt1", null);
-        this.keyExchangeSalt2 = values.getOrDefault("keyExchangeSalt2", null);
-        this.associatedPlaintextCmd = values.getOrDefault("associatedPlaintextCmd", null);
-        this.ciphertextCmd = values.getOrDefault("ciphertextCmd", null);
-        this.ivCmd = values.getOrDefault("ivCmd", null);
-        this.gcmAuthenticationTagCmd = values.getOrDefault("gcmAuthenticationTagCmd", null);
-        this.associatedPlaintextData = values.getOrDefault("associatedPlaintextData", null);
-        this.ciphertextData = values.getOrDefault("ciphertextData", null);
-        this.ivData = values.getOrDefault("ivData", null);
-        this.gcmAuthenticationTagData = values.getOrDefault("gcmAuthenticationTagData", null);
-        this.deviceSignature = values.getOrDefault("deviceSignature", null);
+        Class<?> rTicketClass = this.getClass();
+
+        for (Field field : rTicketClass.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+
+            String fieldName = field.getName();
+            String fieldValue = values.get(fieldName);
+
+            try {
+                field.setAccessible(true);
+                if (field.getType().equals(Integer.class)) {
+                    field.set(this, fieldValue != null ? Integer.valueOf(fieldValue) : null);
+                } else {
+                    if (fieldName.equals("protocolVersion")) {
+                        field.set(this, fieldValue != null ? fieldValue : UTicket.PROTOCOL_VERSION);
+                    } else {
+                        field.set(this, fieldValue);
+                    }
+
+                }
+            } catch (IllegalAccessException e) {
+                String failureMsg = "UTicket Map constructor: IllegalAccessException.";
+                throw new RuntimeException(failureMsg, e);
+            }
+        }
+    }
+    public RTicket(RTicket rTicket) {
+        Class<?> rTicketClass = this.getClass();
+
+        for (Field field : rTicketClass.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
+                continue;
+            }
+            try {
+                field.setAccessible(true);
+                Object value = field.get(rTicket);
+                field.set(this, value);
+            } catch (IllegalAccessException e) {
+                String failure_msg = "RTicket copy constructor: IllegalAccessException.";
+                throw new RuntimeException(failure_msg);
+            }
+        }
     }
 
     @Override

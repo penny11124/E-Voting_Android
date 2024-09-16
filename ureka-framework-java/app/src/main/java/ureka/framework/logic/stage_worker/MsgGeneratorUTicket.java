@@ -65,7 +65,7 @@ public class MsgGeneratorUTicket {
             SimpleLogger.simpleLog("info", successMsg);
         } else if (Objects.equals(newUTicket.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET) ||
                 Objects.equals(newUTicket.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)) {
-            newUTicket =this._addIssuerSignatureOnUTicket(newUTicket, this.thisPerson.getPersonPrivKey());
+            newUTicket = this._addIssuerSignatureOnUTicket(newUTicket, this.thisPerson.getPersonPrivKey());
             SimpleLogger.simpleLog("info", successMsg);
         } else {
             throw new RuntimeException("Shouldn't Reach Here");
@@ -86,39 +86,37 @@ public class MsgGeneratorUTicket {
             signatureByte = ECC.signSignature(unsignedUTicketByte, privateKey);
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
 
         // Add Signature on New Signed UTicket, but Prevent side effect on Unsigned UTicket
-        UTicket signedUTicket;
-        try {
-            signedUTicket = deepCopy(unsignedUTicket);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        UTicket signedUTicket = new UTicket(unsignedUTicket);
+//        try {
+//            signedUTicket = deepCopy(unsignedUTicket);
+//        } catch (IOException | ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
         signedUTicket.setIssuerSignature(SerializationUtil.byteToBase64Str(signatureByte));
 
         return signedUTicket;
     }
 
-    private UTicket deepCopy(UTicket originalUTicket) throws IOException, ClassNotFoundException {
-        // Serialize to a byte array
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(originalUTicket);
-        oos.flush();
-        oos.close();
-        bos.close();
-
-        // Deserialize from byte array
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        UTicket copyUTicket = (UTicket) ois.readObject();
-        ois.close();
-        bis.close();
-
-        return copyUTicket;
-    }
+//    private UTicket deepCopy(UTicket originalUTicket) throws IOException, ClassNotFoundException {
+//        // Serialize to a byte array
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        ObjectOutputStream oos = new ObjectOutputStream(bos);
+//        oos.writeObject(originalUTicket);
+//        oos.flush();
+//        oos.close();
+//        bos.close();
+//
+//        // Deserialize from byte array
+//        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+//        ObjectInputStream ois = new ObjectInputStream(bis);
+//        UTicket copyUTicket = (UTicket) ois.readObject();
+//        ois.close();
+//        bis.close();
+//
+//        return copyUTicket;
+//    }
 
 }

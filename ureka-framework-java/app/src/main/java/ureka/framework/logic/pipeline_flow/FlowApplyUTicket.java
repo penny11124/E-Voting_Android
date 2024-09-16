@@ -137,7 +137,7 @@ public class FlowApplyUTicket {
             }
 
             // [STAGE: (VR)]
-            UTicket storedUTicket = this.msgVerifier._classify_u_ticket_is_defined_type(storedUTicketJson);
+            UTicket storedUTicket = this.msgVerifier._classifyUTicketIsDefinedType(storedUTicketJson);
 
             if (Objects.equals(storedUTicket.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
                 || Objects.equals(storedUTicket.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)) {
@@ -185,7 +185,7 @@ public class FlowApplyUTicket {
             // No need to optionally _store_received_xxx_u_ticket
 
             // [STAGE: (VUT)]
-            this.msgVerifier.verify_u_ticket_can_execute(receivedUTicket);
+            this.msgVerifier.verifyUTicketCanExecute(receivedUTicket);
             this.sharedData.setResultMessage("-> SUCCESS: VERIFY_UT_CAN_EXECUTE");
 
             // UT-RT
@@ -304,6 +304,8 @@ public class FlowApplyUTicket {
 
         } catch (RuntimeException e) {
             throw new RuntimeException("FlowApplyUTicket-_deviceSendRTicket: Unexpected error-2.");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
         // Manually Finish Simulated Comm
@@ -336,10 +338,10 @@ public class FlowApplyUTicket {
                 }
                 // simpleLog("debug", "Corresponding UTicket: {storedUTicketJson}");
                 // [STAGE: (VR)]
-                UTicket storedUTicket = this.msgVerifier._classify_u_ticket_is_defined_type(storedUTicketJson);
+                UTicket storedUTicket = this.msgVerifier._classifyUTicketIsDefinedType(storedUTicketJson);
 
                 // [STAGE: (VRT)]
-                this.msgVerifier.verify_u_ticket_has_executed_through_r_ticket(receivedRTicket, storedUTicket, null);
+                this.msgVerifier.verifyUTicketHasExecutedThroughRTicket(receivedRTicket, storedUTicket, null);
 
                 //[STAGE: (E)(O)]
                 this.executor.executeXxxRTicket(receivedRTicket, "holder-or-device");
@@ -376,8 +378,8 @@ public class FlowApplyUTicket {
         // Manually Finish Simulated/Bluetooth Comm
         if (Environment.COMMUNICATION_CHANNEL == "SIMULATED") {
             this.msgSender.completeSimulatedComm();
-        } else if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "BLUETOOTH")) {
-            this.msgSender.completeBluetoothComm();
+//        } else if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "BLUETOOTH")) {
+//            this.msgSender.completeBluetoothComm();
         }
     }
 }

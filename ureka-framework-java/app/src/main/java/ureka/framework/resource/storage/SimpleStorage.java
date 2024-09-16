@@ -8,6 +8,7 @@ import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.data_model.ThisPerson;
 
 public class SimpleStorage {
+    public SimpleStorage(String deviceName) {}
     public void storeStorage(ThisDevice thisDevice, Map<String, OtherDevice> deviceTable, ThisPerson thisPerson, CurrentSession currentSession) {
     }
 }

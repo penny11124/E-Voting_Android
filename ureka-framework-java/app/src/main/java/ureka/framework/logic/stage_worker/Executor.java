@@ -43,9 +43,9 @@ public class Executor {
     public boolean _initializeState() {
         // [STAGE: (C)]
         if(this.sharedData.getThisDevice().getDeviceType().equals(ThisDevice.IOT_DEVICE)) {
-            this.changeState(ThisDevice.STATE_DEVICE_WAIT_FOR_UT);
+            this._changeState(ThisDevice.STATE_DEVICE_WAIT_FOR_UT);
         } else if (this.sharedData.getThisDevice().getDeviceType().equals(ThisDevice.USER_AGENT_OR_CLOUD_SERVER)) {
-            this.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT);
+            this._changeState(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT);
         }
         return true;
     }
@@ -86,13 +86,13 @@ public class Executor {
                  + DO: Generate Personal Key
                  + DO: Request Ownership Ticket from DM
          */
-        if(!this.sharedData.getThisDevice().getDeviceType().equals(ThisDevice.USER_AGENT_OR_CLOUD_SERVER)) {
+        if (!this.sharedData.getThisDevice().getDeviceType().equals(ThisDevice.USER_AGENT_OR_CLOUD_SERVER)) {
             // FAILURE: (VRESET)
             String failureMsg = "-> FAILURE: ONLY USER-AGENT-OR-CLOUD-SERVER CAN DO THIS INITIALIZATION OPERATION";
             SimpleLogger.simpleLog("error",failureMsg);
             throw new RuntimeException(failureMsg);
         }
-        if(this.sharedData.getThisDevice().getTicketOrder() != 0) {
+        if (this.sharedData.getThisDevice().getTicketOrder() != 0) {
             // FAILURE: (VUT)
             String failureMsg = "-> FAILURE: VERIFY_TICKET_ORDER: USER-AGENT-OR-CLOUD-SERVER ALREADY INITIALIZED";
             SimpleLogger.simpleLog("error", failureMsg);
@@ -147,10 +147,9 @@ public class Executor {
     public void executeXxxUTicket(UTicket uTicketIn) {
         SimpleMeasurer.measureWorkerFunc(this::_executeXxxUTicket, uTicketIn);
     }
-
     private void _executeXxxUTicket(UTicket uTicketIn) {
         try {
-            if(uTicketIn.getUTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET)) {
+            if (uTicketIn.getUTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET)) {
                 // [STAGE: (E)]
                 this._executeOneTimeInitializeIotDevice(uTicketIn);
                 // [STAGE: (O)]
@@ -177,10 +176,11 @@ public class Executor {
                         this.sharedData.getCurrentSession().getAssociatedPlaintextCmd()
                 );
 
+                SimpleLogger.simpleLog("info", "data = " + dataProcessed.first() + ", " + dataProcessed.second());
                 // Update Session: PS-Data
                 this.executePs("sendRToken", uTicketIn, (String) dataProcessed.first(), (String) dataProcessed.second());
 
-                if(uTicketIn.getUTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
+                if (uTicketIn.getUTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
                     // [STAGE: (VTK)]
                     if(this.sharedData.getCurrentSession().getPlaintextCmd().equals("ACCESS_END")) {
                         this.sharedData.setResultMessage("-> SUCCESS: VERIFY_ACCESS_END");
@@ -210,10 +210,9 @@ public class Executor {
     }
     private void _executeXxxRTicket(RTicket rTicketIn, String commEnd) {
         if ("holderOrDevice".equals(commEnd)) {
-            if (
-                    rTicketIn.getRTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET) ||
-                            rTicketIn.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET) ||
-                            rTicketIn.getRTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)
+            if (rTicketIn.getRTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET) ||
+                rTicketIn.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET) ||
+                rTicketIn.getRTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)
             ) { // [STAGE: (O)]
                 this.executeUpdateTicketOrder("holderOrIssuerVerifyRTicket", rTicketIn);
             } else if (rTicketIn.getRTicketType().equals(RTicket.TYPE_CRKE1_RTICKET)) {
@@ -291,8 +290,8 @@ public class Executor {
 
         // Initialize Device Owner
         // RAM
-        PublicKey ownerPubKey = SerializationUtil.strToKey(uTicketIn.getHolderId(), "eccPublicKey");
-        this.sharedData.getThisDevice().setOwnerPubKey((ECPublicKey) ownerPubKey);
+        ECPublicKey ownerPubKey = (ECPublicKey) SerializationUtil.strToKey(uTicketIn.getHolderId(), "eccPublicKey");
+        this.sharedData.getThisDevice().setOwnerPubKey(ownerPubKey);
 
         // Storage
         this.simpleStorage.storeStorage(
@@ -308,8 +307,8 @@ public class Executor {
 
         // Update Device Owner
         // RAM
-        PublicKey ownerPubKey = SerializationUtil.strToKey(newUTicket.getHolderId(), "eccPublicKey");
-        this.sharedData.getThisDevice().setOwnerPubKey((ECPublicKey) ownerPubKey);
+        ECPublicKey ownerPubKey = (ECPublicKey) SerializationUtil.strToKey(newUTicket.getHolderId(), "eccPublicKey");
+        this.sharedData.getThisDevice().setOwnerPubKey(ownerPubKey);
 
         // Storage
         this.simpleStorage.storeStorage(
@@ -373,7 +372,6 @@ public class Executor {
         // Uncomment the line below if you want to enable persistent storage
         // simpleStorage.storeStorage(sharedData.getThisDevice(), sharedData.getDeviceTable(), sharedData.getThisPerson(), sharedData.getCurrentSession());
     }
-
     private void _executeCRKERTicket(RTicket ticketIn, String commEnd, String cmd) {
         if (ticketIn != null && (ticketIn.getRTicketType().equals(RTicket.TYPE_CRKE1_RTICKET))) {
             // Update Session: CR
@@ -398,12 +396,12 @@ public class Executor {
                         this.sharedData.getCurrentSession().getKeyExchangeSalt1(),
                         this.sharedData.getCurrentSession().getKeyExchangeSalt2(),
                         this.sharedData.getThisPerson().getPersonPrivKey(),
-                        SerializationUtil.strToKey(this.sharedData.getCurrentSession().getCurrentDeviceId(), "eccPublicKey")
+                    (ECPublicKey) SerializationUtil.strToKey(this.sharedData.getCurrentSession().getCurrentDeviceId(), "eccPublicKey")
                 );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(Base64.getEncoder().encodeToString(currentSessionKeyByte));
+            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.byteToBase64Str(currentSessionKeyByte));
 
             // Update Session: PS-Cmd
             this.executePs("recvCrke1AndSendCrke2", ticketIn, null, null);
@@ -420,12 +418,12 @@ public class Executor {
                         this.sharedData.getCurrentSession().getKeyExchangeSalt1(),
                         ticketIn.getKeyExchangeSalt2(),
                         this.sharedData.getThisDevice().getDevicePrivKey(),
-                        SerializationUtil.strToKey(this.sharedData.getCurrentSession().getCurrentHolderId(), "eccPublicKey")
+                    (ECPublicKey) SerializationUtil.strToKey(this.sharedData.getCurrentSession().getCurrentHolderId(), "eccPublicKey")
                 );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(Base64.getEncoder().encodeToString(currentSessionKeyByte));
+            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.byteToBase64Str(currentSessionKeyByte));
 
             // Update Session: PS-Cmd
             this.executePs("recvCrke2", ticketIn, null, null);
@@ -453,23 +451,25 @@ public class Executor {
 
     private byte[] _executeGenerateSessionKey(String keyExchangeSalt1, String keyExchangeSalt2, ECPrivateKey serverPrivKey, ECPublicKey peerPubKey) throws Exception {
         // Convert Base64 encoded salts to byte arrays
-        byte[] salt1Bytes = Base64.getDecoder().decode(keyExchangeSalt1);
-        byte[] salt2Bytes = Base64.getDecoder().decode(keyExchangeSalt2);
+        byte[] salt1Bytes = SerializationUtil.base64StrBackToByte(keyExchangeSalt1);
+        byte[] salt2Bytes = SerializationUtil.base64StrBackToByte(keyExchangeSalt2);
 
         // Perform bitwise AND operation between salt1Bytes and salt2Bytes
+        assert salt1Bytes != null && salt2Bytes != null;
         byte[] sharedSaltBytes = new byte[salt1Bytes.length];
         for (int i = 0; i < salt1Bytes.length; i++) {
             sharedSaltBytes[i] = (byte) (salt1Bytes[i] & salt2Bytes[i]);
         }
 
         // len(shared_salt)  # = 32 bytes
-        byte[] currentSessionKey = ECDH.generateEcdhKey(serverPrivKey, sharedSaltBytes, null, peerPubKey);
         // len(current_session_key)  # = 32 bytes
-        return currentSessionKey;
+        return ECDH.generateEcdhKey(serverPrivKey, sharedSaltBytes, null, peerPubKey);
     }
 
     public void executePs(String executingCase, Object ticketIn, String plaintext, String associatedPlaintext) {
-        if (ticketIn instanceof UTicket) {
+        if (ticketIn == null) {
+            SimpleMeasurer.measureWorkerFunc(this::_executePsUTicket, executingCase, null, plaintext, associatedPlaintext);
+        } else if (ticketIn instanceof UTicket) {
             SimpleMeasurer.measureWorkerFunc(this::_executePsUTicket, executingCase, (UTicket) ticketIn, plaintext, associatedPlaintext);
         } else if (ticketIn instanceof RTicket) {
             SimpleMeasurer.measureWorkerFunc(this::_executePsRTicket, executingCase, (RTicket) ticketIn, plaintext, associatedPlaintext);
@@ -477,7 +477,6 @@ public class Executor {
             throw new IllegalArgumentException("Unsupported ticket type");
         }
     }
-
     private void _executePsUTicket(String executingCase, UTicket ticketIn, String plaintext, String associatedPlaintext) {
         SimpleLogger.simpleLog("info","+ " + this.sharedData.getThisDevice().getDeviceName() + " is updating current session...");
 
@@ -561,9 +560,10 @@ public class Executor {
                 this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.second());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvData(this._generateNextIv());
+                break;
             case "recvUToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
                 this.sharedData.getCurrentSession().setCiphertextCmd(ticketIn.getCiphertextCmd());
@@ -585,9 +585,10 @@ public class Executor {
                 }
                 // Update Session: PS-Cmd (Output: Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintextCmd);
+                break;
             case "sendRToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)
@@ -607,11 +608,11 @@ public class Executor {
                 this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.second());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
+                break;
             default: // pragma: no cover -> Shouldn't Reach Here
                 throw new RuntimeException("Shouldn't Reach Here");
         }
     }
-
     private void _executePsRTicket(String executingCase, RTicket ticketIn, String plaintext, String associatedPlaintext) {
         SimpleLogger.simpleLog("info","+ " + this.sharedData.getThisDevice().getDeviceName() + " is updating current session...");
 
@@ -650,7 +651,7 @@ public class Executor {
                 break;
             case "recvCrke2" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
 
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
@@ -674,7 +675,7 @@ public class Executor {
                 break;
             case "sendCrke3" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)
@@ -697,7 +698,7 @@ public class Executor {
                 break;
             case "recvCrke3":
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvCmd(ticketIn.getIvCmd());
                 // Update Session: PS-Data (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
@@ -721,7 +722,7 @@ public class Executor {
             // PS
             case "sendUToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintext);
@@ -740,6 +741,7 @@ public class Executor {
                 this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.second());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvData(this._generateNextIv());
+                break;
             case "sendRToken" :
                 // Update Session: PS-Cmd (Input: Key)
                 currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
@@ -762,9 +764,10 @@ public class Executor {
                 this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.second());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
+                break;
             case "recvRToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvCmd(ticketIn.getIvCmd());
                 // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
@@ -784,6 +787,7 @@ public class Executor {
 
                 // Update Session: PS-Data (Output: Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextData(plaintextData);
+                break;
             default: // pragma: no cover -> Shouldn't Reach Here
                 throw new RuntimeException("Shouldn't Reach Here");
         }
@@ -799,13 +803,15 @@ public class Executor {
 
     private Pair _executeEncryptPlaintext(String plaintext, String associatedPlaintext, byte[] sessionKey, String iv) {
         byte[] plaintextBytes = SerializationUtil.strToByte(plaintext);
+        plaintextBytes = (plaintextBytes == null) ? new byte[0] : plaintextBytes;
         byte[] associatedPlaintextBytes = SerializationUtil.strToByte(associatedPlaintext);
+        associatedPlaintextBytes = (associatedPlaintextBytes == null) ? new byte[0] : associatedPlaintextBytes;
         byte[] ivBytes = SerializationUtil.base64StrBackToByte(iv);
 
         try {
             byte[][] bytePair = ECDH.gcmEncrypt(plaintextBytes, associatedPlaintextBytes, sessionKey, ivBytes);
             byte[] ciphertextBytes = bytePair[0];
-            byte[] gcmAuthenticationTagBytes = bytePair[1];
+            byte[] gcmAuthenticationTagBytes = bytePair[2];
 
             String ciphertext = SerializationUtil.byteToBase64Str(ciphertextBytes);
             String gcmAuthenticationTag = SerializationUtil.byteToBase64Str(gcmAuthenticationTagBytes);
@@ -838,7 +844,7 @@ public class Executor {
             SimpleLogger.simpleLog("error", this.sharedData.getResultMessage());
             throw new RuntimeException(this.sharedData.getResultMessage());
         } catch (Exception e) { // pragma: no cover -> Shouldn't Reach Here
-            throw new RuntimeException("Shouldn't Reach Here");
+            throw new RuntimeException("Shouldn't Reach Here, " + e.getMessage());
         }
     }
 
@@ -936,10 +942,38 @@ public class Executor {
     }
 
     // [STAGE: (C)] Change Receiver State
-    public void changeState(String stateDeviceWaitForUt) {
-        SimpleMeasurer.measureWorkerFunc(this::_changeState,stateDeviceWaitForUt);
+    public void changeState(String newState) {
+        _changeState(newState);
     }
     private void _changeState(String newState) {
         this.sharedData.setState(newState);
+    }
+
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+    public SharedData getSharedData() {
+        return this.sharedData;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
+    public void setSimpleStorage(SimpleStorage simpleStorage) {
+        this.simpleStorage = simpleStorage;
+    }
+    public SimpleStorage getSimpleStorage() {
+        return simpleStorage;
+    }
+
+    public void setMsgVerifier(MsgVerifier msgVerifier) {
+        this.msgVerifier = msgVerifier;
+    }
+    public MsgVerifier getMsgVerifier() {
+        return msgVerifier;
     }
 }

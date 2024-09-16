@@ -22,7 +22,6 @@ public class ReceivedMsgStorer {
     public void storeReceivedXxxUTicket(UTicket receivedUTicket) {
         SimpleMeasurer.measureWorkerFunc(this::_storeReceivedXxxUTicket,receivedUTicket);
     }
-
     private void _storeReceivedXxxUTicket(UTicket receivedUTicket) {
         try {
             String receivedUTicketJson = UTicket.uTicketToJsonStr(receivedUTicket);
@@ -58,7 +57,6 @@ public class ReceivedMsgStorer {
     public void storeReceivedXxxRTicket(RTicket receivedRTicket) {
         SimpleMeasurer.measureWorkerFunc(this::_storeReceivedXxxRTicket, receivedRTicket);
     }
-
     private void _storeReceivedXxxRTicket(RTicket receivedRTicket) {
         try {
             String receivedRTicketJson = RTicket.rTicketToJsonStr(receivedRTicket);

@@ -56,7 +56,19 @@ public class SimpleMeasurer {
     // We need to implement additional interface to handle exceptions.
     /////////////////////////////////////////////////////////////
 
-    // Functional interfaces defined for exception throwing.
+    // Functional interfaces.
+    @FunctionalInterface
+    public interface TriConsumer<T, U, V> {
+        void accept(T t, U u, V v);
+    }
+    @FunctionalInterface
+    public interface ThrowingTriConsumer<T, U, V, E extends Exception> {
+        void accept(T t, U u, V v) throws E;
+    }
+    @FunctionalInterface
+    public interface QuadConsumer<T, U, V, W> {
+        void accept(T t, U u, V v, W w);
+    }
     @FunctionalInterface
     public interface ThrowingSupplier<R> {
         R get() throws Exception;
@@ -176,6 +188,100 @@ public class SimpleMeasurer {
             }
         } else {
             funcToBeMeasured.accept(t, u);
+        }
+    }
+
+    // For methods with 3 parameters and no return value:
+    public static <T, U, V> void measureWorkerFunc(TriConsumer<T, U, V> funcToBeMeasured, T t, U u, V v){
+        if (Environment.MORE_MEASURE_WORKER_LOG == "OPEN") {
+            // Measurement
+            long startProcessTime = System.currentTimeMillis();
+            long startPerfTime = System.nanoTime();
+            funcToBeMeasured.accept(t, u, v);
+            long endProcessTime = System.currentTimeMillis();
+            long endPerfTime = System.nanoTime();
+
+            long elapsedPerfTime = endPerfTime - startPerfTime;
+            long elapsedProcessTime = (long) ((endProcessTime - startProcessTime) / 1e6); // convert nanoseconds to milliseconds
+            long elapsedBlockTime = Math.abs(elapsedPerfTime - elapsedProcessTime);
+
+            // Measurement Log
+            String funcName = funcToBeMeasured.getClass().getName();
+
+            // Function Stack
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            String callerName = stackTrace[2].getMethodName();
+
+            // Can optionally set Threshold: Only show blocking overhead large enough to be noticed
+            if (elapsedBlockTime >= Environment.MORE_MEASUREMENT_BLOCKING_THRESHOLD_TIME * 1e3) {
+                LOGGER.info(String.format(
+                    "[M-WORKER] : blockTime = %1$s -> %2$s : %3$d seconds",
+                    callerName, funcName, elapsedBlockTime));
+            }
+        } else {
+            funcToBeMeasured.accept(t, u, v);
+        }
+    }
+    public static <T, U, V, E extends Exception> void measureWorkerFuncWithException(ThrowingTriConsumer<T, U, V, E> funcToBeMeasured, T t, U u, V v) throws E {
+        if (Environment.MORE_MEASURE_WORKER_LOG == "OPEN") {
+            // Measurement
+            long startProcessTime = System.currentTimeMillis();
+            long startPerfTime = System.nanoTime();
+            funcToBeMeasured.accept(t, u, v);
+            long endProcessTime = System.currentTimeMillis();
+            long endPerfTime = System.nanoTime();
+
+            long elapsedPerfTime = endPerfTime - startPerfTime;
+            long elapsedProcessTime = (long) ((endProcessTime - startProcessTime) / 1e6); // convert nanoseconds to milliseconds
+            long elapsedBlockTime = Math.abs(elapsedPerfTime - elapsedProcessTime);
+
+            // Measurement Log
+            String funcName = funcToBeMeasured.getClass().getName();
+
+            // Function Stack
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            String callerName = stackTrace[2].getMethodName();
+
+            // Can optionally set Threshold: Only show blocking overhead large enough to be noticed
+            if (elapsedBlockTime >= Environment.MORE_MEASUREMENT_BLOCKING_THRESHOLD_TIME * 1e3) {
+                LOGGER.info(String.format(
+                    "[M-WORKER] : blockTime = %1$s -> %2$s : %3$d seconds",
+                    callerName, funcName, elapsedBlockTime));
+            }
+        } else {
+            funcToBeMeasured.accept(t, u, v);
+        }
+    }
+
+    // For methods with 4 parameters and no return value:
+    public static <T, U, V, W> void measureWorkerFunc(QuadConsumer<T, U, V, W> funcToBeMeasured, T t, U u, V v, W w) {
+        if (Environment.MORE_MEASURE_WORKER_LOG == "OPEN") {
+            // Measurement
+            long startProcessTime = System.currentTimeMillis();
+            long startPerfTime = System.nanoTime();
+            funcToBeMeasured.accept(t, u, v, w);
+            long endProcessTime = System.currentTimeMillis();
+            long endPerfTime = System.nanoTime();
+
+            long elapsedPerfTime = endPerfTime - startPerfTime;
+            long elapsedProcessTime = (long) ((endProcessTime - startProcessTime) / 1e6); // convert nanoseconds to milliseconds
+            long elapsedBlockTime = Math.abs(elapsedPerfTime - elapsedProcessTime);
+
+            // Measurement Log
+            String funcName = funcToBeMeasured.getClass().getName();
+
+            // Function Stack
+            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+            String callerName = stackTrace[2].getMethodName();
+
+            // Can optionally set Threshold: Only show blocking overhead large enough to be noticed
+            if (elapsedBlockTime >= Environment.MORE_MEASUREMENT_BLOCKING_THRESHOLD_TIME * 1e3) {
+                LOGGER.info(String.format(
+                    "[M-WORKER] : blockTime = %1$s -> %2$s : %3$d seconds",
+                    callerName, funcName, elapsedBlockTime));
+            }
+        } else {
+            funcToBeMeasured.accept(t, u, v, w);
         }
     }
 

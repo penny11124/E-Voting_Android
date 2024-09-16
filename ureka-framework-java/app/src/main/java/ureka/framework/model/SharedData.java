@@ -38,6 +38,12 @@ public class SharedData {
     private BluetoothService.ConnectionSocket connectionSocket = null;
     private Boolean bluetoothCommCompletedFlag = null;
 
+    public SharedData(ThisDevice thisDevice, CurrentSession currentSession, ThisPerson thisPerson) {
+        this.thisDevice = thisDevice;
+        this.currentSession = currentSession;
+        this.thisPerson = thisPerson;
+    }
+
     public ThisDevice getThisDevice() {
         return thisDevice;
     }

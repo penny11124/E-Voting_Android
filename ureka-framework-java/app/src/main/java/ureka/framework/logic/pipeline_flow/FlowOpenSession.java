@@ -114,8 +114,8 @@ public class FlowOpenSession {
 
             if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
                 msgSender.completeSimulatedComm();
-            } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
-                msgSender.completeBluetoothComm();
+//            } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
+//                msgSender.completeBluetoothComm();
             }
         } catch (Exception e) { // pragma: no cover -> Shouldn't Reach Here
             throw new RuntimeException("Shouldn't Reach Here", e);
@@ -267,11 +267,10 @@ public class FlowOpenSession {
 
         if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
             this.msgSender.completeSimulatedComm();
-        } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
-            msgSender.completeBluetoothComm();
+//        } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
+//            msgSender.completeBluetoothComm();
         }
 
         SimpleLogger.simpleLog("debug", "resultMessage = " + this.sharedData.getResultMessage());
     }
-
 }

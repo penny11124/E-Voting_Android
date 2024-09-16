@@ -1,5 +1,7 @@
 package ureka.framework.logic.stage_worker;
 
+import org.checkerframework.checker.units.qual.C;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,59 +30,58 @@ public class MsgVerifierRTicket {
     private ThisDevice thisDevice;
     private Map<String, OtherDevice> deviceTable;
     private UTicket auditStartTicket;
-    private UTicket auditEndTicket;
+    private UTicket auditEndTicket = null;
     private CurrentSession currentSession;
 
-    public MsgVerifierRTicket(Optional<ThisDevice> thisDevice, Optional<Map<String, OtherDevice>> deviceTable,
-                              Optional<UTicket> auditStartTicket, Optional<UTicket> auditEndTicket,
-                              Optional<CurrentSession> currentSession) {
-        this.thisDevice = thisDevice.orElse(null);
-        this.deviceTable = deviceTable.orElse(null);
-        this.auditStartTicket = auditStartTicket.orElse(null);
-        this.auditEndTicket = auditEndTicket.orElse(null);
-        this.currentSession = currentSession.orElse(null);
+    public MsgVerifierRTicket(ThisDevice thisDevice, Map<String, OtherDevice> deviceTable
+        , UTicket auditStartTicket, CurrentSession currentSession) {
+        this.thisDevice = thisDevice;
+        this.deviceTable = deviceTable;
+        this.auditStartTicket = auditStartTicket;
+        this.currentSession = currentSession;
     }
 
     // Message Verification Flow
-    public RTicket verifyJsonSchema(String arbitraryJson) {
+    public static RTicket verifyJsonSchema(String arbitraryJson) {
         String successMsg = "-> SUCCESS: VERIFY_JSON_SCHEMA";
-        String failureMsg = "-> FAILURE: VERIFY_JSON_SCHEMA";
+        String failureMsg = "-> FAILURE: VERIFY_JSON_SCHEMA: ";
 
         try {
             RTicket rTicketIn = RTicket.jsonStrToRTicket(arbitraryJson);
             SimpleLogger.simpleLog("info", successMsg);
             return rTicketIn;
-        } catch (RuntimeException error) { // pragma: no cover -> Weird R-Ticket
-            SimpleLogger.simpleLog("error", failureMsg + ": " + error.getMessage());
-            throw new RuntimeException(failureMsg + ": " + error.getMessage());
+        } catch (RuntimeException e) {
+            // pragma: no cover -> Weird R-Ticket
+            SimpleLogger.simpleLog("error", failureMsg + e.getMessage());
+            throw new RuntimeException(failureMsg + e.getMessage());
         }
     }
 
-    public RTicket verifyProtocolVersion(RTicket rTicketIn) {
+    public static RTicket verifyProtocolVersion(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: VERIFY_PROTOCOL_VERSION = " + rTicketIn.getProtocolVersion();
         String failureMsg = "-> FAILURE: VERIFY_PROTOCOL_VERSION = " + rTicketIn.getProtocolVersion();
 
         if (rTicketIn.getProtocolVersion().equals(UTicket.PROTOCOL_VERSION)) {
             SimpleLogger.simpleLog("info", successMsg);
             return rTicketIn;
-        } else { // pragma: no cover -> Weird R-Ticket
+        } else {
+            // pragma: no cover -> Weird R-Ticket
             SimpleLogger.simpleLog("error", failureMsg);
             throw new RuntimeException(failureMsg);
         }
     }
 
-    public RTicket verifyRTicketId(RTicket rTicketIn) {
+    public static RTicket verifyRTicketId(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: VERIFY_RTICKET_ID";
         String failureMsg = "-> FAILURE: VERIFY_RTICKET_ID";
 
         // Verify UTicket Id (Hash-based)
         RTicket ticketWithoutIdAndSig;
         try {
-            ticketWithoutIdAndSig = deepCopy(rTicketIn);
+            ticketWithoutIdAndSig = new RTicket(rTicketIn);
             ticketWithoutIdAndSig.setRTicketId(null);
             ticketWithoutIdAndSig.setDeviceSignature(null);
-            String generatedHash;
-            generatedHash = ECDH.generateSha256HashStr(RTicket.rTicketToJsonStr(ticketWithoutIdAndSig));
+            String generatedHash= ECDH.generateSha256HashStr(RTicket.rTicketToJsonStr(ticketWithoutIdAndSig));
 
             if (generatedHash.equals(rTicketIn.getRTicketId())) {
                 SimpleLogger.simpleLog("info", successMsg);
@@ -90,32 +91,34 @@ public class MsgVerifierRTicket {
                 throw new RuntimeException(failureMsg);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(failureMsg);
         }
     }
 
-    public RTicket verifyRTicketType(RTicket rTicketIn) {
+    public static RTicket verifyRTicketType(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: VERIFY_RTICKET_TYPE = " + rTicketIn.getRTicketType();
         String failureMsg = "-> FAILURE: VERIFY_RTICKET_TYPE = " + rTicketIn.getRTicketType();
 
         if (Arrays.asList(RTicket.LEGAL_RTICKET_TYPES).contains(rTicketIn.getRTicketType())) {
             SimpleLogger.simpleLog("info", successMsg);
             return rTicketIn;
-        } else { // pragma: no cover -> Weird R-Ticket
+        } else {
+            // pragma: no cover -> Weird R-Ticket
             SimpleLogger.simpleLog("error", failureMsg);
             throw new RuntimeException(failureMsg);
         }
     }
 
     // Because holder do not really know whether this device_id is correct before get RT
-    public RTicket hasDeviceId(RTicket rTicketIn) {
+    public static RTicket hasDeviceId(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: HAS_DEVICE_ID = " + rTicketIn.getDeviceId();
         String failureMsg = "-> FAILURE: HAS_DEVICE_ID = " + rTicketIn.getDeviceId();
 
         if (rTicketIn.getDeviceId() != null) {
             SimpleLogger.simpleLog("info", successMsg);
             return rTicketIn;
-        } else { // pragma: no cover -> Weird R-Ticket
+        } else {
+            // pragma: no cover -> Weird R-Ticket
             SimpleLogger.simpleLog("error", failureMsg);
             throw new RuntimeException(failureMsg);
         }
@@ -142,7 +145,8 @@ public class MsgVerifierRTicket {
                 if (rTicketIn.getDeviceId().equals(this.auditStartTicket.getDeviceId())) {
                     SimpleLogger.simpleLog("info", successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
@@ -152,25 +156,28 @@ public class MsgVerifierRTicket {
                     if (rTicketIn.getDeviceId().equals(this.currentSession.getCurrentDeviceId())) {
                         SimpleLogger.simpleLog("info", successMsg);
                         return rTicketIn;
-                    } else { // pragma: no cover -> Weird R-Ticket
+                    } else {
+                        // pragma: no cover -> Weird R-Ticket
                         SimpleLogger.simpleLog("error", failureMsg);
                         throw new RuntimeException(failureMsg);
                     }
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
         }
     }
 
-    public RTicket verifyResult(RTicket rTicketIn) {
+    public static RTicket verifyResult(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: VERIFY_RESULT";
         String failureMsg = "-> FAILURE: VERIFY_RESULT";
 
         if (rTicketIn.getResult().contains("SUCCESS")) {
             SimpleLogger.simpleLog("info", successMsg);
             return rTicketIn;
-        } else { // pragma: no cover -> Weird R-Ticket
+        } else {
+            // pragma: no cover -> Weird R-Ticket
             SimpleLogger.simpleLog("error", failureMsg);
             throw new RuntimeException(failureMsg);
         }
@@ -187,7 +194,8 @@ public class MsgVerifierRTicket {
                 if (rTicketIn.getTicketOrder() == 1) {
                     SimpleLogger.simpleLog("info", successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
@@ -197,35 +205,39 @@ public class MsgVerifierRTicket {
                 if (rTicketIn.getTicketOrder() == this.deviceTable.get(rTicketIn.getDeviceId()).getTicketOrder() + 1) {
                     SimpleLogger.simpleLog("info", successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
 
-            // If TX is not finished, the ticket_order should be the same
-            // "holder"
+                // If TX is not finished, the ticket_order should be the same
+                // "holder"
             case RTicket.TYPE_CRKE1_RTICKET:
             case RTicket.TYPE_CRKE3_RTICKET:
             case RTicket.TYPE_DATA_RTOKEN:
                 if (rTicketIn.getTicketOrder().equals(this.deviceTable.get(rTicketIn.getDeviceId()).getTicketOrder())) {
                     SimpleLogger.simpleLog("info", successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
 
-            // "device"
+                // "device"
             case RTicket.TYPE_CRKE2_RTICKET:
                 if (rTicketIn.getTicketOrder().equals(this.thisDevice.getTicketOrder())) {
                     SimpleLogger.simpleLog("info", successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
 
-            default: // pragma: no cover -> Weird R-Ticket
+            default:
+                // pragma: no cover -> Weird R-Ticket
                 SimpleLogger.simpleLog("error", failureMsg);
                 throw new RuntimeException(failureMsg);
         }
@@ -243,7 +255,8 @@ public class MsgVerifierRTicket {
                 if (rTicketIn.getAuditStart().equals(this.auditStartTicket.getUTicketId())) {
                     SimpleLogger.simpleLog("info", successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
@@ -253,18 +266,20 @@ public class MsgVerifierRTicket {
                     if (rTicketIn.getAuditStart().equals(this.currentSession.getCurrentUTicketId())) {
                         SimpleLogger.simpleLog("info", successMsg);
                         return rTicketIn;
-                    } else { // pragma: no cover -> Weird R-Ticket
+                    } else {
+                        // pragma: no cover -> Weird R-Ticket
                         SimpleLogger.simpleLog("error", failureMsg);
                         throw new RuntimeException(failureMsg);
                     }
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error", failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
         }
     }
 
-    public RTicket verifyAuditEnd(RTicket rTicketIn) {
+    public static RTicket verifyAuditEnd(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: VERIFY_AUDIT_END";
         String failureMsg = "-> FAILURE: VERIFY_AUDIT_END";
 
@@ -276,7 +291,8 @@ public class MsgVerifierRTicket {
             if (rTicketIn.getAuditEnd().equals("ACCESS_END")) {
                 SimpleLogger.simpleLog("info", successMsg);
                 return rTicketIn;
-            } else { // pragma: no cover -> Weird R-Ticket
+            } else {
+                // pragma: no cover -> Weird R-Ticket
                 SimpleLogger.simpleLog("error", failureMsg);
                 throw new RuntimeException(failureMsg);
             }
@@ -286,7 +302,7 @@ public class MsgVerifierRTicket {
         }
     }
 
-    public RTicket verifyCRKE(RTicket rTicketIn) {
+    public static RTicket verifyCRKE(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: VERIFY_CR_KE";
         String failureMsg = "-> FAILURE: VERIFY_CR_KE";
 
@@ -302,7 +318,8 @@ public class MsgVerifierRTicket {
                 if(rTicketIn.getChallenge1() != null && rTicketIn.getKeyExchangeSalt1() != null) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
@@ -310,7 +327,8 @@ public class MsgVerifierRTicket {
                 if(rTicketIn.getChallenge1() != null && rTicketIn.getChallenge2() != null && rTicketIn.getKeyExchangeSalt2() != null) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
@@ -318,7 +336,8 @@ public class MsgVerifierRTicket {
                 if(rTicketIn.getChallenge2() != null) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
@@ -328,7 +347,7 @@ public class MsgVerifierRTicket {
         }
     }
 
-    public RTicket verifyPs(RTicket rTicketIn) {
+    public static RTicket verifyPs(RTicket rTicketIn) {
         String successMsg = "-> SUCCESS: VERIFY_PS";
         String failureMsg = "-> FAILURE: VERIFY_PS";
 
@@ -343,7 +362,8 @@ public class MsgVerifierRTicket {
                 if(rTicketIn.getIvCmd() != null) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
@@ -354,23 +374,26 @@ public class MsgVerifierRTicket {
                     rTicketIn.getGcmAuthenticationTagCmd() != null) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
             case RTicket.TYPE_CRKE3_RTICKET:
             case RTicket.TYPE_DATA_RTOKEN:
                 if(rTicketIn.getAssociatedPlaintextData() != null &&
-                        rTicketIn.getCiphertextData() != null &&
-                        rTicketIn.getIvCmd() != null &&
-                        rTicketIn.getGcmAuthenticationTagData() != null) {
+                    rTicketIn.getCiphertextData() != null &&
+                    rTicketIn.getIvCmd() != null &&
+                    rTicketIn.getGcmAuthenticationTagData() != null) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
-            default: // pragma: no cover -> Weird R-Ticket
+            default:
+                // pragma: no cover -> Weird R-Ticket
                 SimpleLogger.simpleLog("error",failureMsg);
                 throw new RuntimeException(failureMsg);
         }
@@ -387,19 +410,21 @@ public class MsgVerifierRTicket {
             case RTicket.TYPE_CRKE1_RTICKET:
             case RTicket.TYPE_CRKE3_RTICKET:
             case UTicket.TYPE_ACCESS_END_UTOKEN:
-                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, SerializationUtil.strToKey(rTicketIn.getRTicketId(),"eccPublicKey"))) {
+                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(rTicketIn.getRTicketId(),"eccPublicKey"))) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
                 }
             case RTicket.TYPE_CRKE2_RTICKET:
-                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, SerializationUtil.strToKey(this.currentSession.getCurrentHolderId(),"eccPublicKey"))) {
+                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(this.currentSession.getCurrentHolderId(),"eccPublicKey"))) {
                     successMsg = "-> SUCCESS: VERIFY_HOLDER_SIGNATURE on " + rTicketIn.getRTicketType() + " RTICKET";
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
-                } else { // pragma: no cover -> Weird R-Ticket
+                } else {
+                    // pragma: no cover -> Weird R-Ticket
                     failureMsg = "-> FAILURE: VERIFY_HOLDER_SIGNATURE on "+ rTicketIn.getRTicketType() + " RTICKET";
                     SimpleLogger.simpleLog("error",failureMsg);
                     throw new RuntimeException(failureMsg);
@@ -408,7 +433,8 @@ public class MsgVerifierRTicket {
                 // No DEVICE_SIGNATURE
                 SimpleLogger.simpleLog("info",successMsg);
                 return rTicketIn;
-            default: // pragma: no cover -> Weird R-Ticket
+            default:
+                // pragma: no cover -> Weird R-Ticket
                 SimpleLogger.simpleLog("error",failureMsg);
                 throw new RuntimeException(failureMsg);
         }
@@ -421,11 +447,7 @@ public class MsgVerifierRTicket {
 
         // Verify Signature on Signed RTicket, but Prevent side effect on Signed RTicket
         RTicket unsignedRTicket;
-        try {
-            unsignedRTicket = deepCopy(signedRTicket);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        unsignedRTicket = new RTicket(signedRTicket);
         unsignedRTicket.setDeviceSignature(null);
 
         String unsignedRTicketStr = RTicket.rTicketToJsonStr(unsignedRTicket);
@@ -434,28 +456,8 @@ public class MsgVerifierRTicket {
         // Verify Signature
         try {
             return ECC.verifySignature(signatureByte, unsignedRTicketByte, eccPublicKey);
-        } catch (NoSuchAlgorithmException | SignatureException | NoSuchProviderException |
-                 InvalidKeyException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private RTicket deepCopy(RTicket originalRTicket) throws IOException, ClassNotFoundException {
-        // Serialize to a byte array
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(originalRTicket);
-        oos.flush();
-        oos.close();
-        bos.close();
-
-        // Deserialize from byte array
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        RTicket copyRTicket = (RTicket) ois.readObject();
-        ois.close();
-        bis.close();
-
-        return copyRTicket;
     }
 }

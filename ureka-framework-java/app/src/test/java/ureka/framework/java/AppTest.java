@@ -3,10 +3,33 @@
  */
 package ureka.framework.java;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+
+import ureka.framework.model.data_model.CurrentSession;
+import ureka.framework.model.data_model.OtherDevice;
+import ureka.framework.model.data_model.ThisDevice;
+import ureka.framework.model.message_model.RTicket;
+import ureka.framework.model.message_model.UTicket;
+import ureka.framework.resource.crypto.ECC;
+import ureka.framework.resource.crypto.ECDH;
+import ureka.framework.resource.crypto.SerializationUtil;
+import ureka.framework.resource.logger.SimpleLogger;
+
 class AppTest {
     // TODO:
     // 1. Uncomment the following files after unit testing:
-    // FlowApplyUTicket, Executor, MsgSender, MsgReceiver
-    // 2. resource.communication is not tested yet
-    // since BluetoothService is not needed in simulation stage.
+    // FlowApplyUTicket, FlowIssueUTicket, FlowOpenSession, FlowIssueUToken
+    // 2. Fix Bluetooth for physical demo.
 }

@@ -8,30 +8,31 @@ import java.util.Map;
 public class CurrentSession {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
     // Access UT
-    private String currentUTicketId;
-    private String currentDeviceId;
-    private String currentHolderId;
-    private String currentTaskScope;
+    private String currentUTicketId = null;
+    private String currentDeviceId = null;
+    private String currentHolderId = null;
+    private String currentTaskScope = null;
     // CR-KE
-    private String challenge1;
-    private String challenge2;
-    private String keyExchangeSalt1;
-    private String keyExchangeSalt2;
+    private String challenge1 = null;
+    private String challenge2 = null;
+    private String keyExchangeSalt1 = null;
+    private String keyExchangeSalt2 = null;
     // PS
-    private String currentSessionKeyStr;
+    private String currentSessionKeyStr = null;
 
-    private String plaintextCmd;
-    private String associatedPlaintextCmd;
-    private String ivCmd;
-    private String ciphertextCmd;
-    private String gcmAuthenticationTagCmd;
+    private String plaintextCmd = null;
+    private String associatedPlaintextCmd = null;
+    private String ivCmd = null;
+    private String ciphertextCmd = null;
+    private String gcmAuthenticationTagCmd = null;
 
-    private String plaintextData;
-    private String associatedPlaintextData;
-    private String ivData;
-    private String ciphertextData;
-    private String gcmAuthenticationTagData;
+    private String plaintextData = null;
+    private String associatedPlaintextData = null;
+    private String ivData = null;
+    private String ciphertextData = null;
+    private String gcmAuthenticationTagData = null;
 
+    public CurrentSession() {}
     public CurrentSession(Map<String, String> values) {
         this.currentUTicketId = values.getOrDefault("current_u_ticket_id", null);
         this.currentDeviceId = values.getOrDefault("current_device_id", null);

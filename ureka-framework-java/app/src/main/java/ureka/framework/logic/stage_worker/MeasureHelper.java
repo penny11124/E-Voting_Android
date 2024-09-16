@@ -53,7 +53,7 @@ public class MeasureHelper {
 
         // Print Measurement Raw Data
         SimpleLogger.simpleLog("measure", "");
-        SimpleLogger.simpleLog("measure", "+ Receive CLI Input: {" + cliName + "}");
+        SimpleLogger.simpleLog("measure", "+ Receive CLI Input: " + cliName);
         SimpleLogger.simpleLog("measure", "cliPerfTime = " + cliPerfTime + " nanoseconds");
         // "cliPerfTime = {cliPerfTime:{Environment.MEASUREMENT_TIME_PRECISION}} seconds"
         if (cliBlockedTime > Environment.IO_BLOCKING_TOLERANCE_TIME * 1e6 /*Conversion from millisecond to nanosecond*/) {

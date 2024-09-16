@@ -34,7 +34,7 @@ public class Environment {
     // "CLOSED": Not Print Log
     public static final String DEBUG_LOG = "OPEN";
     public static final String CLI_LOG = "OPEN";
-    public static final String MEASURE_LOG = "CLOSED";
+    public static final String MEASURE_LOG = "OPEN";
     public static final String MORE_MEASURE_WORKER_LOG = "CLOSED";
     public static final String MORE_MEASURE_RESOURCE_LOG = "CLOSED";
 

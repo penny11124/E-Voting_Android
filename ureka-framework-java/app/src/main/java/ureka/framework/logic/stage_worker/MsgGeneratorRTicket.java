@@ -114,38 +114,36 @@ public class MsgGeneratorRTicket {
             signatureByte = ECC.signSignature(unsignedRTicketByte, privateKey);
         } catch (Exception e) {
             throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
 
         // Add Signature on New Signed RTicket, but Prevent side effect on Unsigned RTicket
-        RTicket signedRTicket;
-        try {
-            signedRTicket = deepCopy(unsignedRTicket);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        RTicket signedRTicket = new RTicket(unsignedRTicket);
+//        try {
+//            signedRTicket = deepCopy(unsignedRTicket);
+//        } catch (IOException | ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
         signedRTicket.setDeviceSignature(SerializationUtil.byteToBase64Str(signatureByte));
 
         return signedRTicket;
     }
 
-    private RTicket deepCopy(RTicket originalRTicket) throws IOException, ClassNotFoundException {
-        // Serialize to a byte array
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(originalRTicket);
-        oos.flush();
-        oos.close();
-        bos.close();
-
-        // Deserialize from byte array
-        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        ObjectInputStream ois = new ObjectInputStream(bis);
-        RTicket copyRTicket = (RTicket) ois.readObject();
-        ois.close();
-        bis.close();
-
-        return copyRTicket;
-    }
+//    private RTicket deepCopy(RTicket originalRTicket) throws IOException, ClassNotFoundException {
+//        // Serialize to a byte array
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        ObjectOutputStream oos = new ObjectOutputStream(bos);
+//        oos.writeObject(originalRTicket);
+//        oos.flush();
+//        oos.close();
+//        bos.close();
+//
+//        // Deserialize from byte array
+//        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+//        ObjectInputStream ois = new ObjectInputStream(bis);
+//        RTicket copyRTicket = (RTicket) ois.readObject();
+//        ois.close();
+//        bis.close();
+//
+//        return copyRTicket;
+//    }
 }

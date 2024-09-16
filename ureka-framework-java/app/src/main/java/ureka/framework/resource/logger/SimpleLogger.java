@@ -1,6 +1,7 @@
 package ureka.framework.resource.logger;
 
 import java.util.Objects;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,7 +9,14 @@ import ureka.framework.Environment;
 
 public class SimpleLogger {
 
-    private static final Logger LOGGER = Logger.getLogger(SimpleLogger.class.getName());
+    private static Logger LOGGER = Logger.getLogger(SimpleLogger.class.getName());
+
+    static {
+        LOGGER.setLevel(Level.FINE);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setLevel(Level.FINE);
+        LOGGER.addHandler(handler);
+    }
 
     public static void simpleLog(String logLevel, String logInfo) {
         // pragma: no cover -> PRODUCTION
