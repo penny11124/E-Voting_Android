@@ -54,7 +54,7 @@ public class ECDH {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[bytesNum];
         random.nextBytes(bytes);
-        return Base64.getEncoder().encodeToString(bytes);
+        return SerializationUtil.byteToBase64Str(bytes);
     }
 
     //////////////////////////////////////////////////////

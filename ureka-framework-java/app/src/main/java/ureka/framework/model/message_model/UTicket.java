@@ -1,6 +1,7 @@
 package ureka.framework.model.message_model;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
 
@@ -59,24 +60,43 @@ public class UTicket {
     // PS-Data
     private String ivData;
 
+    public UTicket() {}
     public UTicket(Map<String, String> values) {
-        this.protocolVersion = values.getOrDefault("protocolVersion", PROTOCOL_VERSION);
-        this.uTicketId = values.getOrDefault("uTicketId", null);
-        this.uTicketType = values.getOrDefault("uTicketType", null);
-        this.deviceId = values.getOrDefault("deviceId", null);
-        this.ticketOrder = Integer.valueOf(values.getOrDefault("ticketOrder", null));
-        this.holderId = values.getOrDefault("holderId", null);
-        this.taskScope = values.getOrDefault("taskScope", null);
-        this.issuerSignature = values.getOrDefault("issuerSignature", null);
-        this.associatedPlaintextCmd = values.getOrDefault("associatedPlaintextCmd", null);
-        this.ciphertextCmd = values.getOrDefault("ciphertextCmd", null);
-        this.gcmAuthenticationTagCmd = values.getOrDefault("gcmAuthenticationTagCmd", null);
-        this.ivData = values.getOrDefault("ivData", null);
+        Class<?> uTicketClass = this.getClass();
+
+        for (Field field : uTicketClass.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+
+            String fieldName = field.getName();
+            String fieldValue = values.get(fieldName);
+
+            try {
+                field.setAccessible(true);
+                if (field.getType().equals(Integer.class)) {
+                    field.set(this, fieldValue != null ? Integer.valueOf(fieldValue) : null);
+                } else {
+                    if (fieldName.equals("protocolVersion")) {
+                        field.set(this, fieldValue != null ? fieldValue : UTicket.PROTOCOL_VERSION);
+                    } else {
+                        field.set(this, fieldValue);
+                    }
+
+                }
+            } catch (IllegalAccessException e) {
+                String failureMsg = "UTicket Map constructor: IllegalAccessException.";
+                throw new RuntimeException(failureMsg, e);
+            }
+        }
     }
     public UTicket(UTicket uTicket) {
         Class<?> uTicketClass = this.getClass();
 
         for (Field field : uTicketClass.getDeclaredFields()) {
+            if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
+                continue;
+            }
             try {
                 field.setAccessible(true);
                 Object value = field.get(uTicket);

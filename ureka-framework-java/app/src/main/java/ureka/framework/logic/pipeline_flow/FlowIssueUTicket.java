@@ -208,7 +208,7 @@ public class FlowIssueUTicket {
                 SimpleLogger.simpleLog("debug", "Corresponding UTicket: " + storedUTicketJson);
 
                 // [STAGE: (VR)]
-                UTicket storedUTicket = this.msgVerifier.classifyUTicketIsDefinedType(storedUTicketJson);
+                UTicket storedUTicket = this.msgVerifier._classifyUTicketIsDefinedType(storedUTicketJson);
 
                 // [STAGE: (VRT)]
                 this.msgVerifier.verifyUTicketHasExecutedThroughRTicket(receivedRTicket, storedUTicket, null);
@@ -222,9 +222,6 @@ public class FlowIssueUTicket {
             } else { // pragma: no cover -> TODO: Revocation UTicket
                 throw new RuntimeException("Not implemented yet");
             }
-        } catch (KeyException e) { // pragma: no cover -> FAILURE: (VL)
-            this.sharedData.setResultMessage("FAILURE: (VL)");
-            throw new RuntimeException("FAILURE: (VL)", e);
         } catch (RuntimeException e) { // pragma: no cover -> FAILURE: (VR)(VRT)
             // TODO: (VRT) test_fail_when_double_issuing_or_double_spending
             this.sharedData.setResultMessage("FAILURE: (VR)(VRT)");

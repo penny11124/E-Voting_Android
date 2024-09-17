@@ -32,11 +32,11 @@ public class Environment {
     //////////////////////////////////////////////////////
     // "OPEN": Print Log
     // "CLOSED": Not Print Log
-    public static String DEBUG_LOG = "OPEN";
-    public static String CLI_LOG = "OPEN";
-    public static String MEASURE_LOG = "CLOSED";
-    public static String MORE_MEASURE_WORKER_LOG = "CLOSED";
-    public static String MORE_MEASURE_RESOURCE_LOG = "CLOSED";
+    public static final String DEBUG_LOG = "OPEN";
+    public static final String CLI_LOG = "OPEN";
+    public static final String MEASURE_LOG = "OPEN";
+    public static final String MORE_MEASURE_WORKER_LOG = "CLOSED";
+    public static final String MORE_MEASURE_RESOURCE_LOG = "CLOSED";
 
     //////////////////////////////////////////////////////
     // Measurement

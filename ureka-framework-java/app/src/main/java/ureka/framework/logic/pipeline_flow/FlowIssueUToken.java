@@ -233,8 +233,8 @@ public class FlowIssueUToken {
 
             SimpleLogger.simpleLog("debug","Corresponding UTicket: " + storedUTicketJson);
 
-            // STAGE: (VR)]
-            UTicket storedUTicket = this.msgVerifier._classify_u_ticket_is_defined_type(storedUTicketJson);
+            // [STAGE: (VR)]
+            UTicket storedUTicket = this.msgVerifier._classifyUTicketIsDefinedType(storedUTicketJson);
 
             // [STAGE: (VRT)]
             this.msgVerifier.verifyUTicketHasExecutedThroughRTicket(receivedRTicket, storedUTicket, null);
@@ -274,9 +274,8 @@ public class FlowIssueUToken {
 
         if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
             this.msgSender.completeSimulatedComm();
-        } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
-            this.msgSender.completeBluetoothComm();
+//        } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
+//            this.msgSender.completeBluetoothComm();
         }
     }
-
 }

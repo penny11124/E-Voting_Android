@@ -15,6 +15,23 @@ import java.util.Map;
 public class MsgSender {
     private SharedData sharedData;
     private MeasureHelper measureHelper;
+
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+
+    public SharedData getSharedData() {
+        return sharedData;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
     public MsgSender(SharedData sharedData, MeasureHelper measureHelper) {
         this.sharedData = sharedData;
         this.measureHelper = measureHelper;
@@ -39,40 +56,38 @@ public class MsgSender {
         }
     }
 
-//    // Resource (Bluetooth Comm)
-    public void startBluetoothComm() {
-        this.sharedData.setBluetoothCommCompletedFlag(false);
-    }
-
-    public void completeBluetoothComm() {
-        this.sharedData.setBluetoothCommCompletedFlag(true);
-    }
-
-    // something to fixed
-    public void connectBluetoothComm() throws Exception {
-        BluetoothService.ConnectingWorker connectingWorker = new BluetoothService.ConnectingWorker(
-                BluetoothService.SERVICE_UUID,
-                BluetoothService.SERVICE_NAME,
-                BluetoothService.RECONNECT_TIMES,
-                BluetoothService.RECONNECT_INTERVAL
-        );
-        this.sharedData.setConnectionSocket(connectingWorker.connect());
-    }
-
-    public void closeBluetoothConnection() throws Exception {
-        this.sharedData.getConnectionSocket().close();
-    }
+    // Resource (Bluetooth Comm)
+//    public void startBluetoothComm() {
+//        this.sharedData.setBluetoothCommCompletedFlag(false);
+//    }
+//
+//    public void completeBluetoothComm() {
+//        this.sharedData.setBluetoothCommCompletedFlag(true);
+//    }
+//
+//    // something to fixed
+//    public void connectBluetoothComm() throws Exception {
+//        BluetoothService.ConnectingWorker connectingWorker = new BluetoothService.ConnectingWorker(
+//                BluetoothService.SERVICE_UUID,
+//                BluetoothService.SERVICE_NAME,
+//                BluetoothService.RECONNECT_TIMES,
+//                BluetoothService.RECONNECT_INTERVAL
+//        );
+//        this.sharedData.setConnectionSocket(connectingWorker.connect());
+//    }
+//
+//    public void closeBluetoothConnection() throws Exception {
+//        this.sharedData.getConnectionSocket().close();
+//    }
 
     // [STAGE: (S)] Send Message
-    public void sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) {
-        SimpleMeasurer.measureWorkerFunc(this::_sendXxxMessage, messageOperation, messageType, sentMessageJson); // something to fixed
+    public void sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws InterruptedException {
+        SimpleMeasurer.measureWorkerFuncWithException(this::_sendXxxMessage, messageOperation, messageType, sentMessageJson); // something to fixed
     }
-    private void _sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws Exception {
+    private void _sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws InterruptedException {
         // Generate Message
-        if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) ||
-                messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
-                (messageType.equals(UTicket.MESSAGE_TYPE) ||
-                        messageType.equals(RTicket.MESSAGE_TYPE))) {
+        if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) || messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
+            (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
 
             Map<String, String> messageRequest = new HashMap<>();
             messageRequest.put("messageOperation", messageOperation);
@@ -91,10 +106,9 @@ public class MsgSender {
         }
 
         if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
-            SimpleLogger.simpleLog("info",
-                    "+ " + this.sharedData.getThisDevice().getDeviceName() +
-                            " is sending message to " +
-                            this.sharedData.getSimulatedCommChannel().getEnd().getSharedData().getThisDevice().getDeviceName() + "...");
+//            SimpleLogger.simpleLog("info"
+//                ,"+ " + this.sharedData.getThisDevice().getDeviceName() + " is sending message to " +
+//                    this.sharedData.getSimulatedCommChannel().getEnd().getSharedData().getThisDevice().getDeviceName() + "...");
 
             // Simulate Network Delay
             for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
@@ -105,14 +119,22 @@ public class MsgSender {
                     Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
                 }
             }
+            Map<String, String> messageRequest = new HashMap<>();
+            messageRequest.put("messageOperation", messageOperation);
+            messageRequest.put("messageType", messageType);
+            messageRequest.put("messageStr", sentMessageJson);
 
-            this.sharedData.getSimulatedCommChannel().getSenderQueue().put(newMessageJson);
+            try {
+                Message newMessage = new Message(messageRequest);
+                String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
+                // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
+                this.sharedData.getSimulatedCommChannel().getSenderQueue().offer(newMessageJson);
+            } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
+                throw new RuntimeException("Weird M-Request: " + error);
+            }
         } else { // pragma: no cover -> PRODUCTION
-            SimpleLogger.simpleLog("info",
-                    "+ " + this.sharedData.getThisDevice().getDeviceName() +
-                            " is sending message to BT_address or BT_name...");
-
-            this.sharedData.getConnectionSocket().sendMessage(newMessageJson);
+//            SimpleLogger.simpleLog("info", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is sending message to BT_address or BT_name...");
+//            this.sharedData.getConnectionSocket().sendMessage(newMessageJson);
         }
     }
 }

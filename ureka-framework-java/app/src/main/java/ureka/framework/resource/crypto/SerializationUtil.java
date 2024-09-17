@@ -16,6 +16,9 @@ public class SerializationUtil {
 
     ////////// String <-> Bytes //////////
     public static byte[] strToByte(String string) {
+        if (string == null) {
+            return null;
+        }
         return string.getBytes(StandardCharsets.UTF_8);
     }
 
@@ -34,6 +37,9 @@ public class SerializationUtil {
 
     public static byte[] base64StrBackToByte(String base64String) {
         try {
+            if (base64String == null) {
+                return null;
+            }
             return Base64.getUrlDecoder().decode(base64String.getBytes(StandardCharsets.UTF_8));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("base64StrBackToByte: Decode failed.", e);
