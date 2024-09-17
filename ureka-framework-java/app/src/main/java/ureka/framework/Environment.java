@@ -6,14 +6,14 @@ public class Environment {
     //////////////////////////////////////////////////////
     // "TEST": Test Mode (e.g., logging, etc.)
     // "PRODUCTION": Production Mode (e.g., print, etc.)
-    public static final String DEPLOYMENT_ENV = "TEST";
+    public static String DEPLOYMENT_ENV = "TEST";
 
     //////////////////////////////////////////////////////
     // Communication Channel
     //////////////////////////////////////////////////////
     // "SIMULATED": Exchange message through shared memory
     // "BLUETOOTH": Exchange message through bluetooth communication
-    public static final String COMMUNICATION_CHANNEL = "SIMULATED";
+    public static String COMMUNICATION_CHANNEL = "SIMULATED";
 
     // "TEST": No Delay (complete tests faster)
     // "PRODUCTION": With Delay (make local simulation interactive)

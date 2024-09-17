@@ -51,7 +51,7 @@ public class Executor {
     }
 
     // Execute Initialization (Update Keystore)
-    public boolean _executeOneTimeSetDeviceTypeAndName(String deviceType, String deviceName) {
+    public boolean _executeOneTimeSetTimeDeviceTypeAndName(String deviceType, String deviceName) {
         /* Determine device type name, but still be uninitialized
            Determine device name (for test)
          */
@@ -178,7 +178,7 @@ public class Executor {
 
                 SimpleLogger.simpleLog("info", "data = " + dataProcessed.first() + ", " + dataProcessed.second());
                 // Update Session: PS-Data
-                this.executePs("sendRToken", uTicketIn, (String) dataProcessed.first(), (String) dataProcessed.second());
+                this.executePs("sendRToken", uTicketIn, (String) dataProcessed.getPairFirst(), (String) dataProcessed.getPairSecond());
 
                 if (uTicketIn.getUTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
                     // [STAGE: (VTK)]
@@ -433,8 +433,8 @@ public class Executor {
                     this.sharedData.getCurrentSession().getPlaintextCmd(),
                     this.sharedData.getCurrentSession().getAssociatedPlaintextCmd()
             );
-            String plaintextData = (String) dataProcessed.first();
-            String associatedPlaintextData = (String) dataProcessed.second();
+            String plaintextData = (String) dataProcessed.getPairFirst();
+            String associatedPlaintextData = (String) dataProcessed.getPairSecond();
 
             // Update Session: PS-Data
             this.executePs("sendCrke3", ticketIn, plaintextData, associatedPlaintextData);
@@ -533,8 +533,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.first());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.second());
+                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
                 break;
@@ -556,8 +556,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Cmd (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.first());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.second());
+                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvData(this._generateNextIv());
                 break;
@@ -604,8 +604,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.first());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.second());
+                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
                 break;
@@ -643,8 +643,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Cmd (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.first());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.second());
+                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.getPairSecond());
 
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvData(this._generateNextIv());
@@ -691,8 +691,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.first());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.second());
+                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
                 break;
@@ -737,8 +737,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Cmd (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.first());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.second());
+                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvData(this._generateNextIv());
                 break;
@@ -760,8 +760,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.first());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.second());
+                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
                 break;
