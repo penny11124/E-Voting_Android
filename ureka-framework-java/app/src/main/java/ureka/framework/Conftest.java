@@ -125,7 +125,7 @@ public class Conftest {
         generatedRequest.put("holderId", cloudServerDM.getSharedData().getThisPerson().getPersonPubKeyStr());
         generatedRequest.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
 
-        cloudServerDM.getFlowIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
+        cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
         cloudServerDM.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
 
         waitSimulatedCommCompleted(cloudServerDM, iotDevice);
@@ -158,7 +158,7 @@ public class Conftest {
         generatedRequest.put("holderId", userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr());
         generatedRequest.put("uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET);
 
-        cloudServerDM.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+        cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         waitSimulatedCommCompleted(userAgentDO, cloudServerDM);
 
         // WHEN: Holder: DO's UA forward the ownership_u_ticket
@@ -187,7 +187,7 @@ public class Conftest {
         generatedRequest.put("uTicketType", UTicket.TYPE_SELFACCESS_UTICKET);
         generatedRequest.put("taskScope", generatedTaskScope);
 
-        userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId, generatedRequest);
+        userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId, generatedRequest);
 
         // WHEN: Holder: DO's UA forward the self_access_u_ticket
         createSimulatedCommConnection(userAgentDO, iotDevice);
@@ -225,7 +225,7 @@ public class Conftest {
         generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
         generatedRequest.put("taskScope", generatedTaskScope);
 
-        userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+        userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket
@@ -260,7 +260,7 @@ public class Conftest {
         generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
         generatedRequest.put("taskScope", generatedTaskScope);
 
-        userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+        userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket

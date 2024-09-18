@@ -94,7 +94,7 @@ public class DeviceController {
 
         // Set Device Type (must after loading storage)
         if (!this.sharedData.getThisDevice().getHasDeviceType()) {
-            this.executor._executeOneTimeSetDeviceTypeAndName(device_type, device_name);
+            this.executor._executeOneTimeSetTimeDeviceTypeAndName(device_type, device_name);
         }
         // Set Initialized State
         this.executor._initializeState();
@@ -112,6 +112,113 @@ public class DeviceController {
 
     public SharedData getSharedData() {
         return this.sharedData;
+    }
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+
+    public SimpleStorage getSimpleStorage() {
+        return simpleStorage;
+    }
+
+    public void setSimpleStorage(SimpleStorage simpleStorage) {
+        this.simpleStorage = simpleStorage;
+    }
+
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+
+    public ReceivedMsgStorer getReceivedMsgStorer() {
+        return receivedMsgStorer;
+    }
+
+    public void setReceivedMsgStorer(ReceivedMsgStorer receivedMsgStorer) {
+        this.receivedMsgStorer = receivedMsgStorer;
+    }
+
+    public MsgVerifier getMsgVerifier() {
+        return msgVerifier;
+    }
+
+    public void setMsgVerifier(MsgVerifier msgVerifier) {
+        this.msgVerifier = msgVerifier;
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
+
+    public MsgGenerator getMsgGenerator() {
+        return msgGenerator;
+    }
+
+    public void setMsgGenerator(MsgGenerator msgGenerator) {
+        this.msgGenerator = msgGenerator;
+    }
+
+    public GeneratedMsgStorer getGeneratedMsgStorer() {
+        return generatedMsgStorer;
+    }
+
+    public void setGeneratedMsgStorer(GeneratedMsgStorer generatedMsgStorer) {
+        this.generatedMsgStorer = generatedMsgStorer;
+    }
+
+    public MsgSender getMsgSender() {
+        return msgSender;
+    }
+
+    public void setMsgSender(MsgSender msgSender) {
+        this.msgSender = msgSender;
+    }
+
+    public MsgReceiver getMsgReceiver() {
+        return msgReceiver;
+    }
+
+    public void setMsgReceiver(MsgReceiver msgReceiver) {
+        this.msgReceiver = msgReceiver;
+    }
+
+    public FlowIssueUTicket getFlowIssuerIssueUTicket() {
+        return flowIssuerIssueUTicket;
+    }
+
+    public void setFlowIssuerIssueUTicket(FlowIssueUTicket flowIssuerIssueUTicket) {
+        this.flowIssuerIssueUTicket = flowIssuerIssueUTicket;
+    }
+
+    public FlowOpenSession getFlowOpenSession() {
+        return flowOpenSession;
+    }
+
+    public void setFlowOpenSession(FlowOpenSession flowOpenSession) {
+        this.flowOpenSession = flowOpenSession;
+    }
+
+    public FlowApplyUTicket getFlowApplyUTicket() {
+        return flowApplyUTicket;
+    }
+
+    public void setFlowApplyUTicket(FlowApplyUTicket flowApplyUTicket) {
+        this.flowApplyUTicket = flowApplyUTicket;
+    }
+
+    public FlowIssueUToken getFlowIssueUToken() {
+        return flowIssueUToken;
+    }
+
+    public void setFlowIssueUToken(FlowIssueUToken flowIssueUToken) {
+        this.flowIssueUToken = flowIssueUToken;
     }
 }
 // TODO:

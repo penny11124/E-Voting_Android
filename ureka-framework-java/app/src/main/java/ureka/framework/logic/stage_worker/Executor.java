@@ -176,7 +176,7 @@ public class Executor {
                         this.sharedData.getCurrentSession().getAssociatedPlaintextCmd()
                 );
 
-                SimpleLogger.simpleLog("info", "data = " + dataProcessed.first() + ", " + dataProcessed.second());
+                SimpleLogger.simpleLog("info", "data = " + dataProcessed.getPairFirst() + ", " + dataProcessed.getPairSecond());
                 // Update Session: PS-Data
                 this.executePs("sendRToken", uTicketIn, (String) dataProcessed.getPairFirst(), (String) dataProcessed.getPairSecond());
 

@@ -42,7 +42,7 @@ public class Test01SuccessWhenInitializeAgentOrServer {
         // GIVEN: Uninitialized CS
         this.cloudServerDm = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "cloudServerDm");
 
-        // 初始狀態應該為空
+        //
         assertEquals(0, this.cloudServerDm.getSharedData().getThisDevice().getTicketOrder());
         assertNull(this.cloudServerDm.getSharedData().getThisDevice().getDevicePrivKeyStr());
         assertNull(this.cloudServerDm.getSharedData().getThisDevice().getDevicePubKeyStr());
@@ -50,7 +50,7 @@ public class Test01SuccessWhenInitializeAgentOrServer {
         assertNull(this.cloudServerDm.getSharedData().getThisPerson().getPersonPrivKeyStr());
         assertNull(this.cloudServerDm.getSharedData().getThisPerson().getPersonPubKeyStr());
 
-        // WHEN: DM apply execute_one_time_intialize_agent_or_server() on Uninitialized CS
+        // WHEN: DM apply _executeOneTimeInitializeAgentOrServer() on Uninitialized CS
         currentTestWhenAndThenLog();
         this.cloudServerDm.getExecutor()._executeOneTimeInitializeAgentOrServer();
 

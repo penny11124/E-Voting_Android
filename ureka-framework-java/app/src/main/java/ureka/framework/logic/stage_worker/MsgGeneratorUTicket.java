@@ -77,8 +77,8 @@ public class MsgGeneratorUTicket {
     // something to fixed
     private UTicket _addIssuerSignatureOnUTicket(UTicket unsignedUTicket, ECPrivateKey privateKey) {
         // Message
-        String uTicketToJsonstr = UTicket.uTicketToJsonStr(unsignedUTicket);
-        byte[] unsignedUTicketByte = SerializationUtil.strToByte(uTicketToJsonstr);
+        String uTicketToJsonStr = UTicket.uTicketToJsonStr(unsignedUTicket);
+        byte[] unsignedUTicketByte = SerializationUtil.strToByte(uTicketToJsonStr);
 
         // Sign Signature
         byte[] signatureByte;

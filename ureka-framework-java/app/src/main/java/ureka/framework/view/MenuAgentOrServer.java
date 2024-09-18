@@ -81,7 +81,7 @@ public class MenuAgentOrServer {
         generatedRequest.put("holderId", this.agentOrServer.getSharedData().getThisPerson().getPersonPubKeyStr());
         generatedRequest.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
 
-        this.agentOrServer.getFlowIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
+        this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
 
         // WHEN: Holder: DM's CS forward the intialization_u_ticket to Uninitialized IoTD
         this.agentOrServer.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
@@ -109,7 +109,7 @@ public class MenuAgentOrServer {
         generatedRequest.put("holderId", newOwner.getSharedData().getThisPerson().getPersonPubKeyStr());
         generatedRequest.put("uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET);
 
-        this.agentOrServer.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+        this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         Conftest.waitSimulatedCommCompleted(newOwner, this.agentOrServer);
     }
 
@@ -141,7 +141,7 @@ public class MenuAgentOrServer {
         generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
         generatedRequest.put("taskScope", generatedTaskScope);
 
-        this.agentOrServer.getFlowIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
+        this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
         // WHEN: Holder: DM's CS forward the self_access_u_ticket to Uninitialized IoTD
         String generatedCommand = "HELLO-1";
@@ -166,7 +166,7 @@ public class MenuAgentOrServer {
         generatedRequest.put("holderId", newAccessor.getSharedData().getThisPerson().getPersonPubKeyStr());
         generatedRequest.put("uTicketType", generatedTaskScope);
 
-        this.agentOrServer.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+        this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         Conftest.waitSimulatedCommCompleted(newAccessor, this.agentOrServer);
     }
 
@@ -225,7 +225,7 @@ public class MenuAgentOrServer {
         // WHEN: Holder: Holder return the r_ticket to Issuer
         Environment.COMMUNICATION_CHANNEL = "SIMULATED";
         Conftest.createSimulatedCommConnection(originalIssuer, this.agentOrServer);
-        this.agentOrServer.getFlowIssueUTicket().holderSendRTicketToIssuer(targetDeviceId);
+        this.agentOrServer.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(targetDeviceId);
 
         Conftest.waitSimulatedCommCompleted(originalIssuer, this.agentOrServer);
     }
