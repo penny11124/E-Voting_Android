@@ -80,7 +80,7 @@ public class Test15FailWhenAccessDeviceByOthers {
 
         // WHEN: Pretend Holder: Other
         // WHEN: Forge Flow (_holderRecvUTicket)
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(generatedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(generatedUTicketJson));
 
         // WHEN: Apply Flow (holderApplyUTicket)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
@@ -122,14 +122,14 @@ public class Test15FailWhenAccessDeviceByOthers {
                 "uTicketType", UTicket.TYPE_ACCESS_UTICKET,
                 "taskScope", generatedTaskScope
         );
-        this.userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+        this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (_holderRecvUTicket)
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String interceptedUTicketJson = this.cloudServerEP.getSharedData().getReceivedMessageJson();
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Preempt (holderApplyUTicket)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
@@ -171,7 +171,7 @@ public class Test15FailWhenAccessDeviceByOthers {
                 "uTicketType", UTicket.TYPE_ACCESS_UTICKET,
                 "taskScope", generatedTaskScope
         );
-        this.userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+        this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
 
         // WHEN: Holder: EP's CS forward the accessUTicket
@@ -190,7 +190,7 @@ public class Test15FailWhenAccessDeviceByOthers {
         // WHEN: Interception (_holderRecvUTicket)
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String interceptedUTicketJson = this.cloudServerEP.getSharedData().getDeviceTable().get(targetDeviceId2).getDeviceUTicketForOwner();
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Reuse (holderApplyUTicket)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);

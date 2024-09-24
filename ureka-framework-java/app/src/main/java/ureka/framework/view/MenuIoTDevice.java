@@ -45,16 +45,16 @@ public class MenuIoTDevice {
     public DeviceController receiveUTicketThroughBluetooth() {
         // WHEN: Accept bluetooth connection from UA or CS
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.iotDevice.getMsgReceiver().acceptBluetoothComm();
+//        this.iotDevice.getMsgReceiver().acceptBluetoothComm();
 
         // WHEN: Receive/Send Message in Connection
         this.iotDevice.getMsgReceiver()._recvXxxMessage();
 
         // RE-GIVEN: Close bluetooth Connection with UA or CS
-        this.iotDevice.getMsgReceiver().closeBluetoothConnection();
+//        this.iotDevice.getMsgReceiver().closeBluetoothConnection();
 
         // RE-GIVEN: Stop Accepting New bluetooth Connections from UA or CS
-        this.iotDevice.getMsgReceiver().closeBluetoothAcception();
+//        this.iotDevice.getMsgReceiver().closeBluetoothAcception();
         return this.iotDevice;
     }
 
@@ -62,13 +62,14 @@ public class MenuIoTDevice {
     public DeviceController receiveInsecureCmdThroughBluetooth(String option) {
         // WHEN: Accept bluetooth connection from UA or CS
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.iotDevice.getMsgReceiver().acceptBluetoothComm();
+//        this.iotDevice.getMsgReceiver().acceptBluetoothComm();
 
         // WHEN: IoTD receive the insecure_cmd from UA or CS
         while (true) {
             try {
                 // This will block until message is received
-                String insecureCmdJson = this.iotDevice.getSharedData().getConnectionSocket().recvMessage();
+                String insecureCmdJson = "";
+//                insecureCmdJson = this.iotDevice.getSharedData().getConnectionSocket().recvMessage();
 
                 // Message Size Measurement
                 this.iotDevice.getMeasureHelper().measureMessageSize("_recvMessage",insecureCmdJson);
@@ -91,7 +92,7 @@ public class MenuIoTDevice {
                     insecureDataJson = SerializationUtil.dictToJsonStr(insecureDataDict);
                 }
                 // WHEN: IoTD return the insecure_data to UA or CS
-                this.iotDevice.getSharedData().getConnectionSocket().sendMessage(insecureDataJson);
+//                this.iotDevice.getSharedData().getConnectionSocket().sendMessage(insecureDataJson);
                 SimpleLogger.simpleLog("cli","Sent Data: " + insecureDataJson);
 
                 // End Process Measurement
@@ -102,16 +103,20 @@ public class MenuIoTDevice {
                     this.iotDevice.getMeasureHelper().measureCommPerfStart();
                     SimpleLogger.simpleLog("debug", this.iotDevice.getSharedData().getThisDevice().getDeviceName() + " manually finish CMD-DATA~~ (device)");
                 }
-            } catch (IOException e) {
+//            } catch (IOException e) {
+//                SimpleLogger.simpleLog("cli", "");
+//                SimpleLogger.simpleLog("cli", "+ Connection is closed by peer.");
+//                break;
+            } catch (RuntimeException e) {
                 SimpleLogger.simpleLog("cli", "");
                 SimpleLogger.simpleLog("cli", "+ Connection is closed by peer.");
                 break;
             }
         }
         // RE-GIVEN: Close bluetooth connection with UA or CS
-        this.iotDevice.getMsgReceiver().closeBluetoothConnection();
+//        this.iotDevice.getMsgReceiver().closeBluetoothConnection();
         // RE-GIVEN: Stop Accepting New bluetooth Connections from UA or CS
-        this.iotDevice.getMsgReceiver().closeBluetoothAcception();
+//        this.iotDevice.getMsgReceiver().closeBluetoothAcception();
         return this.iotDevice;
     }
 }

@@ -25,14 +25,14 @@ public class Test01SuccessWhenInitializeAgentOrServer {
     @BeforeEach
     public void setup() {
         currentSetupLog();
-        SimpleStorage.deleteStorageInTest();
+//        SimpleStorage.deleteStorageInTest();
     }
 
     // RE-GIVEN: Reset the test environment
     @AfterEach
     public void teardown() {
         currentTeardownLog();
-        SimpleStorage.deleteStorageInTest();
+//        SimpleStorage.deleteStorageInTest();
     }
 
     @Test

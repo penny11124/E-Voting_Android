@@ -30,9 +30,8 @@ public class MsgGenerator {
                 this.sharedData.getDeviceTable()
         );
         UTicket generatedUTicket = uTicketGenerator.generateArbitraryUTicket(arbitraryDict);
-        String generatedUTicketJson = UTicket.uTicketToJsonStr(generatedUTicket);
 
-        return generatedUTicketJson;
+        return UTicket.uTicketToJsonStr(generatedUTicket);
     }
 
     public String generateXxxRTicket(Map<String, String> arbitraryDict) {
@@ -46,9 +45,9 @@ public class MsgGenerator {
                 this.sharedData.getThisPerson(),
                 this.sharedData.getDeviceTable()
         );
-        RTicket generatedRTicket = rTicketGenerator.generateArbitraryRTicket(arbitraryDict);
-        String generatedRTicketJson = RTicket.rTicketToJsonStr(generatedRTicket);
 
-        return generatedRTicketJson;
+        RTicket generatedRTicket = rTicketGenerator.generateArbitraryRTicket(arbitraryDict);
+
+        return RTicket.rTicketToJsonStr(generatedRTicket);
     }
 }

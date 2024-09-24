@@ -109,7 +109,7 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
 
         // WHEN: Holder: EP's CS return the access_end_r_ticket to DO's UA
         createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
-        this.cloudServerEP.getFlowIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
+        this.cloudServerEP.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
         waitSimulatedCommCompleted(this.userAgentDO, this.cloudServerEP);
 
         // THEN: Issuer: DM's CS know that EP's CS has ended the private session with DO's IoTD (& ticket order++)
@@ -180,7 +180,7 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
     }
 
     @Test
-    public void testFailWhenInterceptAndReuseTheUToken() {
+    public void testFailWhenInterceptAndReuseTheUToken() throws InterruptedException {
         currentTestGivenLog();
 
         // GIVEN: Initialized EP's CS open a seesion on DO's IoTD
@@ -208,7 +208,7 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
 
         // WHEN: Pretend Holder: Other
         // WHEN: Pretend Holder: Session
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
         // WHEN: Interception (_deviceRecvCmd)
         String interceptedUTokenJson = this.iotDevice.getSharedData().getReceivedMessageJson();
 

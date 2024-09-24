@@ -52,6 +52,78 @@ public class FlowIssueUToken {
         this.flowApplyUTicket = flowApplyUTicket;
     }
 
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+
+    public SharedData getSharedData() {
+        return sharedData;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
+    public void setReceivedMsgStorer(ReceivedMsgStorer receivedMsgStorer) {
+        this.receivedMsgStorer = receivedMsgStorer;
+    }
+
+    public ReceivedMsgStorer getReceivedMsgStorer() {
+        return receivedMsgStorer;
+    }
+
+    public void setMsgVerifier(MsgVerifier msgVerifier) {
+        this.msgVerifier = msgVerifier;
+    }
+
+    public MsgVerifier getMsgVerifier() {
+        return msgVerifier;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public void setMsgGenerator(MsgGenerator msgGenerator) {
+        this.msgGenerator = msgGenerator;
+    }
+
+    public MsgGenerator getMsgGenerator() {
+        return msgGenerator;
+    }
+
+    public void setGeneratedMsgStorer(GeneratedMsgStorer generatedMsgStorer) {
+        this.generatedMsgStorer = generatedMsgStorer;
+    }
+
+    public GeneratedMsgStorer getGeneratedMsgStorer() {
+        return generatedMsgStorer;
+    }
+
+    public void setMsgSender(MsgSender msgSender) {
+        this.msgSender = msgSender;
+    }
+
+    public MsgSender getMsgSender() {
+        return msgSender;
+    }
+
+    public void setFlowApplyUTicket(FlowApplyUTicket flowApplyUTicket) {
+        this.flowApplyUTicket = flowApplyUTicket;
+    }
+
+    public FlowApplyUTicket getFlowApplyUTicket() {
+        return flowApplyUTicket;
+    }
+
     /* [PIPELINE FLOW]
 
      APY (PS):

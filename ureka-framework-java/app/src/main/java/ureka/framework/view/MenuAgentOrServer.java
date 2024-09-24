@@ -68,11 +68,11 @@ public class MenuAgentOrServer {
     public DeviceController applyInitializationTicketThroughBluetooth() {
         // WHEN: Connect bluetooth connection with IoTD
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        try {
-            this.agentOrServer.getMsgSender().connectBluetoothComm();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            this.agentOrServer.getMsgSender().connectBluetoothComm();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
 
         // WHEN: Issuer: DM's CS generate the intialization_u_ticket to herself
         String idForInitializationUTicket = "noId";
@@ -90,11 +90,11 @@ public class MenuAgentOrServer {
         this.agentOrServer.getMsgReceiver()._recvXxxMessage();
 
         // RE-GIVEN: Close bluetooth connection with IoTD (Finish UT-RT~~)
-        try {
-            this.agentOrServer.getMsgSender().closeBluetoothConnection();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            this.agentOrServer.getMsgSender().closeBluetoothConnection();
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
 
         return this.agentOrServer;
     }
@@ -116,7 +116,7 @@ public class MenuAgentOrServer {
     public DeviceController applyOwnershipTicketThroughBluetooth(String targetDeviceId) {
         // WHEN: Connect bluetooth connection with IoTD
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.agentOrServer.getMsgSender().connectBluetoothComm();
+//        this.agentOrServer.getMsgSender().connectBluetoothComm();
 
         // WHEN: Holder: EP's CS apply the ownership_u_ticket to IoTD
         this.agentOrServer.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId);
@@ -124,14 +124,14 @@ public class MenuAgentOrServer {
         this.agentOrServer.getMsgReceiver()._recvXxxMessage();
 
         // RE-GIVEN: Close bluetooth connection with IoTD (Finish UT-RT~~)
-        this.agentOrServer.getMsgSender().closeBluetoothConnection();
+//        this.agentOrServer.getMsgSender().closeBluetoothConnection();
         return this.agentOrServer;
     }
 
     public DeviceController applySelfAccessTicketThroughBluetooth(String targetDeviceId) {
         // WHEN: Connect bluetooth connection with IoTD
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.agentOrServer.getMsgSender().connectBluetoothComm();
+//        this.agentOrServer.getMsgSender().connectBluetoothComm();
 
         // WHEN: Issuer: DM's CS generate the self_access_u_ticket to herself
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
@@ -151,7 +151,7 @@ public class MenuAgentOrServer {
         this.agentOrServer.getMsgReceiver()._recvXxxMessage();
 
         // RE-GIVEN: Close bluetooth connection with IoTD (Finish CR-KE~~)
-        this.agentOrServer.getMsgSender().closeBluetoothConnection();
+//        this.agentOrServer.getMsgSender().closeBluetoothConnection();
         return this.agentOrServer;
     }
 
@@ -173,7 +173,7 @@ public class MenuAgentOrServer {
     public DeviceController applyAccessTicketThroughBluetooth(String targetDeviceId) {
         // WHEN: Connect bluetooth connection with IoTD
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.agentOrServer.getMsgSender().connectBluetoothComm();
+//        this.agentOrServer.getMsgSender().connectBluetoothComm();
 
         // WHEN: Holder: EP's CS apply the access_u_ticket to IoTD
         String generatedCommand = "HELLO-1";
@@ -183,14 +183,14 @@ public class MenuAgentOrServer {
         this.agentOrServer.getMsgReceiver()._recvXxxMessage();
 
         // RE-GIVEN: Close bluetooth connection with IoTD (Finish CR-KE~~)
-        this.agentOrServer.getMsgSender().closeBluetoothConnection();
+//        this.agentOrServer.getMsgSender().closeBluetoothConnection();
         return this.agentOrServer;
     }
 
     public DeviceController applyCmdTokenThroughBluetooth(String targetDeviceId) {
         // WHEN: Connect bluetooth connection with IoTD
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.agentOrServer.getMsgSender().connectBluetoothComm();
+//        this.agentOrServer.getMsgSender().connectBluetoothComm();
 
         // WHEN: Holder: EP's CS apply the access_u_ticket to IoTD
         String generatedCommand = "HELLO-2";
@@ -200,14 +200,14 @@ public class MenuAgentOrServer {
         this.agentOrServer.getMsgReceiver()._recvXxxMessage();
 
         // RE-GIVEN: Close bluetooth connection with IoTD (Finish PS~~)
-        this.agentOrServer.getMsgSender().closeBluetoothConnection();
+//        this.agentOrServer.getMsgSender().closeBluetoothConnection();
         return this.agentOrServer;
     }
 
     public DeviceController applyAccessEndTokenThroughBluetooth(String targetDeviceId) {
         // WHEN: Connect bluetooth connection with IoTD
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.agentOrServer.getMsgSender().connectBluetoothComm();
+//        this.agentOrServer.getMsgSender().connectBluetoothComm();
 
         // WHEN: Holder: EP's CS apply the access_u_ticket to IoTD
         String generatedCommand = "ACCESS_END";
@@ -217,7 +217,7 @@ public class MenuAgentOrServer {
         this.agentOrServer.getMsgReceiver()._recvXxxMessage();
 
         // RE-GIVEN: Close bluetooth connection with IoTD (Finish PS~~)
-        this.agentOrServer.getMsgSender().closeBluetoothConnection();
+//        this.agentOrServer.getMsgSender().closeBluetoothConnection();
         return this.agentOrServer;
     }
 
@@ -234,14 +234,14 @@ public class MenuAgentOrServer {
     public DeviceController applyInsecureCmdThroughBluetooth(String option) {
         // WHEN: Connect bluetooth connection with IoTD
         Environment.COMMUNICATION_CHANNEL = "BLUETOOTH";
-        this.agentOrServer.getMsgSender().connectBluetoothComm();
+//        this.agentOrServer.getMsgSender().connectBluetoothComm();
 
         // WHEN: UA or CS send the insecure_cmd to IoTD
 
         // Start Process Measurement
         this.agentOrServer.getMeasureHelper().measureProcessPerfStart();
 
-        String insecureCmdJson;
+        String insecureCmdJson = "";
         if (option.equals("shortest")) {
             insecureCmdJson = "HELLO";
         } else if (option.equals("withDeviceId")) {
@@ -260,7 +260,7 @@ public class MenuAgentOrServer {
             insecureCmdJson = SerializationUtil.dictToJsonStr(insecureCmdDict);
         }
 
-        this.agentOrServer.getSharedData().getConnectionSocket().sendMessage(insecureCmdJson);
+//        this.agentOrServer.getSharedData().getConnectionSocket().sendMessage(insecureCmdJson);
         SimpleLogger.simpleLog("cli", "Sent Command: " + insecureCmdJson);
 
         // End Process Measurement
@@ -276,7 +276,8 @@ public class MenuAgentOrServer {
             this.agentOrServer.getMeasureHelper().measureCommPerfStart();
 
             // This will block until message is received
-            String insecureDataJson = this.agentOrServer.getSharedData().getConnectionSocket().recvMessage();
+            String insecureDataJson = "";
+//            insecureDataJson = this.agentOrServer.getSharedData().getConnectionSocket().recvMessage();
 
             // End Comm Measurement
             this.agentOrServer.getMeasureHelper().measureCommTime("_recvMessage");
@@ -304,8 +305,7 @@ public class MenuAgentOrServer {
         }
 
         // RE-GIVEN: Close bluetooth connection with IoTD (Finish CMD-DATA~~)
-        this.agentOrServer.getMsgSender().closeBluetoothConnection();
+//        this.agentOrServer.getMsgSender().closeBluetoothConnection();
         return this.agentOrServer;
     }
-
 }
