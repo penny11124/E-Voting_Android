@@ -47,6 +47,70 @@ public class FlowOpenSession {
         this.msgSender = msgSender;
     }
 
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+
+    public SharedData getSharedData() {
+        return sharedData;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
+    public void setReceivedMsgStorer(ReceivedMsgStorer receivedMsgStorer) {
+        this.receivedMsgStorer = receivedMsgStorer;
+    }
+
+    public ReceivedMsgStorer getReceivedMsgStorer() {
+        return receivedMsgStorer;
+    }
+
+    public void setMsgVerifier(MsgVerifier msgVerifier) {
+        this.msgVerifier = msgVerifier;
+    }
+
+    public MsgVerifier getMsgVerifier() {
+        return msgVerifier;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public void setMsgGenerator(MsgGenerator msgGenerator) {
+        this.msgGenerator = msgGenerator;
+    }
+
+    public MsgGenerator getMsgGenerator() {
+        return msgGenerator;
+    }
+
+    public void setGeneratedMsgStorer(GeneratedMsgStorer generatedMsgStorer) {
+        this.generatedMsgStorer = generatedMsgStorer;
+    }
+
+    public GeneratedMsgStorer getGeneratedMsgStorer() {
+        return generatedMsgStorer;
+    }
+
+    public void setMsgSender(MsgSender msgSender) {
+        this.msgSender = msgSender;
+    }
+
+    public MsgSender getMsgSender() {
+        return msgSender;
+    }
+
     // [PIPELINE FLOW]
     // APY (CR-KE):
     //       holderApplyUTicket() -> _deviceRecvUTicket()
@@ -57,7 +121,7 @@ public class FlowOpenSession {
         try {
             // [STAGE: (G)]
             Map<String, String> rTicketRequest = new HashMap<>();
-            if(resultMessage.contains("SUCCESS")) {
+            if (resultMessage.contains("SUCCESS")) {
                 rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE1_RTICKET);
                 rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 rTicketRequest.put("result", resultMessage);

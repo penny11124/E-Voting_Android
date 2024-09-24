@@ -75,7 +75,7 @@ public class Test14FailWhenAccessDeviceByOwner {
                 "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
                 "taskScope", generatedTaskScope
         );
-        this.cloudServerATK.getFlowIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
+        this.cloudServerATK.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
         // WHEN: Apply Flow (holder_apply_u_ticket)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
@@ -122,7 +122,7 @@ public class Test14FailWhenAccessDeviceByOwner {
                 "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
                 "taskScope", generatedTaskScope
         );
-        this.userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
+        this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (issuer_issue_u_ticket_to_herself)
@@ -176,7 +176,7 @@ public class Test14FailWhenAccessDeviceByOwner {
                 "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
                 "taskScope", generatedTaskScope
         );
-        this.userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
+        this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
         // WHEN: Holder: DO's UA forward the selfAccessUTicket
         createSimulatedCommConnection(this.userAgentDO, this.iotDevice);

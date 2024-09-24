@@ -41,6 +41,14 @@ public class MsgVerifierRTicket {
         this.currentSession = currentSession;
     }
 
+    public void setDeviceTable(Map<String, OtherDevice> deviceTable) {
+        this.deviceTable = deviceTable;
+    }
+
+    public Map<String, OtherDevice> getDeviceTable() {
+        return deviceTable;
+    }
+
     // Message Verification Flow
     public static RTicket verifyJsonSchema(String arbitraryJson) {
         String successMsg = "-> SUCCESS: VERIFY_JSON_SCHEMA";

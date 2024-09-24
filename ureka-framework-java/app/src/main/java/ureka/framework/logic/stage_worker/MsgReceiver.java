@@ -226,7 +226,7 @@ public class MsgReceiver implements Runnable {
 //                    if (this.sharedData.getBluetoothCommCompletedFlag()) {
 //                        break;
 //                    }
-//                    receivedMessageWithHeader = this.sharedData.getConnectionSocket().recvMessage();
+////                    receivedMessageWithHeader = this.sharedData.getConnectionSocket().recvMessage();
 //                    this.measureHelper.measureCommTime("_recvMessage");
 //
 //                    SimpleLogger.simpleLog("info", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is receiving message from BT_address or BT_name...");
@@ -250,27 +250,27 @@ public class MsgReceiver implements Runnable {
                 // IOT_DEVICE
                 String state = this.sharedData.getState();
                 if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_UT)) {
-//                    this.flowApplyUTicket._deviceRecvUTicket((UTicket) receivedMessage);
+                    this.flowApplyUTicket._deviceRecvUTicket((UTicket) receivedMessage);
                 } else if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_CRKE2)) {
-//                    this.flowOpenSession._deviceRecvCrKe2((RTicket) receivedMessage);
+                    this.flowOpenSession._deviceRecvCrKe2((RTicket) receivedMessage);
                     SimpleLogger.simpleLog("cli", "plaintextCmd in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextCmd());
                 } else if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_CMD)) {
-//                    this.flowIssueUToken._deviceRecvCmd((UTicket) receivedMessage);
+                    this.flowIssueUToken._deviceRecvCmd((UTicket) receivedMessage);
                     SimpleLogger.simpleLog("cli", "plaintextCmd in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextCmd());
                 }
                 // USER_AGENT_OR_CLOUD_SERVER
                 else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT)) {
                     if (receivedMessage instanceof UTicket) {
-//                        this.flowIssueUTicket._holder_recv_u_ticket(receivedMessage);
+                        this.flowIssueUTicket._holderRecvUTicket((UTicket) receivedMessage);
                     } else if (receivedMessage instanceof RTicket) {
-//                        this.flowIssueUTicket._issuer_recv_r_ticket(receivedMessage);
+                        this.flowIssueUTicket._issuerRecvRTicket((RTicket) receivedMessage);
                     }
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_RT)) {
-//                    this.flowApplyUTicket._holderRecvRTicket(receivedMessage);
+                    this.flowApplyUTicket._holderRecvRTicket((RTicket) receivedMessage);
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE1)) {
-//                    this.flowOpenSession._holderRecvCrKe1(receivedMessage);
+                    this.flowOpenSession._holderRecvCrKe1((RTicket) receivedMessage);
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE3)) {
-//                    this.flowOpenSession._holderRecvCrKe3(receivedMessage);
+                    this.flowOpenSession._holderRecvCrKe3((RTicket) receivedMessage);
                     SimpleLogger.simpleLog("cli", "plaintextData in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextData());
                     SimpleLogger.simpleLog("cli", "+++Session is Constructed+++");
                 } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_DATA)) {
@@ -279,7 +279,13 @@ public class MsgReceiver implements Runnable {
                 } else { // pragma: no cover -> Shouldn't Reach Here
                     throw new RuntimeException("Shouldn't Reach Here");
                 }
-//            } catch (TimeoutException | InterruptedException error) { // Automatically Finish Simulated Comm
+            } catch (TimeoutException error) { // Automatically Finish Simulated Comm
+                SimpleLogger.simpleLog("debug", "+ " + this.sharedData.getThisDevice().getDeviceName() + " automatically terminate receiver thread (simulated comm) after Timeout (" + Environment.SIMULATED_COMM_TIME_OUT + " seconds)~~");
+                if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
+                    this.msgSender.completeSimulatedComm();
+                }
+                break;
+//            } catch (InterruptedException error) {
 //                SimpleLogger.simpleLog("debug", "+ " + this.sharedData.getThisDevice().getDeviceName() + " automatically terminate receiver thread (simulated comm) after Timeout (" + Environment.SIMULATED_COMM_TIME_OUT + " seconds)~~");
 //                if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
 //                    this.msgSender.completeSimulatedComm();

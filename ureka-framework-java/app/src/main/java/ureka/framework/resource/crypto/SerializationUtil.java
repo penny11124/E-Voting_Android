@@ -32,7 +32,7 @@ public class SerializationUtil {
 
     ////////// Bytes <-> Base64Str //////////
     public static String byteToBase64Str(byte[] byteArray) {
-        return Base64.getUrlEncoder().encodeToString(byteArray);
+        return Base64.getEncoder().encodeToString(byteArray);
     }
 
     public static byte[] base64StrBackToByte(String base64String) {
@@ -40,7 +40,7 @@ public class SerializationUtil {
             if (base64String == null) {
                 return null;
             }
-            return Base64.getUrlDecoder().decode(base64String.getBytes(StandardCharsets.UTF_8));
+            return Base64.getDecoder().decode(base64String);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("base64StrBackToByte: Decode failed.", e);
         }
@@ -69,7 +69,7 @@ public class SerializationUtil {
             } else if (keyType.equals("eccPrivateKey") && keyObj instanceof ECPrivateKey) {
                 return ((ECPrivateKey) keyObj).getEncoded();
             } else {
-                throw new RuntimeException("_keyToByte: Ket type not supported.");
+                throw new RuntimeException("_keyToByte: Key type not supported.");
             }
         } catch (Exception e) {
             throw new RuntimeException("_keyToByte: Conversion failed.", e);
@@ -102,8 +102,10 @@ public class SerializationUtil {
         }
     }
     public static String keyToStr(Object keyObj) {
-        if (keyObj instanceof ECPrivateKey || keyObj instanceof ECPublicKey) {
+        if (keyObj instanceof ECPublicKey) {
             return byteToBase64Str(_keyToByte(keyObj, "eccPublicKey"));
+        } else if (keyObj instanceof ECPrivateKey) {
+            return byteToBase64Str(_keyToByte(keyObj, "eccPrivateKey"));
         } else {
             throw new IllegalArgumentException("keyToStr: Illegal argument.");
         }
@@ -113,6 +115,6 @@ public class SerializationUtil {
         return _byteToKey(base64StrBackToByte(keyStr), keyType);
     }
     public static Object strToKey(String keyStr) {
-        return _byteToKey(base64StrBackToByte(keyStr), "ecc-public-key");
+        return _byteToKey(base64StrBackToByte(keyStr), "eccPublicKey");
     }
 }

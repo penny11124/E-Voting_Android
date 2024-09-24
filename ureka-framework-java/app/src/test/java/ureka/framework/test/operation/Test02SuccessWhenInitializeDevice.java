@@ -70,7 +70,7 @@ public class Test02SuccessWhenInitializeDevice {
                 "holderId", this.cloudServerDm.getSharedData().getThisPerson().getPersonPubKeyStr(),
                 "uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET
         );
-        this.cloudServerDm.getFlowIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
+        this.cloudServerDm.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
 
         // WHEN: Holder: DM's CS forward the access_u_ticket to Uninitialized IoTD
         createSimulatedCommConnection(this.cloudServerDm, this.iotDevice);

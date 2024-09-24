@@ -70,7 +70,7 @@ public class Test05SuccessWhenAccessDeviceByOthers {
                 "uTicketType", UTicket.TYPE_ACCESS_UTICKET,
                 "taskScope", generatedTaskScope
         );
-        this.userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
+        this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
         waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket

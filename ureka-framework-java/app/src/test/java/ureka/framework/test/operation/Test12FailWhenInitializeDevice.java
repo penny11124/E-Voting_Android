@@ -62,7 +62,7 @@ public class Test12FailWhenInitializeDevice {
                 "holderId", this.cloudServerDM.getSharedData().getThisPerson().getPersonPubKeyStr(),
                 "uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET
         );
-        this.cloudServerDM.getFlowIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
+        this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
         this.cloudServerDM.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
         waitSimulatedCommCompleted(this.cloudServerDM,this.iotDevice);
 

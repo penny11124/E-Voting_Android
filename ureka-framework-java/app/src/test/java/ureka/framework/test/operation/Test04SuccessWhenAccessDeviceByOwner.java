@@ -63,7 +63,7 @@ public class Test04SuccessWhenAccessDeviceByOwner {
                 "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
                 "taskScope", generatedTaskScope
         );
-        this.userAgentDO.getFlowIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
+        this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
         // WHEN: Holder: DO's UA forward the self_access_u_ticket
         createSimulatedCommConnection(this.userAgentDO,this.iotDevice);
