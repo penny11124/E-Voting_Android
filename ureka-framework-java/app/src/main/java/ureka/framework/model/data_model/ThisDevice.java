@@ -6,8 +6,10 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
@@ -157,7 +159,7 @@ public class ThisDevice {
         this.ownerPubKey = ownerPubKey;
     }
 
-    public static Map<String, String> _thisDeviceToMap(ThisDevice thisDevice) throws IllegalAccessException {
+    private static Map<String, String> _thisDeviceToMap(ThisDevice thisDevice) throws IllegalAccessException {
         Map<String, String> thisDeviceMap = new HashMap<>();
         Class<?> otherDeviceClass = thisDevice.getClass();
 
@@ -165,6 +167,10 @@ public class ThisDevice {
             try {
                 field.setAccessible(true);
                 Object value = field.get(thisDevice);
+
+                if (Modifier.isFinal(field.getModifiers())) {
+                    continue;
+                }
 
                 if (value != null) {
                     if (field.getType().equals(Integer.class)) {
@@ -188,7 +194,7 @@ public class ThisDevice {
         return thisDeviceMap;
     }
 
-    public static ThisDevice _mapToThisDevice(Map<String, String> thisDeviceMap)
+    private static ThisDevice _mapToThisDevice(Map<String, String> thisDeviceMap)
         throws NoSuchFieldException, IllegalAccessException {
         ThisDevice thisDevice = new ThisDevice();
       
@@ -199,6 +205,10 @@ public class ThisDevice {
                 Field field = thisDeviceClass.getDeclaredField(entry.getKey());
                 field.setAccessible(true);
 
+                if (Modifier.isFinal(field.getModifiers())) {
+                    continue;
+                }
+
                 String value = entry.getValue();
                 if (value == null) {
                     field.set(thisDevice, null);
@@ -207,9 +217,9 @@ public class ThisDevice {
                 } else if (field.getType().equals(Integer.class)) {
                     field.set(thisDevice, Integer.valueOf(value));
                 } else if (field.getType().equals(ECPrivateKey.class)) {
-                    field.set(thisDevice, SerializationUtil.strToKey(value, "ecc-private-key"));
+                    field.set(thisDevice, SerializationUtil.strToKey(value, "eccPrivateKey"));
                 } else if (field.getType().equals(ECPublicKey.class)) {
-                    field.set(thisDevice, SerializationUtil.strToKey(value, "ecc-public-key"));
+                    field.set(thisDevice, SerializationUtil.strToKey(value, "eccPublicKey"));
                 }
             } catch (NoSuchFieldException e) {
                 String failureMsg = "ThisDevice._mapToThisDevice: NoSuchFieldException occurs.";
@@ -224,23 +234,40 @@ public class ThisDevice {
         return thisDevice;
     }
 
-    public static String thisDeviceToJsonStr(ThisDevice thisDevice) {
-        // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
-        return gson.toJson(thisDevice);
+//     public static String thisDeviceToJsonStr(ThisDevice thisDevice) {
+//         // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
+//         return gson.toJson(thisDevice);
+//     }
+
+//     public static ThisDevice jsonStrToThisDevice(String jsonStr) {
+//         try {
+//             if (!isValidJson(jsonStr)) {
+//                 throw new RuntimeException("Invalid JSON string");
+//             } else {
+//                 System.out.println("VALID!!!");
+//             }
+//             return gson.fromJson(jsonStr, ThisDevice.class);
+//         } catch (Exception e) {
+//             String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
+//             throw new RuntimeException(failureMsg);
+//         }
+
+    public static String thisDeviceToJsonstr(ThisDevice thisDevice) throws Exception {
+        Map<String, String> thisDeviceMap = _thisDeviceToMap(thisDevice);
+        return gson.toJson(thisDeviceMap);
     }
 
-    public static ThisDevice jsonStrToThisDevice(String jsonStr) {
-        try {
-            if (!isValidJson(jsonStr)) {
-                throw new RuntimeException("Invalid JSON string");
-            } else {
-                System.out.println("VALID!!!");
-            }
-            return gson.fromJson(jsonStr, ThisDevice.class);
-        } catch (Exception e) {
-            String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
-            throw new RuntimeException(failureMsg);
-        }
+    public static ThisDevice jsonStrToThisDevice(String jsonStr) throws Exception {
+//        try {
+//            Map<String, String> thisDeviceMap = gson.fromJson(jsonStr, new TypeToken<Map<String, String>>() {}.getType());
+//            return _mapToThisDevice(thisDeviceMap);
+//        } catch (Exception e) {
+//            String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
+//            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+//            throw new RuntimeException(failureMsg);
+//        }
+        Map<String, String> thisDeviceMap = gson.fromJson(jsonStr, new TypeToken<Map<String, String>>() {}.getType());
+        return _mapToThisDevice(thisDeviceMap);
     }
 
     public static boolean isValidJson(String jsonStr) {

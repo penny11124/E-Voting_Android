@@ -42,6 +42,69 @@ public class FlowIssueUTicket {
         this.msgSender = msgSender;
     }
 
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+
+    public SharedData getSharedData() {
+        return sharedData;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
+    public void setReceivedMsgStorer(ReceivedMsgStorer receivedMsgStorer) {
+        this.receivedMsgStorer = receivedMsgStorer;
+    }
+
+    public ReceivedMsgStorer getReceivedMsgStorer() {
+        return receivedMsgStorer;
+    }
+
+    public void setMsgVerifier(MsgVerifier msgVerifier) {
+        this.msgVerifier = msgVerifier;
+    }
+
+    public MsgVerifier getMsgVerifier() {
+        return msgVerifier;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public void setMsgGenerator(MsgGenerator msgGenerator) {
+        this.msgGenerator = msgGenerator;
+    }
+
+    public MsgGenerator getMsgGenerator() {
+        return msgGenerator;
+    }
+
+    public void setGeneratedMsgStorer(GeneratedMsgStorer generatedMsgStorer) {
+        this.generatedMsgStorer = generatedMsgStorer;
+    }
+
+    public GeneratedMsgStorer getGeneratedMsgStorer() {
+        return generatedMsgStorer;
+    }
+
+    public void setMsgSender(MsgSender msgSender) {
+        this.msgSender = msgSender;
+    }
+
+    public MsgSender getMsgSender() {
+        return msgSender;
+    }
     /* [PIPELINE FLOW]
         CST: issuer_issue_u_ticket_to_herself()
         TODO: REQ: _issuer_recv_request() <- holder_send_request_to_issuer()

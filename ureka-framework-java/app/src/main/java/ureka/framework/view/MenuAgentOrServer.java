@@ -307,5 +307,4 @@ public class MenuAgentOrServer {
 //        this.agentOrServer.getMsgSender().closeBluetoothConnection();
 //        return this.agentOrServer;
 //    }
-
 }

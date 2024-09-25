@@ -182,7 +182,7 @@ public class Executor {
 
                 if (uTicketIn.getUTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
                     // [STAGE: (VTK)]
-                    if(this.sharedData.getCurrentSession().getPlaintextCmd().equals("ACCESS_END")) {
+                    if (this.sharedData.getCurrentSession().getPlaintextCmd().equals("ACCESS_END")) {
                         this.sharedData.setResultMessage("-> SUCCESS: VERIFY_ACCESS_END");
                         SimpleLogger.simpleLog("info", this.sharedData.getResultMessage());
 
@@ -193,9 +193,9 @@ public class Executor {
                         SimpleLogger.simpleLog("error", this.sharedData.getResultMessage());
                         throw new RuntimeException(this.sharedData.getResultMessage());
                     }
-                } else { // pragma: no cover -> Shouldn't Reach Here
-                    throw new RuntimeException("Shouldn't Reach Here");
                 }
+            } else { // pragma: no cover -> Shouldn't Reach Here
+                throw new RuntimeException("Shouldn't Reach Here");
             }
         } catch (RuntimeException error) {
             SimpleLogger.simpleLog("error", error.getMessage());
@@ -493,7 +493,7 @@ public class Executor {
                 break;
             case "recvCrke2" :
                 // Update Session: PS-Cmd (Input: Key)
-                byte[] currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                byte[] currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
 
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
@@ -517,7 +517,7 @@ public class Executor {
                 break;
             case "sendCrke3" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)
@@ -541,7 +541,7 @@ public class Executor {
             // PS
             case "sendUToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintext);
@@ -744,7 +744,7 @@ public class Executor {
                 break;
             case "sendRToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = Base64.getDecoder().decode(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)

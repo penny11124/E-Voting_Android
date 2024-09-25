@@ -3,6 +3,7 @@ package ureka.framework.logic.stage_worker;
 import ureka.framework.model.SharedData;
 import ureka.framework.model.data_model.OtherDevice;
 import ureka.framework.model.message_model.UTicket;
+import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 import ureka.framework.resource.storage.SimpleStorage;
 
@@ -15,6 +16,30 @@ public class GeneratedMsgStorer {
         this.sharedData = sharedData;
         this.measureHelper = measureHelper;
         this.simpleStorage = simpleStorage;
+    }
+
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+
+    public SharedData getSharedData() {
+        return sharedData;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
+    public void setSimpleStorage(SimpleStorage simpleStorage) {
+        this.simpleStorage = simpleStorage;
+    }
+
+    public SimpleStorage getSimpleStorage() {
+        return simpleStorage;
     }
 
     // [STAGE: (SG)] Store Generated Message

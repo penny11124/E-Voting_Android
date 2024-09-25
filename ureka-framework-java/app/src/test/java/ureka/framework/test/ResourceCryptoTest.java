@@ -46,15 +46,15 @@ public class ResourceCryptoTest {
         assert (map.equals(SerializationUtil.jsonStrToDict(SerializationUtil.dictToJsonStr(map))));
 
         KeyPair keyPair = ECC.generateKeyPair();
-        byte[] publicKeyByte = SerializationUtil._keyToByte(keyPair.getPublic(), "ecc-public-key");
+        byte[] publicKeyByte = SerializationUtil._keyToByte(keyPair.getPublic(), "eccPublicKey");
         byte[] newPublicKeyByte = SerializationUtil._keyToByte(
-            SerializationUtil._byteToKey(publicKeyByte, "ecc-public-key"), "ecc-public-key");
+            SerializationUtil._byteToKey(publicKeyByte, "eccPublicKey"), "eccPublicKey");
         // Since keys might not override equals() functions, we compare the keys in byte[] form.
         assert (Arrays.equals(publicKeyByte, newPublicKeyByte));
 
-        String privateKeyStr = SerializationUtil.keyToStr(keyPair.getPrivate(), "ecc-private-key");
+        String privateKeyStr = SerializationUtil.keyToStr(keyPair.getPrivate(), "eccPrivateKey");
         String newPrivateKeyStr = SerializationUtil.keyToStr(
-            SerializationUtil.strToKey(privateKeyStr, "ecc-private-key"), "ecc-private-key");
+            SerializationUtil.strToKey(privateKeyStr, "eccPrivateKey"), "eccPrivateKey");
         assert (Objects.equals(privateKeyStr, newPrivateKeyStr));
     }
 

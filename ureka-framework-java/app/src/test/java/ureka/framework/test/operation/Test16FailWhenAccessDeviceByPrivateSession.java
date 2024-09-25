@@ -180,7 +180,7 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
     }
 
     @Test
-    public void testFailWhenInterceptAndReuseTheUToken() {
+    public void testFailWhenInterceptAndReuseTheUToken() throws InterruptedException {
         currentTestGivenLog();
 
         // GIVEN: Initialized EP's CS open a seesion on DO's IoTD

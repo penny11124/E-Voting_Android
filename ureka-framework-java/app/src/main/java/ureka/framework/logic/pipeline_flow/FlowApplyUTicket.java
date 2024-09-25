@@ -17,6 +17,7 @@ import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.Message;
 import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
+import ureka.framework.resource.logger.SimpleLogger;
 
 public class FlowApplyUTicket {
     private SharedData sharedData;
@@ -118,7 +119,6 @@ public class FlowApplyUTicket {
     public void holderApplyUTicket(String deviceId) {
         holderApplyUTicket(deviceId, "");
     }
-
     public void holderApplyUTicket(String deviceId, String cmd) {
         //////////////////////////////////////////////////////
         // Start Process Measurement
@@ -376,7 +376,7 @@ public class FlowApplyUTicket {
         }
 
         // Manually Finish Simulated/Bluetooth Comm
-        if (Environment.COMMUNICATION_CHANNEL == "SIMULATED") {
+        if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "SIMULATED")) {
             this.msgSender.completeSimulatedComm();
 //        } else if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "BLUETOOTH")) {
 //            this.msgSender.completeBluetoothComm();

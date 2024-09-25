@@ -126,9 +126,9 @@ public class ThisPerson {
                 } else if (field.getType().equals(Integer.class)) {
                     field.set(thisPerson, Integer.valueOf(value));
                 } else if (field.getType().equals(ECPrivateKey.class)) {
-                    field.set(thisPerson, SerializationUtil.strToKey(value, "ecc-private-key"));
+                    field.set(thisPerson, SerializationUtil.strToKey(value, "eccPrivateKey"));
                 } else if (field.getType().equals(ECPublicKey.class)) {
-                    field.set(thisPerson, SerializationUtil.strToKey(value, "ecc-public-key"));
+                    field.set(thisPerson, SerializationUtil.strToKey(value, "eccPublicKey"));
                 }
             } catch (NoSuchFieldException e) {
                 String failureMsg = "thisPerson._mapToThisPerson: NoSuchFieldException occurs.";

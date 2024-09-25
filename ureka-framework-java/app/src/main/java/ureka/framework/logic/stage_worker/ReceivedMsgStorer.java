@@ -18,6 +18,30 @@ public class ReceivedMsgStorer {
         this.simpleStorage = simpleStorage;
     }
 
+    public void setSharedData(SharedData sharedData) {
+        this.sharedData = sharedData;
+    }
+
+    public SharedData getSharedData() {
+        return sharedData;
+    }
+
+    public void setMeasureHelper(MeasureHelper measureHelper) {
+        this.measureHelper = measureHelper;
+    }
+
+    public MeasureHelper getMeasureHelper() {
+        return measureHelper;
+    }
+
+    public void setSimpleStorage(SimpleStorage simpleStorage) {
+        this.simpleStorage = simpleStorage;
+    }
+
+    public SimpleStorage getSimpleStorage() {
+        return simpleStorage;
+    }
+
     // [STAGE: (SR)] Store Received Message
     public void storeReceivedXxxUTicket(UTicket receivedUTicket) {
         SimpleMeasurer.measureWorkerFunc(this::_storeReceivedXxxUTicket,receivedUTicket);
