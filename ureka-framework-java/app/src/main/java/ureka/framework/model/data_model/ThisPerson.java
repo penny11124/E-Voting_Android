@@ -144,7 +144,7 @@ public class ThisPerson {
         return thisPerson;
     }
 
-    public static String thisPersonToJsonstr(ThisPerson thisPerson) {
+    public static String thisPersonToJsonStr(ThisPerson thisPerson) {
         // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
         return gson.toJson(thisPerson);
     }

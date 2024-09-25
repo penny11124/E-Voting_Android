@@ -70,7 +70,7 @@ public class Test03SuccessWhenTransferDeviceOwnership {
                 "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
                 "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
         );
-        this.cloudServerDm.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
+        this.cloudServerDm.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
         waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerDm);
 
         // WHEN: Holder: DO's UA forward the ownership_u_ticket
@@ -90,7 +90,7 @@ public class Test03SuccessWhenTransferDeviceOwnership {
 
         // WHEN: Holder: DO's UA return the ownership_r_ticket to DM's CS
         createSimulatedCommConnection(this.cloudServerDm,this.userAgentDO);
-        this.userAgentDO.getFlowIssueUTicket().holderSendRTicketToIssuer(targetDeviceId);
+        this.userAgentDO.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(targetDeviceId);
         waitSimulatedCommCompleted(this.cloudServerDm,this.userAgentDO);
 
         // THEN: Issuer: DM's CS know that DO's UA has become the new owner of DO's IoTD (& ticket order++)

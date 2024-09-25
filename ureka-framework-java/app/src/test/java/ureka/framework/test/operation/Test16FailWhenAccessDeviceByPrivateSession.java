@@ -109,7 +109,7 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
 
         // WHEN: Holder: EP's CS return the access_end_r_ticket to DO's UA
         createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
-        this.cloudServerEP.getFlowIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
+        this.cloudServerEP.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
         waitSimulatedCommCompleted(this.userAgentDO, this.cloudServerEP);
 
         // THEN: Issuer: DM's CS know that EP's CS has ended the private session with DO's IoTD (& ticket order++)
@@ -208,14 +208,18 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
 
         // WHEN: Pretend Holder: Other
         // WHEN: Pretend Holder: Session
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
         // WHEN: Interception (_deviceRecvCmd)
         String interceptedUTokenJson = this.iotDevice.getSharedData().getReceivedMessageJson();
 
         // WHEN: Reuse (holderSendCmd, incl. _executePS)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         this.cloudServerATK.getExecutor().changeState(ThisDevice.STATE_AGENT_WAIT_FOR_DATA);
-        this.cloudServerATK.getMsgSender().sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE,UTicket.MESSAGE_TYPE,interceptedUTokenJson);
+        try {
+            this.cloudServerATK.getMsgSender().sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE,UTicket.MESSAGE_TYPE,interceptedUTokenJson);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal session key & iv will be different in every use, legal authentication (iv+hmac) cannot be generated

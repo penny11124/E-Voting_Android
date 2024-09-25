@@ -108,7 +108,7 @@ public class Test06SuccessWhenAccessDeviceByPrivateSession {
 
         // WHEN: Holder: EP's CS return the access_end_r_ticket to DO's UA
         createSimulatedCommConnection(this.userAgentDO,this.cloudServerEP);
-        this.cloudServerEP.getFlowIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
+        this.cloudServerEP.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
         waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerEP);
 
         // THEN: Issuer: DM's CS know that EP's CS has ended the private session with DO's IoTD (& ticket order++)

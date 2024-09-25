@@ -84,6 +84,11 @@ public class DeviceController {
             this.flowIssuerIssueUTicket, this.flowApplyUTicket, this.flowOpenSession, this.flowIssueUToken
         );
 
+//        SimpleStorage.Tuple tuple = this.simpleStorage.loadStorage();
+//        this.sharedData.setThisDevice(tuple.thisDevice);
+//        this.sharedData.setDeviceTable(tuple.deviceTable);
+//        this.sharedData.setThisPerson(tuple.thisPerson);
+//        this.sharedData.setCurrentSession(tuple.currentSession);
 //        # Always load Storage after Reboot
 //            (
 //                self.shared_data.this_device,
@@ -99,14 +104,14 @@ public class DeviceController {
         // Set Initialized State
         this.executor._initializeState();
 
-        SimpleLogger.simpleLog("info", "+ Here is a " + this.sharedData.getThisDevice().getDeviceName() + "...");
+        SimpleLogger.simpleLog("info", "Here is a " + this.sharedData.getThisDevice().getDeviceName() + "...");
     }
 
     //////////////////////////////////////////////////////
     // Device Activity Cycle
     //////////////////////////////////////////////////////
     public void rebootDevice() {
-        SimpleLogger.simpleLog("info", "+ Reboot " + this.sharedData.getThisDevice().getDeviceName() + "...");
+        SimpleLogger.simpleLog("info", "Reboot " + this.sharedData.getThisDevice().getDeviceName() + "...");
         this._initialize(this.sharedData.getThisDevice().getDeviceType(), this.sharedData.getThisDevice().getDeviceName());
     }
 

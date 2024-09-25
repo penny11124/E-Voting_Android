@@ -31,9 +31,9 @@ public class ModelDataModelTest {
         otherDevice.setDeviceId("foo");
         otherDeviceMap.put("bar", otherDevice);
 
-        String otherDeviceJson = OtherDevice.deviceTableToJsonstr(otherDeviceMap);
+        String otherDeviceJson = OtherDevice.deviceTableToJsonStr(otherDeviceMap);
         System.out.println(otherDeviceJson);
-        Map<String, OtherDevice> newOtherDeviceMap = OtherDevice.jsonstrToDeviceTable(otherDeviceJson);
+        Map<String, OtherDevice> newOtherDeviceMap = OtherDevice.jsonStrToDeviceTable(otherDeviceJson);
         assert (otherDeviceMap.equals(newOtherDeviceMap));
 
         // Since the serialization and deserialization of ThisDevice and ThisPerson are the same,
@@ -41,7 +41,7 @@ public class ModelDataModelTest {
         ThisDevice thisDevice = new ThisDevice();
         thisDevice.setDeviceName("foo");
 
-        String thisDeviceJson = ThisDevice.thisDeviceToJsonstr(thisDevice);
+        String thisDeviceJson = ThisDevice.thisDeviceToJsonStr(thisDevice);
         System.out.println(thisDeviceJson);
         ThisDevice newThisDevice = ThisDevice.jsonStrToThisDevice(thisDeviceJson);
         assert (thisDevice.equals(newThisDevice));

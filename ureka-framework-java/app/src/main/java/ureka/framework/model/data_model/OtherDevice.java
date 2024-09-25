@@ -193,12 +193,12 @@ public class OtherDevice {
         return otherDevice;
     }
 
-    public static String deviceTableToJsonstr(Map<String, OtherDevice> otherDeviceMap) {
+    public static String deviceTableToJsonStr(Map<String, OtherDevice> otherDeviceMap) {
         // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
         return gson.toJson(otherDeviceMap);
     }
 
-    public static Map<String, OtherDevice> jsonstrToDeviceTable(String jsonStr) {
+    public static Map<String, OtherDevice> jsonStrToDeviceTable(String jsonStr) {
         Type mapType = new TypeToken<Map<String, OtherDevice>>(){}.getType();
 
         try {

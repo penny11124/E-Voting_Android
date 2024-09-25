@@ -78,7 +78,7 @@ public class Test13FailWhenTransferDeviceOwnership {
 
         // WHEN: Pretend Holder: Other
         // WHEN: Forge Flow (_holder_recv_u_ticket)
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(generatedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(generatedUTicketJson));
 
         // WHEN: Apply Flow (holder_apply_u_ticket)
         createSimulatedCommConnection(this.cloudServerATK,this.iotDevice);
@@ -119,14 +119,14 @@ public class Test13FailWhenTransferDeviceOwnership {
                 "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
                 "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
         );
-        this.cloudServerDM.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
+        this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
         waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerDM);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (_holderRecvUTicket)
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String interceptedUTicketJson = this.userAgentDO.getSharedData().getReceivedMessageJson();
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Preempt (holder_apply_u_ticket)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
@@ -166,7 +166,7 @@ public class Test13FailWhenTransferDeviceOwnership {
                 "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
                 "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
         );
-        this.cloudServerDM.getFlowIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
+        this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
         waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerDM);
 
         // WHEN: Holder: DO's UA forward the TYPE_OWNERSHIP_UTICKET
@@ -178,7 +178,7 @@ public class Test13FailWhenTransferDeviceOwnership {
         // WHEN: Interception (_holderRecvUTicket)
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String interceptedUTicketJson = this.userAgentDO.getSharedData().getDeviceTable().get(targetDeviceId2).getDeviceUTicketForOwner();
-        this.cloudServerATK.getFlowIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
+        this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Reuse (holderApplyUTicket)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);

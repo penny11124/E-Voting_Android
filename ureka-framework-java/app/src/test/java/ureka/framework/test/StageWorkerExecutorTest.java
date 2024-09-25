@@ -63,7 +63,7 @@ public class StageWorkerExecutorTest {
     public void executeOneTimeSetDeviceTypeAndNameTest() {
         String type = ThisDevice.IOT_DEVICE;
         String name = "foo";
-        executor._executeOneTimeSetDeviceTypeAndName(type, name);
+        executor._executeOneTimeSetTimeDeviceTypeAndName(type, name);
         assert (executor.getSharedData().getThisDevice().getHasDeviceType());
         assert (executor.getSharedData().getThisDevice().getTicketOrder() == 0);
     }
