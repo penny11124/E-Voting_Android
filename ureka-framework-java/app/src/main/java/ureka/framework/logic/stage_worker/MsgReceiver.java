@@ -1,5 +1,6 @@
 package ureka.framework.logic.stage_worker;
 
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -166,12 +167,16 @@ public class MsgReceiver implements Runnable {
     // [STAGE: (R)] Receive Message
     public void _recvXxxMessage() {
 //        this.run();
-        String receivedMessageWithHeader = null;
-
-        Queue<String> receiverQueue = this.sharedData.getSimulatedCommChannel().getReceiverQueue();
-        if (Environment.DEPLOYMENT_ENV.equals("TEST")) {
-            // This will block until message is received
-            receivedMessageWithHeader = receiverQueue.poll();
+//        String receivedMessageWithHeader = null;
+//
+//        Queue<String> receiverQueue = this.sharedData.getSimulatedCommChannel().getReceiverQueue();
+//        if (Environment.DEPLOYMENT_ENV.equals("TEST")) {
+//            // This will block until message is received
+//            receivedMessageWithHeader = receiverQueue.poll();
+//        }
+        String receivedMessageWithHeader = "";
+        if (Objects.equals(Environment.DEPLOYMENT_ENV, "TEST")) {
+            receivedMessageWithHeader = Environment.transmittedMessage;
         }
         // Message Size Measurement
         this.measureHelper.measureMessageSize("_recvMessage", receivedMessageWithHeader);
