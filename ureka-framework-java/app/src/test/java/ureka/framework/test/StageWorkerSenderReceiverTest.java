@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Objects;
 
+import ureka.framework.Environment;
 import ureka.framework.logic.stage_worker.MeasureHelper;
 import ureka.framework.logic.stage_worker.MsgReceiver;
 import ureka.framework.logic.stage_worker.MsgSender;
@@ -53,7 +54,7 @@ public class StageWorkerSenderReceiverTest {
         msgSender.sendXxxMessage(message.getMessageOperation(), message.getMessageType(), messageJson);
         message.setMessageStr(messageJson);
         messageJson = Message.messageToJsonstr(message);
-        assert (Objects.equals(msgSender.getSharedData().getSimulatedCommChannel().getSenderQueue().peek(), messageJson));
+        assert (Objects.equals(Environment.transmittedMessage, messageJson));
     }
 
     // MsgReceiver
@@ -75,7 +76,7 @@ public class StageWorkerSenderReceiverTest {
         validMessage.setMessageOperation(Message.MESSAGE_VERIFY_AND_EXECUTE);
         validMessage.setMessageType(UTicket.MESSAGE_TYPE);
         validMessage.setMessageStr(validJson);
-        msgReceiver.getSharedData().getSimulatedCommChannel().getReceiverQueue().offer(Message.messageToJsonstr(validMessage));
+        Environment.transmittedMessage = Message.messageToJsonstr(validMessage);
         msgReceiver._recvXxxMessage();
         assert (Objects.equals(msgReceiver.getSharedData().getReceivedMessageJson(), UTicket.uTicketToJsonStr(validUTicket)));
     }

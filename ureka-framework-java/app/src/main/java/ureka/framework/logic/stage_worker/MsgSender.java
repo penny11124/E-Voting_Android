@@ -127,8 +127,9 @@ public class MsgSender {
             try {
                 Message newMessage = new Message(messageRequest);
                 String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
+                Environment.transmittedMessage = newMessageJson;
                 // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
-                this.sharedData.getSimulatedCommChannel().getSenderQueue().offer(newMessageJson);
+                // this.sharedData.getSimulatedCommChannel().getSenderQueue().offer(newMessageJson);
             } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
                 throw new RuntimeException("Weird M-Request: " + error);
             }

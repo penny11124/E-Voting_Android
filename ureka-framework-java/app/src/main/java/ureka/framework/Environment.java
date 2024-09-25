@@ -48,4 +48,9 @@ public class Environment {
     public static final String MEASUREMENT_TIME_PRECISION = ".3f";
     public static final String MORE_MEASUREMENT_TIME_PRECISION = "6.3f";
     public static final int MEASUREMENT_REPEAT_TIMES = 5;
+
+    //////////////////////////////////////////////////////
+    // Transmitted Data in Simulation
+    //////////////////////////////////////////////////////
+    public static String transmittedMessage;
 }
