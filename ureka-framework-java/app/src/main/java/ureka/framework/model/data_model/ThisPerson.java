@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Field;
 import java.security.interfaces.ECPrivateKey;
@@ -12,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ureka.framework.resource.crypto.SerializationUtil;
+import ureka.framework.resource.logger.SimpleLogger;
 
 public class ThisPerson {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
@@ -132,11 +134,11 @@ public class ThisPerson {
                 }
             } catch (NoSuchFieldException e) {
                 String failureMsg = "thisPerson._mapToThisPerson: NoSuchFieldException occurs.";
-                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
                 throw e;
             } catch (IllegalAccessException e) {
                 String failureMsg = "thisPerson._mapToThisPerson: IllegalAccessException occurs.";
-                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+                SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
                 throw e;
             }
         }
@@ -146,16 +148,30 @@ public class ThisPerson {
 
     public static String thisPersonToJsonStr(ThisPerson thisPerson) {
         // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
-        return gson.toJson(thisPerson);
+        Map<String, String> thisPersonMap = null;
+        try {
+            thisPersonMap = _thisPersonToMap(thisPerson);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        // Convert the map to JSON using GSON
+        return gson.toJson(thisPersonMap);
     }
 
     public static ThisPerson jsonStrToThisPerson(String jsonStr) {
+//        try {
+//            return gson.fromJson(jsonStr, ThisPerson.class);
+//        } catch (Exception e) {
+//            String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
+//            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+//            throw new RuntimeException(failureMsg);
+//        }
+        Map<String, String> thisPersonMap = gson.fromJson(jsonStr, new TypeToken<Map<String, String>>() {}.getType());
+        // Map the fields from the map back to the ThisPerson object
         try {
-            return gson.fromJson(jsonStr, ThisPerson.class);
-        } catch (Exception e) {
-            String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw new RuntimeException(failureMsg);
+            return _mapToThisPerson(thisPersonMap);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 }

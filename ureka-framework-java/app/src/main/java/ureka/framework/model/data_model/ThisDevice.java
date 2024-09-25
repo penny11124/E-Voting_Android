@@ -252,7 +252,7 @@ public class ThisDevice {
 //             throw new RuntimeException(failureMsg);
 //         }
 
-    public static String thisDeviceToJsonstr(ThisDevice thisDevice) throws Exception {
+    public static String thisDeviceToJsonStr(ThisDevice thisDevice) throws Exception {
         Map<String, String> thisDeviceMap = _thisDeviceToMap(thisDevice);
         return gson.toJson(thisDeviceMap);
     }

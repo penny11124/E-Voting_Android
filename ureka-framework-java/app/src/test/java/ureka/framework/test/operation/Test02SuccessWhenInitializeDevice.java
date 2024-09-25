@@ -63,7 +63,7 @@ public class Test02SuccessWhenInitializeDevice {
 
         // WHEN:
         currentTestWhenAndThenLog();
-        // WHEN: Issuer: DM's CS generate the intialization_u_ticket to herself
+        // WHEN: Issuer: DM's CS generate the initializationUTicket to herself
         String idForInitializationUTicket = "noId";
         Map<String, String> generatedRequest = Map.of(
                 "deviceId", idForInitializationUTicket,
@@ -72,7 +72,7 @@ public class Test02SuccessWhenInitializeDevice {
         );
         this.cloudServerDm.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
 
-        // WHEN: Holder: DM's CS forward the access_u_ticket to Uninitialized IoTD
+        // WHEN: Holder: DM's CS forward the accessUTicket to Uninitialized IoTD
         createSimulatedCommConnection(this.cloudServerDm, this.iotDevice);
         this.cloudServerDm.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
         waitSimulatedCommCompleted(this.cloudServerDm, this.iotDevice);
