@@ -30,7 +30,11 @@ public class SimpleStorage {
     }
     public void storeStorage(ThisDevice thisDevice, Map<String, OtherDevice> deviceTable,
                              ThisPerson thisPerson, CurrentSession currentSession) {
-        this.inMemoryStorage.put("thisDevice", ThisDevice.thisDeviceToJsonStr(thisDevice));
+        try {
+            this.inMemoryStorage.put("thisDevice", ThisDevice.thisDeviceToJsonStr(thisDevice));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         this.inMemoryStorage.put("deviceTable", OtherDevice.deviceTableToJsonStr(deviceTable));
         this.inMemoryStorage.put("thisPerson", ThisPerson.thisPersonToJsonStr(thisPerson));
         this.inMemoryStorage.put("currentSession", CurrentSession.currentSessionToJsonStr(currentSession));
@@ -52,7 +56,12 @@ public class SimpleStorage {
         System.out.println("Load Person: " + thisPersonJsonStr);
         System.out.println("Load CS: " + currentSessionJsonStr);
 
-        ThisDevice loadThisDevice = ThisDevice.jsonStrToThisDevice(thisDeviceJsonStr);
+        ThisDevice loadThisDevice = null;
+        try {
+            loadThisDevice = ThisDevice.jsonStrToThisDevice(thisDeviceJsonStr);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Map<String, OtherDevice> loadDeviceTable = OtherDevice.jsonStrToDeviceTable(deviceTableJsonStr);
         ThisPerson loadThisPerson = ThisPerson.jsonStrToThisPerson(thisPersonJsonStr);
         CurrentSession loadCurrentSession = CurrentSession.jsonStrToCurrentSession(currentSessionJsonStr);

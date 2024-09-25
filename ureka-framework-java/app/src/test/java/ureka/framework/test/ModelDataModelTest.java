@@ -41,8 +41,8 @@ public class ModelDataModelTest {
         otherDevice.setDeviceId("foo");
         otherDeviceMap.put("bar", otherDevice);
 
-        String otherDeviceJson = OtherDevice.deviceTableToJsonstr(otherDeviceMap);
-        Map<String, OtherDevice> newOtherDeviceMap = OtherDevice.jsonstrToDeviceTable(otherDeviceJson);
+        String otherDeviceJson = OtherDevice.deviceTableToJsonStr(otherDeviceMap);
+        Map<String, OtherDevice> newOtherDeviceMap = OtherDevice.jsonStrToDeviceTable(otherDeviceJson);
         assert (otherDeviceMap.equals(newOtherDeviceMap));
 
         // Since the serialization and deserialization of ThisDevice and ThisPerson are the same,

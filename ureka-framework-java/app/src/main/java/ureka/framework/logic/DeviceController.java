@@ -39,12 +39,12 @@ public class DeviceController {
     private FlowApplyUTicket flowApplyUTicket;
     private FlowIssueUToken flowIssueUToken;
 
-    public DeviceController(String device_type, String device_name) {
-        this._initialize(device_type, device_name);
+    public DeviceController(String deviceType, String deviceName) {
+        this._initialize(deviceType, deviceName);
     }
-    private void _initialize(String device_type, String device_name) {
+    private void _initialize(String deviceType, String deviceName) {
         this.sharedData = new SharedData(new ThisDevice(), new CurrentSession(), new ThisPerson());
-        this.simpleStorage = new SimpleStorage(device_name);
+        this.simpleStorage = new SimpleStorage(deviceName);
         this.sharedData.setSimulatedCommChannel(new SimulatedCommChannel());
 //        # Resource (Bluetooth Comm)
 //        if HAS_PYBLUEZ == True:
@@ -99,7 +99,7 @@ public class DeviceController {
 
         // Set Device Type (must after loading storage)
         if (!this.sharedData.getThisDevice().getHasDeviceType()) {
-            this.executor._executeOneTimeSetTimeDeviceTypeAndName(device_type, device_name);
+            this.executor._executeOneTimeSetTimeDeviceTypeAndName(deviceType, deviceName);
         }
         // Set Initialized State
         this.executor._initializeState();
