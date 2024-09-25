@@ -25,6 +25,7 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1' // GSON
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70' // Bouncy castle
     implementation 'org.bouncycastle:bcpkix-jdk15on:1.70' // Bouncy castle
+
 }
 
 application {

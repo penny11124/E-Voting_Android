@@ -80,7 +80,7 @@ public class Conftest {
         end1.getMsgReceiver().createSimulatedCommConnection(end2);
         end2.getMsgReceiver().createSimulatedCommConnection(end1);
 
-        SimpleLogger.simpleLog("info", String.format("+ Connection between %s and %s is started...",
+        SimpleLogger.simpleLog("info", String.format("Connection between %s and %s is started...",
                 end1.getSharedData().getThisDevice().getDeviceName(),
                 end2.getSharedData().getThisDevice().getDeviceName()));
     }
@@ -94,7 +94,7 @@ public class Conftest {
             throw new RuntimeException(e);
         }
 
-        SimpleLogger.simpleLog("info",String.format("+ Connection between %s and %s is completed...",
+        SimpleLogger.simpleLog("info", String.format("Connection between %s and %s is completed...",
                 end1.getSharedData().getThisDevice().getDeviceName(),
                 end2.getSharedData().getThisDevice().getDeviceName()));
         SimpleLogger.simpleLog("info","");
@@ -115,7 +115,7 @@ public class Conftest {
         DeviceController cloudServerDM = deviceManufacturerServer();
 
         // GIVEN: Uninitialized IoTD
-        DeviceController iotDevice = new DeviceController(ThisDevice.IOT_DEVICE, "iot_device");
+        DeviceController iotDevice = new DeviceController(ThisDevice.IOT_DEVICE, "iotDevice");
 
         // WHEN: Issuer: DM's CS generate & send the initialization_u_ticket to Uninitialized IoTD
         createSimulatedCommConnection(cloudServerDM, iotDevice);

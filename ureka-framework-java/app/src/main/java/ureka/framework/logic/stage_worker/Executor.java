@@ -77,7 +77,7 @@ public class Executor {
         // Start Process Measurement
         this.measureHelper.measureProcessPerfStart();
 
-        SimpleLogger.simpleLog("info","+ " + this.sharedData.getThisDevice().getDeviceName() + " is initializing...");
+        SimpleLogger.simpleLog("info",this.sharedData.getThisDevice().getDeviceName() + " is initializing...");
 
         /*
         TODO: New way for _execute_one_time_initialize_agent_or_server()
@@ -267,7 +267,7 @@ public class Executor {
 
     // Ownership
     public void _executeOneTimeInitializeIotDevice(UTicket uTicketIn) {
-        SimpleLogger.simpleLog("info","+ " + sharedData.getThisDevice().getDeviceName() + " is initializing...");
+        SimpleLogger.simpleLog("info",sharedData.getThisDevice().getDeviceName() + " is initializing...");
 
         if (!this.sharedData.getThisDevice().getDeviceType().equals(ThisDevice.IOT_DEVICE)) {
             String failureMsg = "-> FAILURE: ONLY IOT_DEVICE CAN DO THIS INITIALIZATION OPERATION";
@@ -303,7 +303,7 @@ public class Executor {
     }
 
     public void _executeOwnershipTransfer(UTicket newUTicket) {
-        SimpleLogger.simpleLog("info", "+ " + sharedData.getThisDevice().getDeviceName() + " is transferring ownership...");
+        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is transferring ownership...");
 
         // Update Device Owner
         // RAM
@@ -870,7 +870,7 @@ public class Executor {
         SimpleMeasurer.measureWorkerFunc(this::_executeUpdateTicketOrder,updatingCase,ticketIn);
     }
     private void _executeUpdateTicketOrder(String updatingCase, Object ticketIn) {
-        SimpleLogger.simpleLog("info", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is updating ticket order...");
+        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is updating ticket order...");
 
         switch (updatingCase) {
             case "hasType":

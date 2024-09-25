@@ -215,7 +215,11 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
         // WHEN: Reuse (holderSendCmd, incl. _executePS)
         createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         this.cloudServerATK.getExecutor().changeState(ThisDevice.STATE_AGENT_WAIT_FOR_DATA);
-        this.cloudServerATK.getMsgSender().sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE,UTicket.MESSAGE_TYPE,interceptedUTokenJson);
+        try {
+            this.cloudServerATK.getMsgSender().sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE,UTicket.MESSAGE_TYPE,interceptedUTokenJson);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal session key & iv will be different in every use, legal authentication (iv+hmac) cannot be generated

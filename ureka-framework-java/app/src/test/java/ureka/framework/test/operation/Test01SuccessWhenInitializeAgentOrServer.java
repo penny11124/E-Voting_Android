@@ -13,6 +13,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.naming.Context;
+
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.resource.storage.SimpleStorage;
@@ -25,14 +27,14 @@ public class Test01SuccessWhenInitializeAgentOrServer {
     @BeforeEach
     public void setup() {
         currentSetupLog();
-//        SimpleStorage.deleteStorageInTest();
+        // SimpleStorage.deleteStorageInTest();
     }
 
     // RE-GIVEN: Reset the test environment
     @AfterEach
     public void teardown() {
         currentTeardownLog();
-//        SimpleStorage.deleteStorageInTest();
+        // SimpleStorage.deleteStorageInTest();
     }
 
     @Test

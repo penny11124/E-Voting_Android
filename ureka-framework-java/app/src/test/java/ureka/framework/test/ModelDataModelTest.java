@@ -53,7 +53,7 @@ public class ModelDataModelTest {
 //        thisDevice.setDevicePubKey((ECPublicKey) keyPair.getPublic());
 //        thisDevice.setDevicePrivKey((ECPrivateKey) keyPair.getPrivate());
 
-        String thisDeviceJson = ThisDevice.thisDeviceToJsonstr(thisDevice);
+        String thisDeviceJson = ThisDevice.thisDeviceToJsonStr(thisDevice);
         System.out.println(thisDeviceJson);
         ThisDevice newThisDevice = ThisDevice.jsonStrToThisDevice(thisDeviceJson);
         assert (thisDevice.equals(newThisDevice));
