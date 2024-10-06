@@ -83,10 +83,12 @@ public class Test15FailWhenAccessDeviceByOthers {
         this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(generatedUTicketJson));
 
         // WHEN: Apply Flow (holderApplyUTicket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         String generatedCommand = "HELLO-1";
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal issuer private key, legal authorization (issuer signature) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_ISSUER_SIGNATURE on ACCESS UTICKET"));
@@ -113,7 +115,7 @@ public class Test15FailWhenAccessDeviceByOthers {
 
         // WHEN: Interception (TYPE_ACCESS_UTICKET)
         // Because TYPE_ACCESS_UTICKET has sent on BC, & maybe have been sent in WPAN (Reopen Session) the attacker can intercept & preempt it.
-        createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
+        // createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
@@ -123,7 +125,8 @@ public class Test15FailWhenAccessDeviceByOthers {
                 "taskScope", generatedTaskScope
         );
         this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (_holderRecvUTicket)
@@ -132,10 +135,14 @@ public class Test15FailWhenAccessDeviceByOthers {
         this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Preempt (holderApplyUTicket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         String generatedCommand = "HELLO-1";
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId2, generatedCommand);
-        waitSimulatedCommCompleted(this.cloudServerATK,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK,this.iotDevice);
 
         // THEN: Because no legal holder private key, legal authentication (holder signature) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_HOLDER_SIGNATURE"));
@@ -162,7 +169,7 @@ public class Test15FailWhenAccessDeviceByOthers {
 
         // WHEN: Interception (TYPE_ACCESS_UTICKET)
         // Because TYPE_ACCESS_UTICKET has sent on BC, & maybe have been sent in WPAN (Reopen Session) the attacker can intercept & preempt it.
-        createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
+        // createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
@@ -172,19 +179,26 @@ public class Test15FailWhenAccessDeviceByOthers {
                 "taskScope", generatedTaskScope
         );
         this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
 
         // WHEN: Holder: EP's CS forward the accessUTicket
-        createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
         String generatedCommand = "HELLO-1";
         this.cloudServerEP.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
 
         // GIVEN: EP's CS close the session (ACCESS_END)
-        createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
         String generatedCommand2 = "ACCESS_END";
         this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId, generatedCommand2, true);
-        waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (_holderRecvUTicket)
@@ -193,10 +207,12 @@ public class Test15FailWhenAccessDeviceByOthers {
         this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Reuse (holderApplyUTicket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         String generatedCommand3 = "HELLO-1";
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId2, generatedCommand3);
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal holder private key, legal authentication (holder signature) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_TICKET_ORDER"));

@@ -53,11 +53,11 @@ public class MeasureHelper {
 
         // Print Measurement Raw Data
         SimpleLogger.simpleLog("measure", "");
-        SimpleLogger.simpleLog("measure", "+ Receive CLI Input: " + cliName);
+        SimpleLogger.simpleLog("measure", "Receive CLI Input: " + cliName);
         SimpleLogger.simpleLog("measure", "cliPerfTime = " + cliPerfTime + " nanoseconds");
         // "cliPerfTime = {cliPerfTime:{Environment.MEASUREMENT_TIME_PRECISION}} seconds"
         if (cliBlockedTime > Environment.IO_BLOCKING_TOLERANCE_TIME * 1e6 /*Conversion from millisecond to nanosecond*/) {
-            SimpleLogger.simpleLog("warning", "+ PROC I/O MAYBE BLOCKED TOO LONG...");
+            SimpleLogger.simpleLog("warning", "PROC I/O MAYBE BLOCKED TOO LONG...");
             SimpleLogger.simpleLog(
                 "warning",
                 "cliPerfTime = " + cliBlockedTime + " nanoseconds"
@@ -98,10 +98,10 @@ public class MeasureHelper {
         SimpleLogger.simpleLog("measure", "msgPerfTime = " + msgPerfTime + " nanoseconds");
         // "cliPerfTime = {cliPerfTime:{Environment.MEASUREMENT_TIME_PRECISION}} seconds"
         if (msgBlockedTime > Environment.IO_BLOCKING_TOLERANCE_TIME * 1e6 /*Conversion from millisecond to nanosecond*/) {
-            SimpleLogger.simpleLog("warning", "+ PROC I/O MAYBE BLOCKED TOO LONG...");
+            SimpleLogger.simpleLog("warning", "PROC I/O MAYBE BLOCKED TOO LONG...");
             SimpleLogger.simpleLog("warning", "msgPerfTime = " + msgPerfTime + " nanoseconds");
         }
-        SimpleLogger.simpleLog("measure", "+ Receive Message Input = " + commName);
+        SimpleLogger.simpleLog("measure", "Receive Message Input = " + commName);
         SimpleLogger.simpleLog("measure", "");
     }
     //////////////////////////////////////////////////////
@@ -130,10 +130,10 @@ public class MeasureHelper {
 
         // Print Measurement Raw Data
         SimpleLogger.simpleLog("measure", "");
-        SimpleLogger.simpleLog("measure", "+ Receive Comm Input: " + commName);
+        SimpleLogger.simpleLog("measure", "Receive Comm Input: " + commName);
         SimpleLogger.simpleLog("measure", "commTime = " + commTime + " nanoseconds");
         if (commTime > Environment.COMM_BLOCKING_TOLERANCE_TIME * 1e6/*Conversion from millisecond to nanosecond*/) {
-            SimpleLogger.simpleLog("warning", "+ COMM I/O MAYBE BLOCKED TOO LONG...");
+            SimpleLogger.simpleLog("warning", "COMM I/O MAYBE BLOCKED TOO LONG...");
             SimpleLogger.simpleLog("warning", "commTime = " + commTime + " nanoseconds");
         }
     }

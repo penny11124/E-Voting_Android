@@ -38,11 +38,6 @@ public class SimpleStorage {
         this.inMemoryStorage.put("deviceTable", OtherDevice.deviceTableToJsonStr(deviceTable));
         this.inMemoryStorage.put("thisPerson", ThisPerson.thisPersonToJsonStr(thisPerson));
         this.inMemoryStorage.put("currentSession", CurrentSession.currentSessionToJsonStr(currentSession));
-
-        System.out.println("In-memory storage contents:");
-        for (Map.Entry<String, String> entry : this.inMemoryStorage.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
     }
 
     public Tuple loadStorage() {
@@ -50,11 +45,6 @@ public class SimpleStorage {
         String deviceTableJsonStr = this.inMemoryStorage.get("deviceTable");
         String thisPersonJsonStr = this.inMemoryStorage.get("thisPerson");
         String currentSessionJsonStr = this.inMemoryStorage.get("currentSession");
-
-        System.out.println("Load Device: " + thisDeviceJsonStr);
-        System.out.println("Load DeviceTable: " + deviceTableJsonStr);
-        System.out.println("Load Person: " + thisPersonJsonStr);
-        System.out.println("Load CS: " + currentSessionJsonStr);
 
         ThisDevice loadThisDevice = null;
         try {

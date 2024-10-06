@@ -266,8 +266,10 @@ public class FlowOpenSession {
                 rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 rTicketRequest.put("result", resultMessage);
                 rTicketRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
-                rTicketRequest.put("challenge1", this.sharedData.getCurrentSession().getChallenge1());
                 rTicketRequest.put("challenge2", this.sharedData.getCurrentSession().getChallenge2());
+                rTicketRequest.put("associatedPlaintextData", this.sharedData.getCurrentSession().getAssociatedPlaintextData());
+                rTicketRequest.put("ciphertextData", this.sharedData.getCurrentSession().getCiphertextData());
+                rTicketRequest.put("gcmAuthenticationTagData", this.sharedData.getCurrentSession().getGcmAuthenticationTagData());
                 rTicketRequest.put("ivCmd", this.sharedData.getCurrentSession().getIvCmd());
             } else {
                 rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE3_RTICKET);
@@ -312,7 +314,7 @@ public class FlowOpenSession {
             this.executor.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT);
 
             // Automatically Terminate Simulated/Bluetooth Comm
-            SimpleLogger.simpleLog("debug", "+ " + this.sharedData.getThisDevice().getDeviceName() + " automatically terminate CR-KE-3~~ (holder)");
+            SimpleLogger.simpleLog("debug", this.sharedData.getThisDevice().getDeviceName() + " automatically terminate CR-KE-3~~ (holder)");
             // // Anyway, Finish CR-KE~~
         } catch (Exception e) {
             throw new RuntimeException("Shouldn't Reach Here", e);

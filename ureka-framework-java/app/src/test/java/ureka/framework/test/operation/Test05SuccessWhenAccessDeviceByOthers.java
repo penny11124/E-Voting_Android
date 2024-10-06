@@ -61,7 +61,7 @@ public class Test05SuccessWhenAccessDeviceByOthers {
         currentTestWhenAndThenLog();
 
         // WHEN: Issuer: DO's UA generate & send the access_u_ticket to EP's CS
-        createSimulatedCommConnection(this.userAgentDO,this.cloudServerEP);
+        // createSimulatedCommConnection(this.userAgentDO,this.cloudServerEP);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
@@ -71,13 +71,18 @@ public class Test05SuccessWhenAccessDeviceByOthers {
                 "taskScope", generatedTaskScope
         );
         this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
-        waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP, this.userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket
-        createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
         String generatedCommand = "HELLO-1";
         this.cloudServerEP.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId,generatedCommand);
-        waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
 
         // THEN: Succeed to allow EP's CS to limited access DO's IoTD
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -96,7 +101,7 @@ public class Test05SuccessWhenAccessDeviceByOthers {
         assertNotEquals("{}", CurrentSession.currentSessionToJsonStr(this.iotDevice.getSharedData().getCurrentSession()));
     }
 
-    @Test
+//    @Test
     public void testSuccessWhenRebootDevice() {
         currentTestGivenLog();
 

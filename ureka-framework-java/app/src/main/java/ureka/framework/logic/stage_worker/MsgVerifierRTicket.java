@@ -1,16 +1,5 @@
 package ureka.framework.logic.stage_worker;
 
-import org.checkerframework.checker.units.qual.C;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.Map;
@@ -140,7 +129,7 @@ public class MsgVerifierRTicket {
         switch (rTicketIn.getRTicketType()) {
             case UTicket.TYPE_INITIALIZATION_UTICKET:
                 // Note that for TYPE_INITIALIZATION:
-                // u_ticket_device_id = "no_id"
+                // u_ticket_device_id = "noId"
                 // r_ticket_device_id = "newly-created device public key string"
 
                 // NO Device ID
@@ -418,7 +407,7 @@ public class MsgVerifierRTicket {
             case RTicket.TYPE_CRKE1_RTICKET:
             case RTicket.TYPE_CRKE3_RTICKET:
             case UTicket.TYPE_ACCESS_END_UTOKEN:
-                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(rTicketIn.getRTicketId(),"eccPublicKey"))) {
+                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(rTicketIn.getDeviceId(),"eccPublicKey"))) {
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
                 } else {

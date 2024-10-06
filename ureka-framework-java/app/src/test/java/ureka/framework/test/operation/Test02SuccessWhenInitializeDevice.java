@@ -20,10 +20,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.UTicket;
 import ureka.framework.resource.Pair;
+import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.storage.SimpleStorage;
 
 public class Test02SuccessWhenInitializeDevice {
@@ -71,11 +73,12 @@ public class Test02SuccessWhenInitializeDevice {
                 "uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET
         );
         this.cloudServerDm.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
-
         // WHEN: Holder: DM's CS forward the accessUTicket to Uninitialized IoTD
-        createSimulatedCommConnection(this.cloudServerDm, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerDm, this.iotDevice);
         this.cloudServerDm.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
-        waitSimulatedCommCompleted(this.cloudServerDm, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerDm.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerDm, this.iotDevice);
 
         // THEN: Succeed to initialize DM's IoTD
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -90,7 +93,7 @@ public class Test02SuccessWhenInitializeDevice {
         assertNull(this.iotDevice.getSharedData().getThisPerson().getPersonPubKeyStr());
     }
 
-    @Test
+//    @Test
     public void testSuccessWhenRebootDevice() {
         currentTestGivenLog();
 

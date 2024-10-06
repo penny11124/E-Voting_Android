@@ -97,7 +97,7 @@ public class ResourceCryptoTest {
         byte[] ecdh_key2 = ECDH.generateEcdhKey((ECPrivateKey) keyPair2.getPrivate(), salt, null, (ECPublicKey) keyPair1.getPublic());
         assert (Arrays.equals(ecdh_key1, ecdh_key2));
 
-        byte[] plaintext = foobar.getBytes();
+        byte[] plaintext = SerializationUtil.base64StrBackToByte(foobar);
         byte[][] cbc_result = ECDH.cbcEncrypt(plaintext, ecdh_key1);
         byte[] cbc_ciphertext = cbc_result[0];
         byte[] cbc_iv = cbc_result[1];

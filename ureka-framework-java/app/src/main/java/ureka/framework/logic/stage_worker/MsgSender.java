@@ -97,6 +97,7 @@ public class MsgSender {
             try {
                 Message newMessage = new Message(messageRequest);
                 String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
+                Environment.transmittedMessage = newMessageJson;
                 // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
             } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
                 throw new RuntimeException("Weird M-Request: " + error);
@@ -112,27 +113,27 @@ public class MsgSender {
 
             // Simulate Network Delay
             for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
-                SimpleLogger.simpleLog("info", "+ network delay");
-                SimpleLogger.simpleLog("info", "+ network delay");
-                SimpleLogger.simpleLog("info", "+ network delay");
+                SimpleLogger.simpleLog("info", "network delay");
+                SimpleLogger.simpleLog("info", "network delay");
+                SimpleLogger.simpleLog("info", "network delay");
                 if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
                     Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
                 }
             }
-            Map<String, String> messageRequest = new HashMap<>();
-            messageRequest.put("messageOperation", messageOperation);
-            messageRequest.put("messageType", messageType);
-            messageRequest.put("messageStr", sentMessageJson);
+//            Map<String, String> messageRequest = new HashMap<>();
+//            messageRequest.put("messageOperation", messageOperation);
+//            messageRequest.put("messageType", messageType);
+//            messageRequest.put("messageStr", sentMessageJson);
 
-            try {
-                Message newMessage = new Message(messageRequest);
-                String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
-                Environment.transmittedMessage = newMessageJson;
-                // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
-                // this.sharedData.getSimulatedCommChannel().getSenderQueue().offer(newMessageJson);
-            } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
-                throw new RuntimeException("Weird M-Request: " + error);
-            }
+//            try {
+//                Message newMessage = new Message(messageRequest);
+//                String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
+//                Environment.transmittedMessage = newMessageJson;
+//                // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
+//                // this.sharedData.getSimulatedCommChannel().getSenderQueue().offer(newMessageJson);
+//            } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
+//                throw new RuntimeException("Weird M-Request: " + error);
+//            }
         } else { // pragma: no cover -> PRODUCTION
 //            SimpleLogger.simpleLog("info", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is sending message to BT_address or BT_name...");
 //            this.sharedData.getConnectionSocket().sendMessage(newMessageJson);

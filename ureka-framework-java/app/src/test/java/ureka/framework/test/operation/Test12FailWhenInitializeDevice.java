@@ -54,8 +54,8 @@ public class Test12FailWhenInitializeDevice {
 
         // WHEN:
         currentTestWhenAndThenLog();
-        // WHEN: DM's CS re-apply the initialization_u_ticket to Initialized IoTD
-        createSimulatedCommConnection(this.cloudServerDM,this.iotDevice);
+        // WHEN: DM's CS re-apply the initializationUTicket to Initialized IoTD
+        // createSimulatedCommConnection(this.cloudServerDM,this.iotDevice);
         String idForInitializationUTicket = "noId";
         Map<String, String> generatedRequest = Map.of(
                 "deviceId", idForInitializationUTicket,
@@ -63,12 +63,15 @@ public class Test12FailWhenInitializeDevice {
                 "uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET
         );
         this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
+
         this.cloudServerDM.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
-        waitSimulatedCommCompleted(this.cloudServerDM,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerDM.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerDM,this.iotDevice);
 
         // THEN: Fail to re-initialize IoTD & R-Ticket will provide the reason
         for (OtherDevice value : this.cloudServerDM.getSharedData().getDeviceTable().values()) {
-            if (!value.getDeviceId().equals("no_id")) {
+            if (!value.getDeviceId().equals("noId")) {
                 String rTicketResult = RTicket.jsonStrToRTicket(value.getDeviceRTicketForOwner()).getResult();
                 assertEquals("-> FAILURE: VERIFY_TICKET_ORDER: IOT_DEVICE ALREADY INITIALIZED", rTicketResult);
             }

@@ -132,7 +132,7 @@ public class FlowIssueUToken {
                                ...
                            ..repeated..
                                ...
-           holderSendCmd(access_end) -> _deviceRecvCmd(access_end)
+           holderSendCmd(ACCESS_END) -> _deviceRecvCmd(ACCESS_END)
            _holderRecvRTicket() <- _deviceSendRTicket()
      */
     public void holderSendCmd(String deviceId, String cmd, boolean accessEnd) {
@@ -197,7 +197,7 @@ public class FlowIssueUToken {
             SimpleLogger.simpleLog("error", failureMsg);
             this.sharedData.setResultMessage(failureMsg);
         } catch (Exception e) {
-            throw new RuntimeException("Shouldn't Reach Here", e);
+            throw new RuntimeException("Shouldn't Reach Here");
         }
     }
 
@@ -227,7 +227,7 @@ public class FlowIssueUToken {
             // [STAGE: (C)]
             this.executor.changeState(ThisDevice.STATE_DEVICE_WAIT_FOR_CMD);
         } catch (Exception e) { // pragma: no cover -> Shouldn't Reach Here
-            throw new RuntimeException("Shouldn't Reach Here", e);
+            throw new RuntimeException("Shouldn't Reach Here");
         } finally {
             // PS
             if (receivedUToken.getUTicketType().equals(UTicket.TYPE_CMD_UTOKEN)) {

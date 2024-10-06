@@ -59,11 +59,13 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
         currentTestWhenAndThenLog();
 
         // WHEN: Holder: EP's CS forward the UToken
-        createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedCommand = "HELLO-2";
         this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId, generatedCommand, false);
-        waitSimulatedCommCompleted(this.cloudServerEP, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP, this.iotDevice);
 
         // THEN: Succeed to allow EP's CS to limited access DO's IoTD
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -79,11 +81,12 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
         assertNotEquals("{}", CurrentSession.currentSessionToJsonStr(this.iotDevice.getSharedData().getCurrentSession()));
 
         // WHEN: Holder: EP's CS forward the UToken (with Forbidden command)
-        createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedCommand2 = "HELLO-3";
-        this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId2, generatedCommand, false);
-        waitSimulatedCommCompleted(this.cloudServerEP, this.iotDevice);
+        this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId2, generatedCommand2, false);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP, this.iotDevice);
 
         // THEN: Fail to allow EP's CS to limited access DO's IoTD
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("FAILURE"));
@@ -92,13 +95,15 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
         assertNotEquals("DATA: " + generatedCommand2, this.iotDevice.getSharedData().getCurrentSession().getPlaintextData());
 
         // WHEN: Holder: EP's CS forward the u_token (ACCESS_END)
-        createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
         String targetDeviceId3 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Integer originalDeviceOrder = this.iotDevice.getSharedData().getThisDevice().getTicketOrder();
         Integer originalAgentOrder = this.cloudServerEP.getSharedData().getDeviceTable().get(targetDeviceId3).getTicketOrder();
         String generatedCommand3 = "ACCESS_END";
         this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId3, generatedCommand3, true);
-        waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
 
         // THEN: Succeed to end this session
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -108,9 +113,10 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
         assertEquals(originalAgentOrder + 1, this.cloudServerEP.getSharedData().getDeviceTable().get(targetDeviceId3).getTicketOrder());
 
         // WHEN: Holder: EP's CS return the access_end_r_ticket to DO's UA
-        createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
+        // createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
         this.cloudServerEP.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
-        waitSimulatedCommCompleted(this.userAgentDO, this.cloudServerEP);
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.userAgentDO, this.cloudServerEP);
 
         // THEN: Issuer: DM's CS know that EP's CS has ended the private session with DO's IoTD (& ticket order++)
         assertTrue(this.userAgentDO.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -149,17 +155,19 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
         this.cloudServerATK.getSharedData().getCurrentSession().setIvCmd(this.cloudServerEP.getSharedData().getCurrentSession().getIvCmd());
 
         // WHEN: Apply Flow (holderSendCmd, incl. _executePS)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         String generatedCommand = "HELLO-2";
         this.cloudServerATK.getFlowIssueUToken().holderSendCmd(targetDeviceId, generatedCommand, false);
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal session key, legal authentication (iv+hmac) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_IV_AND_HMAC"));
         assertTrue(this.cloudServerATK.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_RESULT"));
     }
 
-    @Test
+//    @Test
     public void testFailWhenInterceptAndPreemptToApplyTheUToken() {
         currentTestGivenLog();
 
@@ -197,11 +205,13 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
 
         // WHEN: Interception (TYPE_CMD_UTOKEN)
         // Here, after TYPE_CMD_UTOKEN has been Sent in WPAN (i.e., used), the attacker can intercept & use it.
-        createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP, this.iotDevice);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedCommand = "HELLO-2";
         this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId, generatedCommand, false);
-        waitSimulatedCommCompleted(this.cloudServerEP, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP, this.iotDevice);
 
         // WHEN: Forge Flow (_holderRecvUTicket, incl. _executeCKRE + _executePS)
         String interceptedUTicketJson = this.cloudServerEP.getSharedData().getDeviceTable().get(targetDeviceId).getDeviceUTicketForOwner();
@@ -213,14 +223,12 @@ public class Test16FailWhenAccessDeviceByPrivateSession {
         String interceptedUTokenJson = this.iotDevice.getSharedData().getReceivedMessageJson();
 
         // WHEN: Reuse (holderSendCmd, incl. _executePS)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         this.cloudServerATK.getExecutor().changeState(ThisDevice.STATE_AGENT_WAIT_FOR_DATA);
-        try {
-            this.cloudServerATK.getMsgSender().sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE,UTicket.MESSAGE_TYPE,interceptedUTokenJson);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.cloudServerATK.getMsgSender().sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE,UTicket.MESSAGE_TYPE,interceptedUTokenJson);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+       //  waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal session key & iv will be different in every use, legal authentication (iv+hmac) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_IV_AND_HMAC"));

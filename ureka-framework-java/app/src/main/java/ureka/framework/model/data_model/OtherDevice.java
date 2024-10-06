@@ -10,9 +10,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.crypto.dsig.SignatureMethod;
-
-import ureka.framework.resource.logger.SimpleLogger;
 
 public class OtherDevice {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();

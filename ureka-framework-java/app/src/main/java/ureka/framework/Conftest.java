@@ -118,7 +118,7 @@ public class Conftest {
         DeviceController iotDevice = new DeviceController(ThisDevice.IOT_DEVICE, "iotDevice");
 
         // WHEN: Issuer: DM's CS generate & send the initialization_u_ticket to Uninitialized IoTD
-        createSimulatedCommConnection(cloudServerDM, iotDevice);
+        // createSimulatedCommConnection(cloudServerDM, iotDevice);
         String idForInitializationUTicket = "noId";
         Map<String, String> generatedRequest = new HashMap<>();
         generatedRequest.put("deviceId", idForInitializationUTicket);
@@ -126,9 +126,12 @@ public class Conftest {
         generatedRequest.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
 
         cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
-        cloudServerDM.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
 
-        waitSimulatedCommCompleted(cloudServerDM, iotDevice);
+        cloudServerDM.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        cloudServerDM.getMsgReceiver()._recvXxxMessage();
+
+        // waitSimulatedCommCompleted(cloudServerDM, iotDevice);
 
         return new Pair(cloudServerDM, iotDevice);
     }
@@ -151,7 +154,7 @@ public class Conftest {
         DeviceController userAgentDO = deviceOwnerAgent();
 
         // WHEN: Issuer: DM's CS generate & send the ownership_u_ticket to DO's UA
-        createSimulatedCommConnection(cloudServerDM, userAgentDO);
+        // createSimulatedCommConnection(cloudServerDM, userAgentDO);
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Map<String, String> generatedRequest = new HashMap<>();
         generatedRequest.put("deviceId", targetDeviceId);
@@ -159,12 +162,15 @@ public class Conftest {
         generatedRequest.put("uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET);
 
         cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        waitSimulatedCommCompleted(userAgentDO, cloudServerDM);
+        userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(userAgentDO, cloudServerDM);
 
-        // WHEN: Holder: DO's UA forward the ownership_u_ticket
-        createSimulatedCommConnection(userAgentDO, iotDevice);
+        // WHEN: Holder: DO's UA forward the ownershipUTicket
+        // createSimulatedCommConnection(userAgentDO, iotDevice);
         userAgentDO.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId);
-        waitSimulatedCommCompleted(userAgentDO, iotDevice);
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(userAgentDO, iotDevice);
 
         return new Pair(userAgentDO, iotDevice);
     }
@@ -193,7 +199,11 @@ public class Conftest {
         createSimulatedCommConnection(userAgentDO, iotDevice);
         String generatedCommand = "HELLO-1";
         userAgentDO.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        waitSimulatedCommCompleted(userAgentDO, iotDevice);
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        userAgentDO.getMsgReceiver()._recvXxxMessage();
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(userAgentDO, iotDevice);
 
         return new Pair(userAgentDO, iotDevice);
     }
@@ -216,7 +226,7 @@ public class Conftest {
         DeviceController cloudServerEP = enterpriseProviderServer();
 
         // WHEN: Issuer: DO's UA generate & send the access_u_ticket to EP's CS
-        createSimulatedCommConnection(userAgentDO, cloudServerEP);
+        // createSimulatedCommConnection(userAgentDO, cloudServerEP);
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = new HashMap<>();
@@ -226,13 +236,18 @@ public class Conftest {
         generatedRequest.put("taskScope", generatedTaskScope);
 
         userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
+        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket
-        createSimulatedCommConnection(cloudServerEP, iotDevice);
+        // createSimulatedCommConnection(cloudServerEP, iotDevice);
         String generatedCommand = "HELLO-1";
         cloudServerEP.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        waitSimulatedCommCompleted(cloudServerEP, iotDevice);
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(cloudServerEP, iotDevice);
 
         return new Triple(userAgentDO, cloudServerEP, iotDevice);
     }
@@ -247,7 +262,7 @@ public class Conftest {
         DeviceController cloudServerEP = enterpriseProviderServer();
 
         // WHEN: Issuer: DO's UA generate & send the access_u_ticket to EP's CS
-        createSimulatedCommConnection(userAgentDO, cloudServerEP);
+        // createSimulatedCommConnection(userAgentDO, cloudServerEP);
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of(
                 "SAY-HELLO-1", "allow",
@@ -261,13 +276,18 @@ public class Conftest {
         generatedRequest.put("taskScope", generatedTaskScope);
 
         userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
+        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket
-        createSimulatedCommConnection(cloudServerEP, iotDevice);
+        // createSimulatedCommConnection(cloudServerEP, iotDevice);
         String generatedCommand = "HELLO-1";
         cloudServerEP.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        waitSimulatedCommCompleted(cloudServerEP, iotDevice);
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        iotDevice.getMsgReceiver()._recvXxxMessage();
+        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(cloudServerEP, iotDevice);
 
         return new Triple(userAgentDO, cloudServerEP, iotDevice);
     }

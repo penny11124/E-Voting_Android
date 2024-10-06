@@ -132,7 +132,7 @@ public class MsgReceiver implements Runnable {
            In production, we may need Ctrl+C or other shutdown method to stop this loop program
      */
     public void createSimulatedCommConnection(DeviceController end) {
-        // SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is connecting with {end.sharedData.thisDevice.deviceName}...");
+        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is connecting with {end.sharedData.thisDevice.deviceName}...");
 
         // Set Sender (on Main Thread)
         this.sharedData.getSimulatedCommChannel().setEnd(end);
@@ -192,7 +192,47 @@ public class MsgReceiver implements Runnable {
         }
 
         SimpleLogger.simpleLog("cli", "Received Message: " + this.sharedData.getReceivedMessageJson());
-    }
+
+        try {
+            // IOT_DEVICE
+            String state = this.sharedData.getState();
+            if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_UT)) {
+                this.flowApplyUTicket._deviceRecvUTicket((UTicket) receivedMessage);
+            } else if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_CRKE2)) {
+                this.flowOpenSession._deviceRecvCrKe2((RTicket) receivedMessage);
+                SimpleLogger.simpleLog("cli", "plaintextCmd in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextCmd());
+            } else if (state.equals(ThisDevice.STATE_DEVICE_WAIT_FOR_CMD)) {
+                this.flowIssueUToken._deviceRecvCmd((UTicket) receivedMessage);
+                SimpleLogger.simpleLog("cli", "plaintextCmd in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextCmd());
+            }
+            // USER_AGENT_OR_CLOUD_SERVER
+            else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT)) {
+                if (receivedMessage instanceof UTicket) {
+                    this.flowIssueUTicket._holderRecvUTicket((UTicket) receivedMessage);
+                } else if (receivedMessage instanceof RTicket) {
+                    this.flowIssueUTicket._issuerRecvRTicket((RTicket) receivedMessage);
+                }
+            } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_RT)) {
+                this.flowApplyUTicket._holderRecvRTicket((RTicket) receivedMessage);
+            } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE1)) {
+                this.flowOpenSession._holderRecvCrKe1((RTicket) receivedMessage);
+            } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_CRKE3)) {
+                this.flowOpenSession._holderRecvCrKe3((RTicket) receivedMessage);
+                SimpleLogger.simpleLog("cli", "plaintextData in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextData());
+                SimpleLogger.simpleLog("cli", "+++Session is Constructed+++");
+            } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_DATA)) {
+                this.flowIssueUToken._holderRecvData((RTicket) receivedMessage);
+                SimpleLogger.simpleLog("cli", "plaintextData in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextData());
+            } else { // pragma: no cover -> Shouldn't Reach Here
+                throw new RuntimeException("Shouldn't Reach Here");
+            }
+        } catch (RuntimeException error) {
+            this.sharedData.setResultMessage(error.getMessage());
+            throw error;
+        } catch (Exception error) {
+            throw new RuntimeException("Shouldn't Reach Here", error);
+        }
+}
 
     // _recvXxxMessage?
     @Override

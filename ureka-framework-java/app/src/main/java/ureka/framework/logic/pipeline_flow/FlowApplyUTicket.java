@@ -2,6 +2,7 @@ package ureka.framework.logic.pipeline_flow;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import ureka.framework.Environment;
@@ -168,7 +169,6 @@ public class FlowApplyUTicket {
             // [STAGE: (S)]
             this.msgSender.sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE
                 , UTicket.MESSAGE_TYPE, storedUTicketJson);
-
         } catch (RuntimeException e) {
             this.sharedData.setResultMessage(e.getMessage());
             throw new RuntimeException(e);
@@ -208,7 +208,8 @@ public class FlowApplyUTicket {
             }
 
         } catch (RuntimeException e) {
-            this.sharedData.setResultMessage("error");
+            String filteredMessage = e.getMessage().replace("java.lang.RuntimeException: ", "");
+            this.sharedData.setResultMessage(filteredMessage);
 
             // [STAGE: (C)]
             this.executor.changeState(ThisDevice.STATE_DEVICE_WAIT_FOR_UT);
@@ -270,7 +271,7 @@ public class FlowApplyUTicket {
                     rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
                     rTicketRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
-                    rTicketRequest.put("auditEnd", "ACCESS END");
+                    rTicketRequest.put("auditEnd", "ACCESS_END");
                 } else {
                     // pragma: no cover -> Weird U-Token
                     rTicketRequest.put("rTicketType", uTicketType);
@@ -339,16 +340,14 @@ public class FlowApplyUTicket {
                 // simpleLog("debug", "Corresponding UTicket: {storedUTicketJson}");
                 // [STAGE: (VR)]
                 UTicket storedUTicket = this.msgVerifier._classifyUTicketIsDefinedType(storedUTicketJson);
-
                 // [STAGE: (VRT)]
                 this.msgVerifier.verifyUTicketHasExecutedThroughRTicket(receivedRTicket, storedUTicket, null);
-
                 //[STAGE: (E)(O)]
-                this.executor.executeXxxRTicket(receivedRTicket, "holder-or-device");
+                this.executor.executeXxxRTicket(receivedRTicket, "holderOrDevice");
                 this.sharedData.setResultMessage("-> SUCCESS: VERIFY_UT_HAS_EXECUTED");
-
                 // [STAGE: (C)]
                 this.executor.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_UREQ_UREJ_UT_RT);
+
             } else {
                 // pragma: no cover -> TODO: Revocation UTicket
                 // Query Corresponding UTicket(s)
@@ -357,7 +356,6 @@ public class FlowApplyUTicket {
         } catch (RuntimeException e) {
             // FAILURE: (VR)(VRT)
             this.sharedData.setResultMessage(e.getMessage());
-            throw new RuntimeException(e);
         } catch (Exception e) {
             // pragma: no cover -> Shouldn't Reach Here
             throw new RuntimeException("FlowApplyUTicket-_holderRecvRTicket: Unexpected error.");

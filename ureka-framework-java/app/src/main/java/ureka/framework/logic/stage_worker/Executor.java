@@ -330,13 +330,13 @@ public class Executor {
         }
     }
     private void _executeCRKEUTicket(UTicket ticketIn, String commEnd, String cmd) {
-        SimpleLogger.simpleLog("info","+ " + sharedData.getThisDevice().getDeviceName() + " is updating current session...");
+        SimpleLogger.simpleLog("info",this.sharedData.getThisDevice().getDeviceName() + " is updating current session...");
 
         if(ticketIn != null &&
                 (ticketIn.getUTicketType().equals(UTicket.TYPE_ACCESS_UTICKET) ||
                         ticketIn.getUTicketType().equals(UTicket.TYPE_SELFACCESS_UTICKET))) {
 
-            if ("holder".equals(commEnd)) {
+            if (commEnd.equals("holder")) {
                 // Update Session: Access UT
                 this.sharedData.getCurrentSession().setCurrentUTicketId(ticketIn.getUTicketId());
                 this.sharedData.getCurrentSession().setCurrentDeviceId(ticketIn.getDeviceId());
@@ -344,7 +344,7 @@ public class Executor {
                 this.sharedData.getCurrentSession().setCurrentTaskScope(ticketIn.getTaskScope());
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.executePs("sendUt", null, cmd, null);
-            } else if ("device".equals(commEnd)) {
+            } else if (commEnd.equals("device")) {
                 // Update Session: Access UT
                 this.sharedData.getCurrentSession().setCurrentUTicketId(ticketIn.getUTicketId());
                 this.sharedData.getCurrentSession().setCurrentDeviceId(ticketIn.getDeviceId());
@@ -478,7 +478,7 @@ public class Executor {
         }
     }
     private void _executePsUTicket(String executingCase, UTicket ticketIn, String plaintext, String associatedPlaintext) {
-        SimpleLogger.simpleLog("info","+ " + this.sharedData.getThisDevice().getDeviceName() + " is updating current session...");
+        SimpleLogger.simpleLog("info",this.sharedData.getThisDevice().getDeviceName() + " is updating current session...");
 
         // CR-KE
         switch (executingCase) {
@@ -548,16 +548,16 @@ public class Executor {
                 this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("additional unencrypted cmd");
 
                 // Update Session: PS-Cmd (Encryption)
-                encResult = this._executeEncryptPlaintext(
+                Pair encResult2 = this._executeEncryptPlaintext(
                         this.sharedData.getCurrentSession().getPlaintextCmd(),
                         this.sharedData.getCurrentSession().getAssociatedPlaintextCmd(),
                         currentSessionKeyBytes,
-                        this.sharedData.getCurrentSession().getIvData()
+                        this.sharedData.getCurrentSession().getIvCmd()
                 );
 
                 // Update Session: PS-Cmd (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.getPairFirst());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.getPairSecond());
+                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult2.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult2.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvData(this._generateNextIv());
                 break;
@@ -572,7 +572,7 @@ public class Executor {
 
                 // [STAGE: (VTK)(VTS)]
                 // Update Session: PS-Cmd (Decryption)
-                plaintextCmd = this._executeDecryptCiphertext(
+                String plaintextCmd2 = this._executeDecryptCiphertext(
                         this.sharedData.getCurrentSession().getCiphertextCmd(),
                         this.sharedData.getCurrentSession().getAssociatedPlaintextCmd(),
                         this.sharedData.getCurrentSession().getGcmAuthenticationTagCmd(),
@@ -581,10 +581,10 @@ public class Executor {
                 );
 
                 if(!ticketIn.getUTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
-                    this.msgVerifier.verifyCmdIsInTaskScope(plaintextCmd);
+                    this.msgVerifier.verifyCmdIsInTaskScope(plaintextCmd2);
                 }
                 // Update Session: PS-Cmd (Output: Plaintext)
-                this.sharedData.getCurrentSession().setPlaintextCmd(plaintextCmd);
+                this.sharedData.getCurrentSession().setPlaintextCmd(plaintextCmd2);
                 break;
             case "sendRToken" :
                 // Update Session: PS-Cmd (Input: Key)
@@ -596,7 +596,7 @@ public class Executor {
                 this.sharedData.getCurrentSession().setAssociatedPlaintextData(associatedPlaintext);
 
                 // Update Session: PS-Data (Encryption)
-                encResult = this._executeEncryptPlaintext(
+                Pair encResult3 = this._executeEncryptPlaintext(
                         plaintext,
                         associatedPlaintext,
                         currentSessionKeyBytes,
@@ -604,8 +604,8 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.getPairFirst());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.getPairSecond());
+                this.sharedData.getCurrentSession().setCiphertextData((String) encResult3.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult3.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
                 break;
@@ -683,7 +683,7 @@ public class Executor {
                 this.sharedData.getCurrentSession().setAssociatedPlaintextData(associatedPlaintext);
 
                 // Update Session: PS-Data (Encryption)
-                encResult = this._executeEncryptPlaintext(
+                Pair encResult2 = this._executeEncryptPlaintext(
                         this.sharedData.getCurrentSession().getPlaintextData(),
                         this.sharedData.getCurrentSession().getAssociatedPlaintextData(),
                         currentSessionKeyBytes,
@@ -691,12 +691,13 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.getPairFirst());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.getPairSecond());
+                this.sharedData.getCurrentSession().setCiphertextData((String) encResult2.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult2.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
                 break;
             case "recvCrke3":
+            case "recvRToken":
                 // Update Session: PS-Cmd (Input: Key)
                 currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
@@ -729,16 +730,16 @@ public class Executor {
                 this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("additional unencrypted cmd");
 
                 // Update Session: PS-Cmd (Encryption)
-                encResult = this._executeEncryptPlaintext(
+                Pair encResult3 = this._executeEncryptPlaintext(
                         this.sharedData.getCurrentSession().getPlaintextCmd(),
                         this.sharedData.getCurrentSession().getAssociatedPlaintextCmd(),
                         currentSessionKeyBytes,
-                        this.sharedData.getCurrentSession().getIvData()
+                        this.sharedData.getCurrentSession().getIvCmd()
                 );
 
                 // Update Session: PS-Cmd (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult.getPairFirst());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult.getPairSecond());
+                this.sharedData.getCurrentSession().setCiphertextCmd((String) encResult3.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd((String) encResult3.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvData(this._generateNextIv());
                 break;
@@ -752,7 +753,7 @@ public class Executor {
                 this.sharedData.getCurrentSession().setAssociatedPlaintextData(associatedPlaintext);
 
                 // Update Session: PS-Data (Encryption)
-                encResult = this._executeEncryptPlaintext(
+                Pair encResult4 = this._executeEncryptPlaintext(
                         plaintext,
                         associatedPlaintext,
                         currentSessionKeyBytes,
@@ -760,33 +761,10 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Ciphertext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData((String) encResult.getPairFirst());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult.getPairSecond());
+                this.sharedData.getCurrentSession().setCiphertextData((String) encResult4.getPairFirst());
+                this.sharedData.getCurrentSession().setGcmAuthenticationTagData((String) encResult4.getPairSecond());
                 // Update Session: Next-IV
                 this.sharedData.getCurrentSession().setIvCmd(this._generateNextIv());
-                break;
-            case "recvRToken" :
-                // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
-                // Update Session: PS-Cmd (Input: This-IV)
-                this.sharedData.getCurrentSession().setIvCmd(ticketIn.getIvCmd());
-                // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextData(ticketIn.getCiphertextData());
-                this.sharedData.getCurrentSession().setAssociatedPlaintextData(ticketIn.getAssociatedPlaintextData());
-                this.sharedData.getCurrentSession().setGcmAuthenticationTagData(ticketIn.getGcmAuthenticationTagData());
-
-                // [STAGE: (VTK)]
-                // Update Session: PS-Data (Decryption)
-                plaintextData = this._executeDecryptCiphertext(
-                        this.sharedData.getCurrentSession().getCiphertextData(),
-                        this.sharedData.getCurrentSession().getAssociatedPlaintextData(),
-                        this.sharedData.getCurrentSession().getGcmAuthenticationTagData(),
-                        currentSessionKeyBytes,
-                        this.sharedData.getCurrentSession().getIvData()
-                );
-
-                // Update Session: PS-Data (Output: Plaintext)
-                this.sharedData.getCurrentSession().setPlaintextData(plaintextData);
                 break;
             default: // pragma: no cover -> Shouldn't Reach Here
                 throw new RuntimeException("Shouldn't Reach Here");

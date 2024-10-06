@@ -44,6 +44,7 @@ public class Test14FailWhenAccessDeviceByOwner {
     }
 
     // Threat: (S) Spoofing, (T) Tampering, (E) Elevation of Privilege
+    @Test
     public void testFailWhenForgeHolderIdAndIssuerSigAndApplyTheUTicket() {
         currentTestGivenLog();
 
@@ -77,11 +78,13 @@ public class Test14FailWhenAccessDeviceByOwner {
         );
         this.cloudServerATK.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
-        // WHEN: Apply Flow (holder_apply_u_ticket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // WHEN: Apply Flow (holderApplyUTicket)
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         String generatedCommand = "HELLO-1";
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId,generatedCommand);
-        waitSimulatedCommCompleted(this.cloudServerATK,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK,this.iotDevice);
 
         // THEN: Because no legal holder private key, legal authentication (holder id + signature) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_HOLDER_ID"));
@@ -132,10 +135,14 @@ public class Test14FailWhenAccessDeviceByOwner {
         this.cloudServerATK.getExecutor().executeUpdateTicketOrder("holderGenerateOrReceiveUTicket", UTicket.jsonStrToUTicket(interceptedUTicketJson2));
 
         // WHEN: Preempt (holderApplyUTicket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         String generatedCommand = "HELLO-1";
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId3,generatedCommand);
-        waitSimulatedCommCompleted(this.cloudServerATK,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK,this.iotDevice);
 
         // THEN: Because no legal holder private key, legal authentication (holder signature) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_HOLDER_SIGNATURE"));
@@ -179,16 +186,22 @@ public class Test14FailWhenAccessDeviceByOwner {
         this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
         // WHEN: Holder: DO's UA forward the selfAccessUTicket
-        createSimulatedCommConnection(this.userAgentDO, this.iotDevice);
+        // createSimulatedCommConnection(this.userAgentDO, this.iotDevice);
         String generatedCommand = "HELLO-1";
         this.userAgentDO.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId,generatedCommand);
-        waitSimulatedCommCompleted(this.userAgentDO,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.userAgentDO,this.iotDevice);
 
         // WHEN: DO's UA close the session (ACCESS_END)
-        createSimulatedCommConnection(this.userAgentDO, this.iotDevice);
-        String generatedCommand2 = "HELLO-1";
+        // createSimulatedCommConnection(this.userAgentDO, this.iotDevice);
+        String generatedCommand2 = "ACCESS_END";
         this.userAgentDO.getFlowIssueUToken().holderSendCmd(targetDeviceId,generatedCommand2,true);
-        waitSimulatedCommCompleted(this.userAgentDO,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.userAgentDO,this.iotDevice);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (issuerIssueUTicketToHerself)
@@ -198,10 +211,12 @@ public class Test14FailWhenAccessDeviceByOwner {
         this.cloudServerATK.getExecutor().executeUpdateTicketOrder("holderGenerateOrReceiveUTicket",UTicket.jsonStrToUTicket(interceptedUTicketJson2));
 
         // WHEN: Reuse (holderApplyUTicket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         String generatedCommand3 = "HELLO-1";
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId3,generatedCommand3);
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal holder private key, legal authentication (holder signature) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_TICKET_ORDER"));

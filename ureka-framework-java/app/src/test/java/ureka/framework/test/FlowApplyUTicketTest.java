@@ -127,7 +127,7 @@ public class FlowApplyUTicketTest {
     public void deviceRecvUTicketTest() throws Exception {
         UTicket uTicket = new UTicket();
         uTicket.setUTicketType(UTicket.TYPE_INITIALIZATION_UTICKET);
-        uTicket.setDeviceId("no_id");
+        uTicket.setDeviceId("noId");
         uTicket.setTicketOrder(0);
         uTicket.setHolderId(SerializationUtil.keyToStr(ECC.generateKeyPair().getPublic()));
         flowApplyUTicket.getExecutor().getSharedData().getThisDevice().setDeviceType(ThisDevice.IOT_DEVICE);
@@ -167,7 +167,7 @@ public class FlowApplyUTicketTest {
         UTicket uTicket = new UTicket();
         uTicket.setUTicketType(UTicket.TYPE_INITIALIZATION_UTICKET);
         uTicket.setProtocolVersion(UTicket.PROTOCOL_VERSION);
-        uTicket.setDeviceId("no_id");
+        uTicket.setDeviceId("noId");
         uTicket.setUTicketId(ECDH.generateSha256HashStr(UTicket.uTicketToJsonStr(uTicket)));
 
         RTicket rTicket = new RTicket();

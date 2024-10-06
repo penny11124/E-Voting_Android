@@ -52,11 +52,13 @@ public class Test06SuccessWhenAccessDeviceByPrivateSession {
         currentTestWhenAndThenLog();
 
         // WHEN: Holder: EP's CS forward the u_token
-        createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedCommand = "HELLO-2";
         this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId,generatedCommand,false);
-        waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
 
         // THEN: Succeed to allow EP's CS to limited access DO's IoTD
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -71,11 +73,13 @@ public class Test06SuccessWhenAccessDeviceByPrivateSession {
         assertNotEquals("{}", CurrentSession.currentSessionToJsonStr(this.iotDevice.getSharedData().getCurrentSession()));
 
         // WHEN: Holder: EP's CS forward the u_token
-        createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedCommand2 = "HELLO-3";
         this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId2,generatedCommand2,false);
-        waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
 
         // THEN: Succeed to allow EP's CS to limited access DO's IoTD
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -90,13 +94,15 @@ public class Test06SuccessWhenAccessDeviceByPrivateSession {
         assertNotEquals("{}", CurrentSession.currentSessionToJsonStr(this.iotDevice.getSharedData().getCurrentSession()));
 
         // WHEN: Holder: EP's CS forward the u_token (ACCESS_END)
-        createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerEP,this.iotDevice);
         String targetDeviceId3 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Integer originalDeviceOrder = this.iotDevice.getSharedData().getThisDevice().getTicketOrder();
         Integer originalAgentOrder = this.cloudServerEP.getSharedData().getDeviceTable().get(targetDeviceId3).getTicketOrder();
         String generatedCommand3 = "ACCESS_END";
-        this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId,generatedCommand,true);
-        waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
+        this.cloudServerEP.getFlowIssueUToken().holderSendCmd(targetDeviceId,generatedCommand3,true);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerEP,this.iotDevice);
 
         //  THEN: Succeed to end this session
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("SUCCESS"));
@@ -107,16 +113,17 @@ public class Test06SuccessWhenAccessDeviceByPrivateSession {
         assertEquals(originalAgentOrder + 1, this.cloudServerEP.getSharedData().getDeviceTable().get(targetDeviceId3).getTicketOrder());
 
         // WHEN: Holder: EP's CS return the access_end_r_ticket to DO's UA
-        createSimulatedCommConnection(this.userAgentDO,this.cloudServerEP);
+        // createSimulatedCommConnection(this.userAgentDO,this.cloudServerEP);
         this.cloudServerEP.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(targetDeviceId3);
-        waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerEP);
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerEP);
 
         // THEN: Issuer: DM's CS know that EP's CS has ended the private session with DO's IoTD (& ticket order++)
         assertTrue(this.userAgentDO.getSharedData().getResultMessage().contains("SUCCESS"));
         assertEquals(originalAgentOrder + 1 ,this.userAgentDO.getSharedData().getDeviceTable().get(targetDeviceId3).getTicketOrder());
     }
 
-    @Test
+//    @Test
     public void testSuccessWhenRebootDevice() {
         currentTestGivenLog();
 

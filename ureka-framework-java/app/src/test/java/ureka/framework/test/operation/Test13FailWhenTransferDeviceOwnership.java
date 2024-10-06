@@ -77,13 +77,15 @@ public class Test13FailWhenTransferDeviceOwnership {
         String generatedUTicketJson = this.cloudServerATK.getMsgGenerator().generateXxxUTicket(generatedRequest);
 
         // WHEN: Pretend Holder: Other
-        // WHEN: Forge Flow (_holder_recv_u_ticket)
+        // WHEN: Forge Flow (_holderRecvUTicket)
         this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(generatedUTicketJson));
 
-        // WHEN: Apply Flow (holder_apply_u_ticket)
-        createSimulatedCommConnection(this.cloudServerATK,this.iotDevice);
+        // WHEN: Apply Flow (holderApplyUTicket)
+        // createSimulatedCommConnection(this.cloudServerATK,this.iotDevice);
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId);
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no legal issuer private key, legal authorization (issuer signature) cannot be generated
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_ISSUER_SIGNATURE on OWNERSHIP UTICKET"));
@@ -112,7 +114,7 @@ public class Test13FailWhenTransferDeviceOwnership {
 
         // WHEN: Interception (TYPE_OWNERSHIP_UTICKET)
         // Because TYPE_OWNERSHIP_UTICKET has sent on BC, the attacker can intercept & preempt it.
-        createSimulatedCommConnection(this.cloudServerDM, this.userAgentDO);
+        // createSimulatedCommConnection(this.cloudServerDM, this.userAgentDO);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Map<String, String> generatedRequest = Map.of(
                 "deviceId", targetDeviceId,
@@ -120,7 +122,8 @@ public class Test13FailWhenTransferDeviceOwnership {
                 "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
         );
         this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
-        waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerDM);
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerDM);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (_holderRecvUTicket)
@@ -129,9 +132,11 @@ public class Test13FailWhenTransferDeviceOwnership {
         this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Preempt (holder_apply_u_ticket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId2);
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no CR involved, attacker can execute ownership transfer for new owner, but the RTicket will be lost
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> SUCCESS: VERIFY_UT_CAN_EXECUTE"));
@@ -159,7 +164,7 @@ public class Test13FailWhenTransferDeviceOwnership {
 
         // WHEN: Interception (TYPE_OWNERSHIP_UTICKET)
         // Because TYPE_OWNERSHIP_UTICKET has sent on BC, the attacker can intercept & reuse it.
-        createSimulatedCommConnection(this.cloudServerDM, this.userAgentDO);
+        // createSimulatedCommConnection(this.cloudServerDM, this.userAgentDO);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Map<String, String> generatedRequest = Map.of(
                 "deviceId", targetDeviceId,
@@ -167,12 +172,15 @@ public class Test13FailWhenTransferDeviceOwnership {
                 "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
         );
         this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
-        waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerDM);
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.userAgentDO,this.cloudServerDM);
 
         // WHEN: Holder: DO's UA forward the TYPE_OWNERSHIP_UTICKET
-        createSimulatedCommConnection(this.userAgentDO, this.iotDevice);
+        // createSimulatedCommConnection(this.userAgentDO, this.iotDevice);
         this.userAgentDO.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId);
-        waitSimulatedCommCompleted(this.userAgentDO,this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.userAgentDO,this.iotDevice);
 
         // WHEN: Pretend Holder: Other
         // WHEN: Interception (_holderRecvUTicket)
@@ -181,9 +189,11 @@ public class Test13FailWhenTransferDeviceOwnership {
         this.cloudServerATK.getFlowIssuerIssueUTicket()._holderRecvUTicket(UTicket.jsonStrToUTicket(interceptedUTicketJson));
 
         // WHEN: Reuse (holderApplyUTicket)
-        createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
+        // createSimulatedCommConnection(this.cloudServerATK, this.iotDevice);
         this.cloudServerATK.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId2);
-        waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
+        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+        this.cloudServerATK.getMsgReceiver()._recvXxxMessage();
+        // waitSimulatedCommCompleted(this.cloudServerATK, this.iotDevice);
 
         // THEN: Because no CR involved, attacker can execute ownership transfer for new owner, but no effective harm for new owner (just a little strange)
         assertTrue(this.iotDevice.getSharedData().getResultMessage().contains("-> FAILURE: VERIFY_TICKET_ORDER"));

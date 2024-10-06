@@ -107,7 +107,7 @@ public class MsgVerifierUTicket {
         String failure_msg = "-> FAILURE: VERIFY_DEVICE_ID = " + uticketIn.getDeviceId();
 
         if (Objects.equals(uticketIn.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)) {
-            if (Objects.equals(uticketIn.getDeviceId(), "no_id")) {
+            if (Objects.equals(uticketIn.getDeviceId(), "noId")) {
                 SimpleLogger.simpleLog("info", success_msg);
                 return uticketIn;
             } else {
@@ -136,124 +136,124 @@ public class MsgVerifierUTicket {
     }
 
     public UTicket verifyTicketOrder(UTicket uTicketIn) {
-        String success_msg = "-> SUCCESS: VERIFY_TICKET_ORDER";
-        String failure_msg = "-> FAILURE: VERIFY_TICKET_ORDER";
+        String successMsg = "-> SUCCESS: VERIFY_TICKET_ORDER";
+        String failureMsg = "-> FAILURE: VERIFY_TICKET_ORDER";
 
         if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)) {
             if (this.thisDevice.getTicketOrder() == 0) {
                 if (uTicketIn.getTicketOrder() == 0) {
-                    SimpleLogger.simpleLog("info", success_msg);
+                    SimpleLogger.simpleLog("info", successMsg);
                     return uTicketIn;
                 } else {
                     // pragma: no cover -> Weird U-Ticket
-                    SimpleLogger.simpleLog("error", failure_msg);
-                    throw new RuntimeException(failure_msg);
+                    SimpleLogger.simpleLog("error", failureMsg);
+                    throw new RuntimeException(failureMsg);
                 }
             } else if (this.thisDevice.getTicketOrder() > 0) {
-                failure_msg = "-> FAILURE: VERIFY_TICKET_ORDER: IOT_DEVICE ALREADY INITIALIZED";
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                failureMsg = "-> FAILURE: VERIFY_TICKET_ORDER: IOT_DEVICE ALREADY INITIALIZED";
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             } else {
                 // pragma: no cover -> Weird U-Ticket
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         } else {
             if (Objects.equals(uTicketIn.getTicketOrder(), this.thisDevice.getTicketOrder())) {
-                SimpleLogger.simpleLog("info", success_msg);
+                SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         }
     }
 
     public UTicket verifyHolderId(UTicket uTicketIn) {
-        String success_msg = "-> SUCCESS: VERIFY_HOLDER_ID";
-        String failure_msg = "-> FAILURE: VERIFY_HOLDER_ID";
+        String successMsg = "-> SUCCESS: VERIFY_HOLDER_ID";
+        String failureMsg = "-> FAILURE: VERIFY_HOLDER_ID";
 
         if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)) {
             // With HOLDER_ID
             if (uTicketIn.getHolderId() != null) {
-                SimpleLogger.simpleLog("info", success_msg);
+                SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
                 // pragma: no cover -> Weird U-Ticket
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         } else if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_SELFACCESS_UTICKET)) {
             // HOLDER_ID must be Device Owner
             if (Objects.equals(uTicketIn.getHolderId(), this.thisDevice.getOwnerPubKeyStr())) {
-                SimpleLogger.simpleLog("info", success_msg);
+                SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         } else if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_CMD_UTOKEN)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_END_UTOKEN)) {
             // No HOLDER_ID
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
             return uTicketIn;
         } else {
             // pragma: no cover -> Weird U-Ticket
-            SimpleLogger.simpleLog("error", failure_msg);
-            throw new RuntimeException(failure_msg);
+            SimpleLogger.simpleLog("error", failureMsg);
+            throw new RuntimeException(failureMsg);
         }
     }
 
     public static UTicket verifyTaskScope(UTicket uTicketIn) {
-        String success_msg = "-> SUCCESS: VERIFY_TASK_SCOPE";
-        String failure_msg = "-> FAILURE: VERIFY_TASK_SCOPE";
+        String successMsg = "-> SUCCESS: VERIFY_TASK_SCOPE";
+        String failureMsg = "-> FAILURE: VERIFY_TASK_SCOPE";
 
         if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_CMD_UTOKEN)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_END_UTOKEN)) {
             // No TASK_SCOPE
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
             return uTicketIn;
         } else if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)) {
             if (uTicketIn.getTaskScope() != null) {
-                SimpleLogger.simpleLog("info", success_msg);
+                SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
                 // pragma: no cover -> Weird U-Ticket
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         } else if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_SELFACCESS_UTICKET)) {
             Map<String, String> map = new HashMap<>();
             map.put("ALL", "allow");
             if (Objects.equals(uTicketIn.getTaskScope(), SerializationUtil.dictToJsonStr(map))) {
-                SimpleLogger.simpleLog("info", success_msg);
+                SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
                 // pragma: no cover -> Weird U-Ticket
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         } else {
             // pragma: no cover -> Weird U-Ticket
-            SimpleLogger.simpleLog("error", failure_msg);
-            throw new RuntimeException(failure_msg);
+            SimpleLogger.simpleLog("error", failureMsg);
+            throw new RuntimeException(failureMsg);
         }
     }
 
     public static UTicket verifyPS(UTicket uTicketIn) {
-        String success_msg = "-> SUCCESS: VERIFY_PS";
-        String failure_msg = "-> FAILURE: VERIFY_PS";
+        String successMsg = "-> SUCCESS: VERIFY_PS";
+        String failureMsg = "-> FAILURE: VERIFY_PS";
 
         if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_SELFACCESS_UTICKET)) {
             // No PS
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
             return uTicketIn;
         } else if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_CMD_UTOKEN)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_END_UTOKEN)) {
@@ -261,23 +261,23 @@ public class MsgVerifierUTicket {
                 && uTicketIn.getCiphertextCmd() != null
                 && uTicketIn.getIvData() != null
                 && uTicketIn.getGcmAuthenticationTagCmd() != null) {
-                SimpleLogger.simpleLog("info", success_msg);
+                SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
                 // pragma: no cover -> Weird U-Ticket
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         } else {
             // pragma: no cover -> Weird U-Ticket
-            SimpleLogger.simpleLog("error", failure_msg);
-            throw new RuntimeException(failure_msg);
+            SimpleLogger.simpleLog("error", failureMsg);
+            throw new RuntimeException(failureMsg);
         }
     }
 
     public UTicket verifyIssuerSignature(UTicket uTicketIn) throws Exception {
-        String success_msg = "-> SUCCESS: VERIFY_ISSUER_SIGNATURE on " + uTicketIn.getUTicketType() + " UTICKET";
-        String failure_msg = "-> FAILURE: VERIFY_ISSUER_SIGNATURE on " + uTicketIn.getUTicketType() + " UTICKET";
+        String successMsg = "-> SUCCESS: VERIFY_ISSUER_SIGNATURE on " + uTicketIn.getUTicketType() + " UTICKET";
+        String failureMsg = "-> FAILURE: VERIFY_ISSUER_SIGNATURE on " + uTicketIn.getUTicketType() + " UTICKET";
 
         // Verify ISSUER_SIGNATURE
         if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)
@@ -285,21 +285,21 @@ public class MsgVerifierUTicket {
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_CMD_UTOKEN)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_END_UTOKEN)) {
             // No ISSUER_SIGNATURE
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
             return uTicketIn;
         } else if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)
             || Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_ACCESS_UTICKET)) {
             if (_verifyIssuerSignatureOnUTicket(uTicketIn, this.thisDevice.getOwnerPubKey())) {
-                SimpleLogger.simpleLog("info", success_msg);
+                SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
-                SimpleLogger.simpleLog("error", failure_msg);
-                throw new RuntimeException(failure_msg);
+                SimpleLogger.simpleLog("error", failureMsg);
+                throw new RuntimeException(failureMsg);
             }
         } else {
             // pragma: no cover -> Weird U-Ticket
-            SimpleLogger.simpleLog("error", failure_msg);
-            throw new RuntimeException(failure_msg);
+            SimpleLogger.simpleLog("error", failureMsg);
+            throw new RuntimeException(failureMsg);
         }
     }
 

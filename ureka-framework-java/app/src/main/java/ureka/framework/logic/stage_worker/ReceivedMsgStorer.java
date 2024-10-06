@@ -85,16 +85,16 @@ public class ReceivedMsgStorer {
         try {
             String receivedRTicketJson = RTicket.rTicketToJsonStr(receivedRTicket);
 
-            // We store this RTicket (but not verified) in device_table["device_id"]
+            // We store this RTicket (but not verified) in deviceTable["deviceId"]
             if (receivedRTicket.getRTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET)) {
                 // Holder (for Owner)
                 String createdDeviceId = receivedRTicket.getDeviceId();
-                // Put u_ticket (temporary in device_table["no_id"]) & r_ticket in device_table["created_device_id"]
+                // Put u_ticket (temporary in device_table["noId"]) & r_ticket in device_table["created_device_id"]
                 this.sharedData.getDeviceTable().put(
                         createdDeviceId,
                         new OtherDevice(
                                 createdDeviceId,
-                                this.sharedData.getDeviceTable().get("no_id").getDeviceUTicketForOwner(),
+                                this.sharedData.getDeviceTable().get("noId").getDeviceUTicketForOwner(),
                                 receivedRTicketJson
                         )
                 );

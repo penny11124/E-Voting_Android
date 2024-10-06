@@ -12,6 +12,7 @@ import ureka.framework.logic.stage_worker.MsgSender;
 import ureka.framework.logic.stage_worker.MsgVerifier;
 import ureka.framework.logic.stage_worker.ReceivedMsgStorer;
 import ureka.framework.model.SharedData;
+import ureka.framework.model.data_model.OtherDevice;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.Message;
 import ureka.framework.model.message_model.RTicket;
@@ -124,7 +125,7 @@ public class FlowIssueUTicket {
         this.measureHelper.measureProcessPerfStart();
         try {
             // [STAGE: (VL)]
-            if (this.sharedData.getDeviceTable().containsKey(deviceId) || "no_id".equals(deviceId)) {
+            if (this.sharedData.getDeviceTable().containsKey(deviceId) || "noId".equals(deviceId)) {
                 // [STAGE: (G)]
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(arbitraryDict);
 
@@ -258,7 +259,7 @@ public class FlowIssueUTicket {
                 receivedRTicket.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET) ||
                 receivedRTicket.getRTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
                 // Query Corresponding UTicket(s)
-                //    Notice that even Initialization UTicket is copied in the device_table["device_id"]
+                //    Notice that even Initialization UTicket is copied in the deviceTable["deviceId"]
                 // [STAGE: (VL)(L)]
                 if(receivedRTicket.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET)) {
                     storedUTicketJson = this.sharedData.getDeviceTable().get(receivedRTicket.getDeviceId()).getDeviceOwnershipUTicketForOthers();

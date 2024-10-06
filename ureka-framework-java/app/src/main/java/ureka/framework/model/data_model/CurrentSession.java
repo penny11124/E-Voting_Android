@@ -34,25 +34,25 @@ public class CurrentSession {
 
     public CurrentSession() {}
     public CurrentSession(Map<String, String> values) {
-        this.currentUTicketId = values.getOrDefault("current_u_ticket_id", null);
-        this.currentDeviceId = values.getOrDefault("current_device_id", null);
-        this.currentHolderId = values.getOrDefault("current_holder_id", null);
-        this.currentTaskScope = values.getOrDefault("current_task_scope", null);
-        this.challenge1 = values.getOrDefault("challenge_1", null);
-        this.challenge2 = values.getOrDefault("challenge_2", null);
-        this.keyExchangeSalt1 = values.getOrDefault("key_exchange_salt_1", null);
-        this.keyExchangeSalt2 = values.getOrDefault("key_exchange_salt_2", null);
-        this.currentSessionKeyStr = values.getOrDefault("current_session_key_str", null);
-        this.plaintextCmd = values.getOrDefault("plaintext_cmd", null);
-        this.associatedPlaintextCmd = values.getOrDefault("associated_plaintext_cmd", null);
-        this.ciphertextCmd = values.getOrDefault("ciphertext_cmd", null);
-        this.ivCmd = values.getOrDefault("iv_cmd", null);
-        this.gcmAuthenticationTagCmd = values.getOrDefault("gcm_authentication_tag_cmd", null);
-        this.plaintextData = values.getOrDefault("plaintext_data", null);
-        this.associatedPlaintextData = values.getOrDefault("associated_plaintext_data", null);
-        this.ciphertextData = values.getOrDefault("ciphertext_data", null);
-        this.ivData = values.getOrDefault("iv_data", null);
-        this.gcmAuthenticationTagData = values.getOrDefault("gcm_authentication_tag_data", null);
+        this.currentUTicketId = values.getOrDefault("currentUTicketId", null);
+        this.currentDeviceId = values.getOrDefault("currentDeviceId", null);
+        this.currentHolderId = values.getOrDefault("currentHolderId", null);
+        this.currentTaskScope = values.getOrDefault("currentTaskScope", null);
+        this.challenge1 = values.getOrDefault("challenge1", null);
+        this.challenge2 = values.getOrDefault("challenge2", null);
+        this.keyExchangeSalt1 = values.getOrDefault("keyExchangeSalt1", null);
+        this.keyExchangeSalt2 = values.getOrDefault("keyExchangeSalt2", null);
+        this.currentSessionKeyStr = values.getOrDefault("currentSessionKeyStr", null);
+        this.plaintextCmd = values.getOrDefault("plaintextCmd", null);
+        this.associatedPlaintextCmd = values.getOrDefault("associatedPlaintextCmd", null);
+        this.ciphertextCmd = values.getOrDefault("ciphertextCmd", null);
+        this.ivCmd = values.getOrDefault("ivCmd", null);
+        this.gcmAuthenticationTagCmd = values.getOrDefault("gcmAuthenticationTagCmd", null);
+        this.plaintextData = values.getOrDefault("plaintextData", null);
+        this.associatedPlaintextData = values.getOrDefault("associatedPlaintextData", null);
+        this.ciphertextData = values.getOrDefault("ciphertextData", null);
+        this.ivData = values.getOrDefault("ivData", null);
+        this.gcmAuthenticationTagData = values.getOrDefault("gcmAuthenticationTagData", null);
     }
 
     public String getCurrentUTicketId() {

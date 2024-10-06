@@ -22,7 +22,7 @@ public class MsgGenerator {
         return SimpleMeasurer.measureWorkerFunc(this::_generateXxxUTicket, arbitraryDict);
     }
     private String _generateXxxUTicket(Map<String, String> arbitraryDict) {
-        SimpleLogger.simpleLog("info",this.sharedData.getThisDevice().getDeviceName() + " is generating u_ticket...");
+        SimpleLogger.simpleLog("info",this.sharedData.getThisDevice().getDeviceName() + " is generating U Ticket...");
 
         MsgGeneratorUTicket uTicketGenerator = new MsgGeneratorUTicket(
                 this.sharedData.getThisDevice(),
@@ -38,7 +38,7 @@ public class MsgGenerator {
         return SimpleMeasurer.measureWorkerFunc(this::_generateXxxRTicket, arbitraryDict);
     }
     private String _generateXxxRTicket(Map<String, String> arbitraryDict) {
-        SimpleLogger.simpleLog("info",this.sharedData.getThisDevice().getDeviceName() + " is generating r_ticket...");
+        SimpleLogger.simpleLog("info",this.sharedData.getThisDevice().getDeviceName() + " is generating R Ticket...");
 
         MsgGeneratorRTicket rTicketGenerator = new MsgGeneratorRTicket(
                 this.sharedData.getThisDevice(),

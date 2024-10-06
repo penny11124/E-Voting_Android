@@ -38,7 +38,7 @@ public class MsgVerifier {
 
     //////////////////////////////////////////////////////
     // [STAGE: (V)] Verify Message & Execute
-    //   (VR): classify_message_is_defined_type
+    //   (VR): _classifyMessageIsDefinedType
     //   (VL): has_u_ticket_in_device_table
     //   (VUT): verify_u_ticket_can_execute
     //   (VRT): verify_u_ticket_has_executed_through_r_ticket
@@ -49,7 +49,7 @@ public class MsgVerifier {
         return SimpleMeasurer.measureWorkerFunc(this::__classifyMessageIsDefinedType, arbitraryJson);
     }
     private Object __classifyMessageIsDefinedType(String arbitraryJson) {
-        SimpleLogger.simpleLog("info", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is classifying message type...");
+        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is classifying message type...");
 
         // [STAGE: (VR: UTicket)]
         Message messageIn;
@@ -115,16 +115,19 @@ public class MsgVerifier {
         SimpleMeasurer.measureWorkerFunc(this::_verifyUTicketCanExecute, uTicketIn);
     }
     private void _verifyUTicketCanExecute(UTicket uTicketIn) {
-        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is verifying u_ticket...");
+        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is verifying U Ticket...");
 
         try {
             MsgVerifierUTicket uTicketVerifier = new MsgVerifierUTicket(this.sharedData.getThisDevice());
 
             uTicketVerifier.verifyDeviceId(uTicketIn);
             uTicketVerifier.verifyTicketOrder(uTicketIn);
+            uTicketVerifier.verifyHolderId(uTicketIn);
             MsgVerifierUTicket.verifyTaskScope(uTicketIn);
             MsgVerifierUTicket.verifyPS(uTicketIn);
             uTicketVerifier.verifyIssuerSignature(uTicketIn);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         } catch (Exception e) {
             // pragma: no cover -> Shouldn't Reach Here
             throw new RuntimeException("Shouldn't Reach Here");
@@ -135,7 +138,7 @@ public class MsgVerifier {
         SimpleMeasurer.measureWorkerFunc(this::_verifyUTicketHasExecutedThroughRTicket, rTicketIn, auditStartTicket, auditEndTicket);
     }
     private void _verifyUTicketHasExecutedThroughRTicket(RTicket rTicketIn, UTicket auditStartTicket, UTicket auditEndTicket) {
-        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is verifying r_ticket");
+        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is verifying R Ticket");
 
         try {
             MsgVerifierRTicket rTicketVerifier = new MsgVerifierRTicket(this.sharedData.getThisDevice(), this.sharedData.getDeviceTable(),
@@ -149,32 +152,33 @@ public class MsgVerifier {
             MsgVerifierRTicket.verifyCRKE(rTicketIn);
             MsgVerifierRTicket.verifyPs(rTicketIn);
             rTicketVerifier.verifyDeviceSignature(rTicketIn);
-        } catch (Exception e) {
-            // # pragma: no cover -> Shouldn't Reach Here
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {  // Shouldn't Reach Here
             throw new RuntimeException("Shouldn't Reach Here");
         }
     }
 
     public void verifyCmdIsInTaskScope(String cmd) {
-        String success_msg = "-> SUCCESS: VERIFY_CMD_IN_TASK_SCOPE";
-        String failure_msg = "-> FAILURE: VERIFY_CMD_IN_TASK_SCOPE";
+        String successMsg = "-> SUCCESS: VERIFY_CMD_IN_TASK_SCOPE";
+        String failureMsg = "-> FAILURE: VERIFY_CMD_IN_TASK_SCOPE";
 
         Map<String, String> taskScope = SerializationUtil.jsonStrToDict(this.sharedData.getCurrentSession().getCurrentTaskScope());
         // SimpleLogger.simpleLog("debug", "currentTaskScope: " + taskScope);
 
         if (Objects.equals(taskScope.get("ALL"), "allow")) {
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
         } else if (Objects.equals(cmd, "HELLO-1") && Objects.equals(taskScope.get("SAY-HELLO-1"), "allow")) {
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
         } else if (Objects.equals(cmd, "HELLO-2") && Objects.equals(taskScope.get("SAY-HELLO-2"), "allow")) {
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
         } else if (Objects.equals(cmd, "HELLO-3") && Objects.equals(taskScope.get("SAY-HELLO-3"), "allow")) {
             // pragma: no cover -> FAILURE: (VTS)
-            SimpleLogger.simpleLog("info", success_msg);
+            SimpleLogger.simpleLog("info", successMsg);
         } else {
-            failure_msg = failure_msg + ": Undefined or Forbidden Command: " + cmd;
-            SimpleLogger.simpleLog("error", failure_msg);
-            throw new RuntimeException(failure_msg);
+            failureMsg = failureMsg + ": Undefined or Forbidden Command: " + cmd;
+            SimpleLogger.simpleLog("error", failureMsg);
+            throw new RuntimeException(failureMsg);
         }
     }
 }

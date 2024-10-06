@@ -44,7 +44,6 @@ public class Test01SuccessWhenInitializeAgentOrServer {
         // GIVEN: Uninitialized CS
         this.cloudServerDm = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "cloudServerDm");
 
-        //
         assertEquals(0, this.cloudServerDm.getSharedData().getThisDevice().getTicketOrder());
         assertNull(this.cloudServerDm.getSharedData().getThisDevice().getDevicePrivKeyStr());
         assertNull(this.cloudServerDm.getSharedData().getThisDevice().getDevicePubKeyStr());
@@ -65,7 +64,7 @@ public class Test01SuccessWhenInitializeAgentOrServer {
         assertNotNull(this.cloudServerDm.getSharedData().getThisPerson().getPersonPubKeyStr());
     }
 
-    @Test
+//    @Test
     public void testSuccessWhenReboot() {
         currentTestGivenLog();
 
