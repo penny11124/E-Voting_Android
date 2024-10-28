@@ -13,7 +13,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.naming.Context;
 
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
