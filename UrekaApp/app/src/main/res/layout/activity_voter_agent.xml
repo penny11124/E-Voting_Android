@@ -8,12 +8,23 @@
     tools:context=".VoterAgentActivity">
 
     <Button
+        android:id="@+id/buttonDiscover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Discover"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonRequestUTicket"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
         android:id="@+id/buttonRequestUTicket"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Request UTicket"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/buttonDiscover"
         app:layout_constraintBottom_toBottomOf="@+id/buttonApplyUTicket"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

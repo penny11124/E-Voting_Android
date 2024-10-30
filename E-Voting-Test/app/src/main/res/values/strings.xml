@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Application</string>
+    <string name="button_advertise">advertise</string>
+    <string name="button_discover">discover</string>
+    <string name="button_disconnect">disconnect</string>
+    <string name="button_send">send Json</string>
+</resources>
