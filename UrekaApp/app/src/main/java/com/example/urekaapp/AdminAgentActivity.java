@@ -1,6 +1,7 @@
 package com.example.urekaapp;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -10,11 +11,24 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.connection.AdvertisingOptions;
+import com.google.android.gms.nearby.connection.ConnectionInfo;
+import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
+import com.google.android.gms.nearby.connection.ConnectionResolution;
+import com.google.android.gms.nearby.connection.ConnectionsClient;
+import com.google.android.gms.nearby.connection.Payload;
+import com.google.android.gms.nearby.connection.PayloadCallback;
+import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
+import com.google.android.gms.nearby.connection.Strategy;
+
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import ureka.framework.logic.DeviceController;
 import ureka.framework.logic.pipeline_flow.FlowIssueUTicket;
@@ -28,6 +42,16 @@ public class AdminAgentActivity extends AppCompatActivity {
     private Map<String, String> dataFromBlockchain; // Assume we only have 1 vote
     private DeviceController deviceController;
 //    private KeyStore keyStore;
+
+    ConnectionsClient connectionsClient;
+    private Set<String> connectedEndpoints = new HashSet<>();
+
+    private Button buttonAdvertise;
+    private Button buttonInit;
+    private Button buttonGetData;
+    private Button buttonApplyInitUTicket;
+    private Button buttonApplyTallyUTicket;
+    private Button buttonShowRTickets;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +68,33 @@ public class AdminAgentActivity extends AppCompatActivity {
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
 
+        connectionsClient = Nearby.getConnectionsClient(this);
+
         // components initialization
-        Button buttonInit = findViewById(R.id.buttonInit);
-        Button buttonGetData = findViewById(R.id.buttonGetData);
-        Button buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
-        buttonApplyInitUTicket.setEnabled(false);
-        Button buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
-        buttonApplyTallyUTicket.setEnabled(false);
-        Button buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
-        buttonShowRTickets.setEnabled(false);
+        this.buttonAdvertise = findViewById(R.id.buttonAdvertise);
+        this.buttonInit = findViewById(R.id.buttonInit);
+        this.buttonInit.setEnabled(false);
+        this.buttonGetData = findViewById(R.id.buttonGetData);
+        this.buttonGetData.setEnabled(false);
+        this.buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
+        this.buttonApplyInitUTicket.setEnabled(false);
+        this.buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
+        this.buttonApplyTallyUTicket.setEnabled(false);
+        this.buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
+        this.buttonShowRTickets.setEnabled(false);
+
+        buttonAdvertise.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                connectionsClient.startAdvertising(
+                                "Admin Agent",
+                                getPackageName(),  // Service ID
+                                connectionLifecycleCallback,
+                                new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()  // P2P
+                        ).addOnSuccessListener(unused -> Log.d("Nearby", "Advertising started"))
+                        .addOnFailureListener(e -> Log.d("Nearby", "Advertising failed", e));
+            }
+        });
 
         // buttonInit: Assign the admin agent with the voting machine
         buttonInit.setOnClickListener(new View.OnClickListener() {
@@ -164,4 +206,53 @@ public class AdminAgentActivity extends AppCompatActivity {
             }
         });
     }
+
+    ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
+        @Override
+        public void onConnectionInitiated(String endpointId, ConnectionInfo info) {
+            Log.d("Nearby", "Connection initiated with: " + endpointId);
+            connectionsClient.acceptConnection(endpointId, payloadCallback);
+        }
+
+        @Override
+        public void onConnectionResult(String endpointId, ConnectionResolution result) {
+            if (result.getStatus().isSuccess()) {
+                Log.d("Nearby", "Successfully connected to: " + endpointId);
+                connectedEndpoints.add(endpointId);
+
+                buttonInit.setEnabled(true);
+                buttonGetData.setEnabled(true);
+                buttonApplyInitUTicket.setEnabled(true);
+                buttonApplyTallyUTicket.setEnabled(true);
+                buttonShowRTickets.setEnabled(true);
+
+            } else {
+                Log.d("Nearby", "Connection failed with: " + endpointId);
+            }
+        }
+
+        @Override
+        public void onDisconnected(String endpointId) {
+            Log.d("Nearby", "Disconnected from: " + endpointId);
+            connectedEndpoints.remove(endpointId);
+        }
+    };
+
+    PayloadCallback payloadCallback = new PayloadCallback() {
+        @Override
+        public void onPayloadReceived(String endpointId, Payload payload) {
+            byte[] receivedBytes = payload.asBytes();
+            if (receivedBytes != null) {
+                String receivedJson = new String(receivedBytes);
+                Log.d("Nearby", "Received JSON: " + receivedJson);
+
+                // receivedJsonTextView.setText(receivedJson);
+            }
+        }
+
+        @Override
+        public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
+            // 處理傳輸更新（例如顯示傳輸進度）
+        }
+    };
 }

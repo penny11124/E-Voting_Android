@@ -63,4 +63,6 @@ dependencies {
     implementation(libs.prov) // SpongyCastle
     implementation("com.madgag.spongycastle:core:1.58.0.0") // SpongyCastle
     implementation("com.madgag.spongycastle:prov:1.58.0.0") // SpongyCastle
+
+    implementation(libs.google.play.nearby) // Nearby
 }

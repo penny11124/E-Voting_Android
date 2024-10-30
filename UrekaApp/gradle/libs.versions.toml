@@ -30,7 +30,10 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
 prov = { module = "com.madgag.spongycastle:prov", version.ref = "core" }
+google-play-nearby = "com.google.android.gms:play-services-nearby:18.0.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+
+
 
