@@ -8,12 +8,23 @@
     tools:context=".AdminAgentActivity">
 
     <Button
+        android:id="@+id/buttonAdvertise"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Advertise"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonInit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
         android:id="@+id/buttonInit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Init device"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/buttonAdvertise"
         app:layout_constraintBottom_toBottomOf="@+id/buttonGetData"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
