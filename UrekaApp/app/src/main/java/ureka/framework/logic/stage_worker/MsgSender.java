@@ -1,20 +1,24 @@
 package ureka.framework.logic.stage_worker;
 
+import com.example.urekaapp.communication.BLEManager;
+
 import ureka.framework.Environment;
 import ureka.framework.model.SharedData;
 import ureka.framework.model.message_model.Message;
 import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
-import ureka.framework.resource.communication.bluetooth.BluetoothService;
 import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class MsgSender {
     private SharedData sharedData;
     private MeasureHelper measureHelper;
+    private BLEManager bleManager;
 
     public void setSharedData(SharedData sharedData) {
         this.sharedData = sharedData;
@@ -24,17 +28,22 @@ public class MsgSender {
         return sharedData;
     }
 
-    public void setMeasureHelper(MeasureHelper measureHelper) {
-        this.measureHelper = measureHelper;
-    }
+    public void setMeasureHelper(MeasureHelper measureHelper) {this.measureHelper = measureHelper;}
 
     public MeasureHelper getMeasureHelper() {
         return measureHelper;
     }
 
-    public MsgSender(SharedData sharedData, MeasureHelper measureHelper) {
+    public void setBLEManager(BLEManager bleManager) { this.bleManager = bleManager; }
+
+    public BLEManager getBLEManager() {
+        return bleManager;
+    }
+
+    public MsgSender(SharedData sharedData, MeasureHelper measureHelper, BLEManager bleManager) {
         this.sharedData = sharedData;
         this.measureHelper = measureHelper;
+        this.bleManager = bleManager;
     }
 
     // Resource (Simulated Comm)
@@ -87,7 +96,7 @@ public class MsgSender {
     private void _sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws InterruptedException {
         // Generate Message
         if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) || messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
-            (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
+                (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
 
             Map<String, String> messageRequest = new HashMap<>();
             messageRequest.put("messageOperation", messageOperation);
@@ -96,8 +105,12 @@ public class MsgSender {
 
             try {
                 Message newMessage = new Message(messageRequest);
-                String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
-                Environment.transmittedMessage = newMessageJson;
+                String newMessageJson = Message.messageToJsonstr(newMessage);
+                if (!bleManager.isConnected()) {
+                    throw new IllegalStateException("BLE is not connected.");
+                }
+                bleManager.sendData(newMessageJson);
+//                Environment.transmittedMessage = newMessageJson;
                 // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
             } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
                 throw new RuntimeException("Weird M-Request: " + error);

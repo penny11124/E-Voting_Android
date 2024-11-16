@@ -35,6 +35,7 @@ import java.security.spec.ECPublicKeySpec;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ureka.framework.Environment;
 import ureka.framework.resource.crypto.ECC;
 import ureka.framework.test.operation.Test01SuccessWhenInitializeAgentOrServer;
 import ureka.framework.test.operation.Test02SuccessWhenInitializeDevice;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Environment.initialize(this);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {

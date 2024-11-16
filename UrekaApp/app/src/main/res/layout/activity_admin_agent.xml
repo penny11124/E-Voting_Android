@@ -8,10 +8,10 @@
     tools:context=".AdminAgentActivity">
 
     <Button
-        android:id="@+id/buttonAdvertise"
+        android:id="@+id/buttonScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Advertise"
+        android:text="Scan Device"
         android:background="@drawable/button_init_background"
         android:textColor="@drawable/button_text_color"
         tools:ignore="HardcodedText"
@@ -28,7 +28,7 @@
         android:background="@drawable/button_init_background"
         android:textColor="@drawable/button_text_color"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonAdvertise"
+        app:layout_constraintTop_toTopOf="@+id/buttonScan"
         app:layout_constraintBottom_toBottomOf="@+id/buttonGetData"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

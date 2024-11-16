@@ -1,7 +1,16 @@
 package ureka.framework.logic;
 
+import android.content.Context;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.urekaapp.BLEViewModel;
+import com.example.urekaapp.communication.BLEManager;
+
 import java.util.HashMap;
 
+import ureka.framework.Environment;
 import ureka.framework.logic.pipeline_flow.FlowApplyUTicket;
 import ureka.framework.logic.pipeline_flow.FlowIssueUTicket;
 import ureka.framework.logic.pipeline_flow.FlowIssueUToken;
@@ -33,6 +42,7 @@ public class DeviceController {
     private GeneratedMsgStorer generatedMsgStorer;
     private MsgSender msgSender;
     private MsgReceiver msgReceiver;
+    private BLEManager bleManager;
     // Flow
     private FlowIssueUTicket flowIssuerIssueUTicket;
     private FlowOpenSession flowOpenSession;
@@ -40,9 +50,11 @@ public class DeviceController {
     private FlowIssueUToken flowIssueUToken;
 
     public DeviceController(String deviceType, String deviceName) {
-        this._initialize(deviceType, deviceName);
+        this._initialize(deviceType, deviceName, Environment.applicationContext);
     }
-    private void _initialize(String deviceType, String deviceName) {
+    private void _initialize(String deviceType, String deviceName, Context context) {
+        BLEViewModel bleViewModel = new ViewModelProvider((AppCompatActivity) context).get(BLEViewModel.class);
+
         this.sharedData = new SharedData(new ThisDevice(), new CurrentSession(), new ThisPerson());
         this.simpleStorage = new SimpleStorage(deviceName);
         this.sharedData.setSimulatedCommChannel(new SimulatedCommChannel());
@@ -59,7 +71,8 @@ public class DeviceController {
         this.executor = new Executor(this.sharedData, this.measureHelper, this.simpleStorage, this.msgVerifier);
         this.msgGenerator = new MsgGenerator(this.sharedData, this.measureHelper);
         this.generatedMsgStorer = new GeneratedMsgStorer(this.sharedData, this.measureHelper, this.simpleStorage);
-        this.msgSender = new MsgSender(this.sharedData, this.measureHelper);
+        this.bleManager = bleViewModel.getBLEManager(context);
+        this.msgSender = new MsgSender(this.sharedData, this.measureHelper, bleManager);
 
         // Flow
         this.flowIssuerIssueUTicket = new FlowIssueUTicket(
@@ -112,7 +125,7 @@ public class DeviceController {
     //////////////////////////////////////////////////////
     public void rebootDevice() {
         SimpleLogger.simpleLog("info", "Reboot " + this.sharedData.getThisDevice().getDeviceName() + "...");
-        this._initialize(this.sharedData.getThisDevice().getDeviceType(), this.sharedData.getThisDevice().getDeviceName());
+        this._initialize(this.sharedData.getThisDevice().getDeviceType(), this.sharedData.getThisDevice().getDeviceName(), Environment.applicationContext);
     }
 
     public SharedData getSharedData() {
@@ -224,6 +237,28 @@ public class DeviceController {
 
     public void setFlowIssueUToken(FlowIssueUToken flowIssueUToken) {
         this.flowIssueUToken = flowIssueUToken;
+    }
+
+    public void connectToDevice(String deviceName, Runnable onConnected, Runnable onDisconnected) {
+        this.bleManager.startScan(deviceName, new BLEManager.BLECallback() {
+            @Override
+            public void onConnected() {
+                SimpleLogger.simpleLog("info", "Device connected!");
+                onConnected.run();
+            }
+
+            @Override
+            public void onDisconnected() {
+                SimpleLogger.simpleLog("info", "Device disconnected!");
+                onDisconnected.run();
+            }
+
+            @Override
+            public void onDataReceived(String data) {
+                SimpleLogger.simpleLog("info", "Received data: " + data);
+                msgReceiver._recvXxxMessage(data);
+            }
+        });
     }
 }
 // TODO:

@@ -4,38 +4,25 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.nearby.Nearby;
-import com.google.android.gms.nearby.connection.AdvertisingOptions;
-import com.google.android.gms.nearby.connection.ConnectionInfo;
-import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
-import com.google.android.gms.nearby.connection.ConnectionResolution;
-import com.google.android.gms.nearby.connection.ConnectionsClient;
-import com.google.android.gms.nearby.connection.Payload;
-import com.google.android.gms.nearby.connection.PayloadCallback;
-import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
-import com.google.android.gms.nearby.connection.Strategy;
+import com.example.urekaapp.communication.BLEManager;
+import com.example.urekaapp.communication.BLEPermissionHelper;
 
-import java.security.KeyPair;
-import java.security.KeyStore;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import ureka.framework.logic.DeviceController;
-import ureka.framework.logic.pipeline_flow.FlowIssueUTicket;
 import ureka.framework.model.data_model.ThisDevice;
-import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
-import ureka.framework.resource.crypto.ECC;
 import ureka.framework.resource.crypto.SerializationUtil;
 
 public class AdminAgentActivity extends AppCompatActivity {
@@ -43,15 +30,15 @@ public class AdminAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
 //    private KeyStore keyStore;
 
-    ConnectionsClient connectionsClient;
-    private Set<String> connectedEndpoints = new HashSet<>();
 
-    private Button buttonAdvertise;
+    private Button buttonScan;
     private Button buttonInit;
     private Button buttonGetData;
     private Button buttonApplyInitUTicket;
     private Button buttonApplyTallyUTicket;
     private Button buttonShowRTickets;
+
+    private BLEViewModel bleViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,36 +51,42 @@ public class AdminAgentActivity extends AppCompatActivity {
             return insets;
         });
 
+        if (!BLEPermissionHelper.hasPermissions(this)) {
+            BLEPermissionHelper.requestPermissions(this);
+        }
+
+        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+
         // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
 
-        connectionsClient = Nearby.getConnectionsClient(this);
-
         // components initialization
-        this.buttonAdvertise = findViewById(R.id.buttonAdvertise);
-        this.buttonInit = findViewById(R.id.buttonInit);
-        this.buttonInit.setEnabled(false);
-        this.buttonGetData = findViewById(R.id.buttonGetData);
-        this.buttonGetData.setEnabled(false);
-        this.buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
-        this.buttonApplyInitUTicket.setEnabled(false);
-        this.buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
-        this.buttonApplyTallyUTicket.setEnabled(false);
-        this.buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
-        this.buttonShowRTickets.setEnabled(false);
+        buttonScan = findViewById(R.id.buttonScan);
+        buttonInit = findViewById(R.id.buttonInit);
+        buttonGetData = findViewById(R.id.buttonGetData);
+        buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
+        buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
+        buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
+        buttonInit.setEnabled(false);
+        buttonGetData.setEnabled(false);
+        buttonApplyInitUTicket.setEnabled(false);
+        buttonApplyTallyUTicket.setEnabled(false);
+        buttonShowRTickets.setEnabled(false);
 
-        buttonAdvertise.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                connectionsClient.startAdvertising(
-                                "Admin Agent",
-                                getPackageName(),  // Service ID
-                                connectionLifecycleCallback,
-                                new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()  // P2P
-                        ).addOnSuccessListener(unused -> Log.d("Nearby", "Advertising started"))
-                        .addOnFailureListener(e -> Log.d("Nearby", "Advertising failed", e));
-            }
+        buttonScan.setOnClickListener(view -> {
+            deviceController.connectToDevice("YourDeviceName",
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(true);
+                        buttonGetData.setEnabled(true);
+                    }),
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(false);
+                        buttonGetData.setEnabled(false);
+                    })
+            );
         });
 
         // buttonInit: Assign the admin agent with the voting machine
@@ -207,52 +200,25 @@ public class AdminAgentActivity extends AppCompatActivity {
         });
     }
 
-    ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
-        @Override
-        public void onConnectionInitiated(String endpointId, ConnectionInfo info) {
-            Log.d("Nearby", "Connection initiated with: " + endpointId);
-            connectionsClient.acceptConnection(endpointId, payloadCallback);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        BLEPermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+
+        if (BLEPermissionHelper.hasPermissions(this)) {
+            Toast.makeText(this, "Permissions granted, you can now use BLE features.", Toast.LENGTH_SHORT).show();
         }
+    }
 
-        @Override
-        public void onConnectionResult(String endpointId, ConnectionResolution result) {
-            if (result.getStatus().isSuccess()) {
-                Log.d("Nearby", "Successfully connected to: " + endpointId);
-                connectedEndpoints.add(endpointId);
-
-                buttonInit.setEnabled(true);
-                buttonGetData.setEnabled(true);
-                buttonApplyInitUTicket.setEnabled(true);
-                buttonApplyTallyUTicket.setEnabled(true);
-                buttonShowRTickets.setEnabled(true);
-
-            } else {
-                Log.d("Nearby", "Connection failed with: " + endpointId);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (bleViewModel != null) {
+            BLEManager bleManager = bleViewModel.getBLEManager(this);
+            if (bleManager != null) {
+                bleManager.disconnect();
             }
         }
-
-        @Override
-        public void onDisconnected(String endpointId) {
-            Log.d("Nearby", "Disconnected from: " + endpointId);
-            connectedEndpoints.remove(endpointId);
-        }
-    };
-
-    PayloadCallback payloadCallback = new PayloadCallback() {
-        @Override
-        public void onPayloadReceived(String endpointId, Payload payload) {
-            byte[] receivedBytes = payload.asBytes();
-            if (receivedBytes != null) {
-                String receivedJson = new String(receivedBytes);
-                Log.d("Nearby", "Received JSON: " + receivedJson);
-
-                // receivedJsonTextView.setText(receivedJson);
-            }
-        }
-
-        @Override
-        public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
-            // 處理傳輸更新（例如顯示傳輸進度）
-        }
-    };
+    }
 }

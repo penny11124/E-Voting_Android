@@ -1,32 +1,22 @@
 package com.example.urekaapp;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.nearby.Nearby;
-import com.google.android.gms.nearby.connection.ConnectionInfo;
-import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
-import com.google.android.gms.nearby.connection.ConnectionResolution;
-import com.google.android.gms.nearby.connection.ConnectionsClient;
-import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
-import com.google.android.gms.nearby.connection.DiscoveryOptions;
-import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
-import com.google.android.gms.nearby.connection.Payload;
-import com.google.android.gms.nearby.connection.PayloadCallback;
-import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
-import com.google.android.gms.nearby.connection.Strategy;
+import com.example.urekaapp.communication.BLEManager;
+import com.example.urekaapp.communication.BLEPermissionHelper;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
@@ -36,13 +26,12 @@ import ureka.framework.resource.crypto.SerializationUtil;
 public class VoterAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
 
-    ConnectionsClient connectionsClient;
-    private Set<String> connectedEndpoints = new HashSet<>();
-
-    private Button buttonDiscover;
+    private Button buttonScan;
     private Button buttonRequestUTicket;
     private Button buttonApplyUTicket;
     private Button buttonShowRTicket;
+
+    private BLEViewModel bleViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,29 +44,31 @@ public class VoterAgentActivity extends AppCompatActivity {
             return insets;
         });
 
+        if (!BLEPermissionHelper.hasPermissions(this)) {
+            BLEPermissionHelper.requestPermissions(this);
+        }
+
+        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "User Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
 
-        connectionsClient = Nearby.getConnectionsClient(this);
+        buttonScan = findViewById(R.id.buttonScanDevice);
+        buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
+        buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
+        buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
 
-        this.buttonDiscover = findViewById(R.id.buttonDiscover);
-        this.buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
-        this.buttonRequestUTicket.setEnabled(false);
-        this.buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
-        this.buttonApplyUTicket.setEnabled(false);
-        this.buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
-        this.buttonShowRTicket.setEnabled(false);
-
-        buttonDiscover.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                connectionsClient.startDiscovery(
-                                getPackageName(),
-                                endpointDiscoveryCallback,
-                                new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()  // P2P
-                        ).addOnSuccessListener(unused -> Log.d("Nearby", "Discovery started"))
-                        .addOnFailureListener(e -> Log.d("Nearby", "Discovery failed", e));
-            }
+        buttonScan.setOnClickListener(view -> {
+            deviceController.connectToDevice("YourDeviceName",
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(VoterAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
+                        buttonRequestUTicket.setEnabled(true);
+                    }),
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(VoterAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
+                        buttonRequestUTicket.setEnabled(false);
+                    })
+            );
         });
 
         buttonRequestUTicket.setOnClickListener(new View.OnClickListener() {
@@ -121,77 +112,25 @@ public class VoterAgentActivity extends AppCompatActivity {
         });
     }
 
-    EndpointDiscoveryCallback endpointDiscoveryCallback = new EndpointDiscoveryCallback() {
-        @Override
-        public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
-            Log.d("Nearby", "Endpoint found: " + endpointId);
-            if (!isConnectedToEndpoint(endpointId)) {
-                connectionsClient.requestConnection(
-                                "Voter Agent",
-                                endpointId,
-                                connectionLifecycleCallback
-                        ).addOnSuccessListener(unused -> Log.d("Nearby", "Connection requested"))
-                        .addOnFailureListener(e -> Log.d("Nearby", "Connection request failed: " + e.getMessage()));
-            } else {
-                Log.d("Nearby", "Already connected to endpoint: " + endpointId);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        BLEPermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+
+        if (BLEPermissionHelper.hasPermissions(this)) {
+            Toast.makeText(this, "Permissions granted, you can now use BLE features.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (bleViewModel != null) {
+            BLEManager bleManager = bleViewModel.getBLEManager(this);
+            if (bleManager != null) {
+                bleManager.disconnect();
             }
         }
-
-        @Override
-        public void onEndpointLost(String endpointId) {
-            Log.d("Nearby", "Endpoint lost: " + endpointId);
-        }
-
-        private boolean isConnectedToEndpoint(String endpointId) {
-            return connectedEndpoints.contains(endpointId);
-        }
-    };
-
-    ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
-        @Override
-        public void onConnectionInitiated(String endpointId, ConnectionInfo info) {
-            Log.d("Nearby", "Connection initiated with: " + endpointId);
-            connectionsClient.acceptConnection(endpointId, payloadCallback);
-        }
-
-        @Override
-        public void onConnectionResult(String endpointId, ConnectionResolution result) {
-            if (result.getStatus().isSuccess()) {
-                Log.d("Nearby", "Successfully connected to: " + endpointId);
-                connectedEndpoints.add(endpointId);
-
-                buttonRequestUTicket.setEnabled(true);
-                buttonApplyUTicket.setEnabled(true);
-                buttonShowRTicket.setEnabled(true);
-
-            } else {
-                Log.d("Nearby", "Connection failed with: " + endpointId);
-            }
-        }
-
-        @Override
-        public void onDisconnected(String endpointId) {
-            Log.d("Nearby", "Disconnected from: " + endpointId);
-            connectedEndpoints.remove(endpointId);
-        }
-    };
-
-    PayloadCallback payloadCallback = new PayloadCallback() {
-        @Override
-        public void onPayloadReceived(String endpointId, Payload payload) {
-            byte[] receivedBytes = payload.asBytes();
-            if (receivedBytes != null) {
-                String receivedJson = new String(receivedBytes);
-                Log.d("Nearby", "Received JSON: " + receivedJson);
-
-                // receivedJsonTextView.setText(receivedJson);
-            }
-        }
-
-        @Override
-        public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate update) {
-            // 處理傳輸更新（例如顯示傳輸進度）
-        }
-    };
+    }
 }

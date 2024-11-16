@@ -1,5 +1,7 @@
 package ureka.framework;
 
+import android.content.Context;
+
 public class Environment {
     //////////////////////////////////////////////////////
     // Deployment Environment
@@ -52,5 +54,14 @@ public class Environment {
     //////////////////////////////////////////////////////
     // Transmitted Data in Simulation
     //////////////////////////////////////////////////////
-    public static String transmittedMessage;
+    public static final String SERVICE_UUID = "12345678-1234-1234-1234-123456789abc";
+    public static final String WRITE_CHARACTERISTIC_UUID = "87654321-4321-4321-4321-cba987654321";
+    public static final String NOTIFY_CHARACTERISTIC_UUID = "abcdef01-2345-6789-abcd-ef0123456789";
+    public static final String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
+//    public static String transmittedMessage;
+    public static Context applicationContext;
+
+    public static void initialize(Context context) {
+        applicationContext = context.getApplicationContext();
+    }
 }

@@ -8,10 +8,10 @@
     tools:context=".VoterAgentActivity">
 
     <Button
-        android:id="@+id/buttonDiscover"
+        android:id="@+id/buttonScanDevice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Discover"
+        android:text="Scan"
         android:background="@drawable/button_init_background"
         android:textColor="@drawable/button_text_color"
         tools:ignore="HardcodedText"
@@ -28,7 +28,7 @@
         android:background="@drawable/button_init_background"
         android:textColor="@drawable/button_text_color"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonDiscover"
+        app:layout_constraintTop_toTopOf="@+id/buttonScanDevice"
         app:layout_constraintBottom_toBottomOf="@+id/buttonApplyUTicket"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
