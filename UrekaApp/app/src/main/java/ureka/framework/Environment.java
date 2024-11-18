@@ -61,6 +61,9 @@ public class Environment {
 //    public static String transmittedMessage;
     public static Context applicationContext;
 
+    public static String connectedEndpointId = null;
+
+
     public static void initialize(Context context) {
         applicationContext = context.getApplicationContext();
     }

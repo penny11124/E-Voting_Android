@@ -16,10 +16,12 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.urekaapp.ble.BLEManager;
 import com.example.urekaapp.ble.BLEPermissionHelper;
 import com.example.urekaapp.ble.BLEViewModel;
+import com.example.urekaapp.communication.NearbyManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.UTicket;
@@ -32,6 +34,7 @@ public class AdminAgentActivity extends AppCompatActivity {
 
 
     private Button buttonScan;
+    private Button buttonAdvertising;
     private Button buttonInit;
     private Button buttonGetData;
     private Button buttonApplyInitUTicket;
@@ -39,6 +42,8 @@ public class AdminAgentActivity extends AppCompatActivity {
     private Button buttonShowRTickets;
 
     private BLEViewModel bleViewModel;
+
+    private NearbyManager nearbyManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,13 +61,16 @@ public class AdminAgentActivity extends AppCompatActivity {
         }
 
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyManager = new NearbyManager(this);
 
         // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+        nearbyManager.setMsgReceiver(deviceController.getMsgReceiver());
 
         // components initialization
         buttonScan = findViewById(R.id.buttonScan);
+        buttonAdvertising = findViewById(R.id.buttonAdvertising);
         buttonInit = findViewById(R.id.buttonInit);
         buttonGetData = findViewById(R.id.buttonGetData);
         buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
@@ -75,6 +83,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonShowRTickets.setEnabled(false);
 
         buttonScan.setOnClickListener(view -> {
+            nearbyManager.stopAllActions();
             deviceController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
                         Toast.makeText(AdminAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
@@ -87,6 +96,11 @@ public class AdminAgentActivity extends AppCompatActivity {
                         buttonGetData.setEnabled(false);
                     })
             );
+        });
+
+        buttonAdvertising.setOnClickListener(view -> {
+            bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
+            nearbyManager.startAdvertising("AdminAgent");
         });
 
         // buttonInit: Assign the admin agent with the voting machine

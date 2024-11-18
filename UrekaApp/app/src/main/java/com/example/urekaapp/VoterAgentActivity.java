@@ -1,5 +1,6 @@
 package com.example.urekaapp;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,9 +17,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.urekaapp.ble.BLEManager;
 import com.example.urekaapp.ble.BLEPermissionHelper;
 import com.example.urekaapp.ble.BLEViewModel;
+import com.example.urekaapp.communication.NearbyManager;
 
 import java.util.Map;
 
+import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.UTicket;
@@ -28,12 +31,15 @@ public class VoterAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
 
     private Button buttonScan;
+    private Button buttonConnect;
     private Button buttonRequestUTicket;
     private Button buttonApplyUTicket;
     private Button buttonShowRTicket;
 
     private BLEViewModel bleViewModel;
+    private NearbyManager nearbyManager;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +56,14 @@ public class VoterAgentActivity extends AppCompatActivity {
         }
 
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyManager = new NearbyManager(this);
 
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "User Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+        nearbyManager.setMsgReceiver(deviceController.getMsgReceiver());
 
         buttonScan = findViewById(R.id.buttonScanDevice);
+        buttonConnect = findViewById(R.id.buttonConnect);
         buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
         buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
         buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
@@ -62,17 +71,9 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonApplyUTicket.setEnabled(false);
         buttonShowRTicket.setEnabled(false);
 
-        buttonScan.setOnClickListener(view -> {
-            deviceController.connectToDevice("HC-04BLE",
-                    () -> runOnUiThread(() -> {
-                        Toast.makeText(VoterAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
-                        buttonRequestUTicket.setEnabled(true);
-                    }),
-                    () -> runOnUiThread(() -> {
-                        Toast.makeText(VoterAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
-                        buttonRequestUTicket.setEnabled(false);
-                    })
-            );
+        buttonConnect.setOnClickListener(view -> {
+            bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
+            nearbyManager.startDiscovery("VoterAgent");
         });
 
         buttonRequestUTicket.setOnClickListener(new View.OnClickListener() {
@@ -88,9 +89,23 @@ public class VoterAgentActivity extends AppCompatActivity {
                         "uTicketType", UTicket.TYPE_ACCESS_UTICKET,
                         "taskScope", generatedTaskScope
                 );
-//                this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
+                deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
 //                deviceController.getMsgReceiver()._recvXxxMessage();
             }
+        });
+
+        buttonScan.setOnClickListener(view -> {
+            nearbyManager.stopAllActions();
+            deviceController.connectToDevice("HC-04BLE",
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(VoterAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
+                        buttonApplyUTicket.setEnabled(true);
+                    }),
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(VoterAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
+                        buttonApplyUTicket.setEnabled(false);
+                    })
+            );
         });
 
         buttonApplyUTicket.setOnClickListener(new View.OnClickListener() {

@@ -171,7 +171,7 @@ public class FlowIssueUTicket {
                 }
 
                 // [STAGE: (S)]
-                this.msgSender.sendXxxMessage(
+                this.msgSender.sendXxxMessageByNearby(
                         Message.MESSAGE_RECV_AND_STORE,
                         UTicket.MESSAGE_TYPE,
                         generatedUTicketJson
