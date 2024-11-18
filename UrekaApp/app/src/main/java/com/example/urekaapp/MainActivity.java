@@ -15,28 +15,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import java.math.BigInteger;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.security.Security;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
-import java.security.spec.ECPrivateKeySpec;
-import java.security.spec.ECPublicKeySpec;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ureka.framework.Environment;
-import ureka.framework.resource.crypto.ECC;
 import ureka.framework.test.operation.Test01SuccessWhenInitializeAgentOrServer;
 import ureka.framework.test.operation.Test02SuccessWhenInitializeDevice;
 import ureka.framework.test.operation.Test03SuccessWhenTransferDeviceOwnership;
@@ -49,8 +31,6 @@ import ureka.framework.test.operation.Test13FailWhenTransferDeviceOwnership;
 import ureka.framework.test.operation.Test14FailWhenAccessDeviceByOwner;
 import ureka.framework.test.operation.Test15FailWhenAccessDeviceByOthers;
 import ureka.framework.test.operation.Test16FailWhenAccessDeviceByPrivateSession;
-
-import org.spongycastle.jce.provider.BouncyCastleProvider; // SpongyCastle -> More preferred on Android
 
 public class MainActivity extends AppCompatActivity {
 

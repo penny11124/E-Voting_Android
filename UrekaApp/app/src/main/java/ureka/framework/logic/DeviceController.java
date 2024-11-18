@@ -5,8 +5,8 @@ import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.urekaapp.BLEViewModel;
-import com.example.urekaapp.communication.BLEManager;
+import com.example.urekaapp.ble.BLEViewModel;
+import com.example.urekaapp.ble.BLEManager;
 
 import java.util.HashMap;
 

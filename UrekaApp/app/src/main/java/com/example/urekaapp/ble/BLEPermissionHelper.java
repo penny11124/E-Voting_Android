@@ -1,4 +1,4 @@
-package com.example.urekaapp.communication;
+package com.example.urekaapp.ble;
 
 import android.Manifest;
 import android.content.pm.PackageManager;

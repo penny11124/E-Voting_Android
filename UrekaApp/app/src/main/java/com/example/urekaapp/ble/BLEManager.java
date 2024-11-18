@@ -1,4 +1,4 @@
-package com.example.urekaapp.communication;
+package com.example.urekaapp.ble;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import ureka.framework.Environment;
+import ureka.framework.resource.logger.SimpleLogger;
 
 public class BLEManager {
 
@@ -108,7 +109,10 @@ public class BLEManager {
                     BluetoothGattDescriptor descriptor = notifyCharacteristic.getDescriptor(UUID.fromString(Environment.CLIENT_CHARACTERISTIC_CONFIG));
                     if (descriptor != null) {
                         descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                        gatt.writeDescriptor(descriptor);
+                        boolean success = gatt.writeDescriptor(descriptor);
+                        if (!success) {
+                            callback.onDisconnected();
+                        }
                     }
                     callback.onConnected();
                 } else {
@@ -118,10 +122,12 @@ public class BLEManager {
 
             @Override
             public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                if (characteristic.getUuid().equals(UUID.fromString(Environment.NOTIFY_CHARACTERISTIC_UUID))) {
+                try {
                     String data = new String(characteristic.getValue(), StandardCharsets.UTF_8);
-                    receivedData.postValue(data); // 更新 LiveData
+                    receivedData.postValue(data);
                     callback.onDataReceived(data);
+                } catch (Exception e) {
+                    callback.onDataReceived("Invalid Data Received");
                 }
             }
 
@@ -134,12 +140,14 @@ public class BLEManager {
     }
 
     public void sendData(String json) {
-        if (writeCharacteristic != null) {
+        if (writeCharacteristic != null && isConnected()) {
             writeCharacteristic.setValue(json.getBytes(StandardCharsets.UTF_8));
-            if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(Environment.applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             bluetoothGatt.writeCharacteristic(writeCharacteristic);
+        } else {
+            SimpleLogger.simpleLog("Error", "Not Connected");
         }
     }
 

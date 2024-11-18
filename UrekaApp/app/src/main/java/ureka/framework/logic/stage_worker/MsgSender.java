@@ -1,6 +1,6 @@
 package ureka.framework.logic.stage_worker;
 
-import com.example.urekaapp.communication.BLEManager;
+import com.example.urekaapp.ble.BLEManager;
 
 import ureka.framework.Environment;
 import ureka.framework.model.SharedData;
@@ -11,9 +11,7 @@ import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class MsgSender {
     private SharedData sharedData;
@@ -106,9 +104,9 @@ public class MsgSender {
             try {
                 Message newMessage = new Message(messageRequest);
                 String newMessageJson = Message.messageToJsonstr(newMessage);
-                if (!bleManager.isConnected()) {
-                    throw new IllegalStateException("BLE is not connected.");
-                }
+//                if (!bleManager.isConnected()) {
+//                    throw new IllegalStateException("BLE is not connected.");
+//                }
                 bleManager.sendData(newMessageJson);
 //                Environment.transmittedMessage = newMessageJson;
                 // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);

@@ -1,10 +1,8 @@
-package com.example.urekaapp;
+package com.example.urekaapp.ble;
 
 import android.content.Context;
 
 import androidx.lifecycle.ViewModel;
-
-import com.example.urekaapp.communication.BLEManager;
 
 public class BLEViewModel extends ViewModel {
     private BLEManager bleManager;

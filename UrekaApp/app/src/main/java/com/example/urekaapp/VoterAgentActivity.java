@@ -13,8 +13,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.urekaapp.communication.BLEManager;
-import com.example.urekaapp.communication.BLEPermissionHelper;
+import com.example.urekaapp.ble.BLEManager;
+import com.example.urekaapp.ble.BLEPermissionHelper;
+import com.example.urekaapp.ble.BLEViewModel;
 
 import java.util.Map;
 
@@ -57,9 +58,12 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
         buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
         buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
+        buttonRequestUTicket.setEnabled(false);
+        buttonApplyUTicket.setEnabled(false);
+        buttonShowRTicket.setEnabled(false);
 
         buttonScan.setOnClickListener(view -> {
-            deviceController.connectToDevice("YourDeviceName",
+            deviceController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
                         Toast.makeText(VoterAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
                         buttonRequestUTicket.setEnabled(true);

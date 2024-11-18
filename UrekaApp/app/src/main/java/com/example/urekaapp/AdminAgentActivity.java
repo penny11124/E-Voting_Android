@@ -1,7 +1,6 @@
 package com.example.urekaapp;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,8 +13,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.urekaapp.communication.BLEManager;
-import com.example.urekaapp.communication.BLEPermissionHelper;
+import com.example.urekaapp.ble.BLEManager;
+import com.example.urekaapp.ble.BLEPermissionHelper;
+import com.example.urekaapp.ble.BLEViewModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +75,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonShowRTickets.setEnabled(false);
 
         buttonScan.setOnClickListener(view -> {
-            deviceController.connectToDevice("YourDeviceName",
+            deviceController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
                         Toast.makeText(AdminAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
                         buttonInit.setEnabled(true);
