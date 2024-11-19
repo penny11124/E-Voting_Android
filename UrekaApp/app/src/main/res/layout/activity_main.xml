@@ -55,7 +55,7 @@
         android:id="@+id/textTest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This is the test message."
+        android:text="This is a test message"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="@+id/buttonTest"
         app:layout_constraintBottom_toBottomOf="parent"

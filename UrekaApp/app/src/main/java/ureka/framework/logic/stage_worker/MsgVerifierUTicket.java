@@ -308,7 +308,7 @@ public class MsgVerifierUTicket {
     //////////////////////////////////////////////////////
     private static boolean _verifyIssuerSignatureOnUTicket(UTicket signedUTicket, ECPublicKey publicKey) throws Exception {
         // Get signature on UTicket
-        byte[] signatureByte = SerializationUtil.base64StrBackToByte(signedUTicket.getIssuerSignature());
+        byte[] signatureByte = SerializationUtil.base64StrToSignature(signedUTicket.getIssuerSignature());
 
         // Verify Signature on Signed UTicket, but Prevent side effect on Signed UTicket
         UTicket unsignedUTicket = new UTicket(signedUTicket);

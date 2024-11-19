@@ -7,13 +7,24 @@
     android:layout_height="match_parent"
     tools:context=".AdminAgentActivity">
 
-    <Button
-        android:id="@+id/buttonAdvertise"
+    <TextView
+        android:id="@+id/textViewDeviceType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Advertise"
-        tools:ignore="HardcodedText"
+        android:text="Device type: Admin Agent"
+        android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/textViewConnectingStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/textViewConnectingStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Not connected"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="@+id/textViewDeviceType"
         app:layout_constraintBottom_toBottomOf="@+id/buttonInit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -24,7 +35,7 @@
         android:layout_height="wrap_content"
         android:text="Init device"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonAdvertise"
+        app:layout_constraintTop_toTopOf="@+id/textViewConnectingStatus"
         app:layout_constraintBottom_toBottomOf="@+id/buttonGetData"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -33,7 +44,7 @@
         android:id="@+id/buttonGetData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Data from Blockchain"
+        android:text="Get Data"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="@+id/buttonInit"
         app:layout_constraintBottom_toBottomOf="@+id/buttonApplyInitUTicket"
@@ -44,7 +55,7 @@
         android:id="@+id/buttonApplyInitUTicket"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Apply Init UTicket"
+        android:text="Apply Config UTicket"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="@+id/buttonGetData"
         app:layout_constraintBottom_toBottomOf="@+id/buttonApplyTallyUTicket"

@@ -95,7 +95,7 @@ public class MsgGeneratorUTicket {
 //        } catch (IOException | ClassNotFoundException e) {
 //            throw new RuntimeException(e);
 //        }
-        signedUTicket.setIssuerSignature(SerializationUtil.byteToBase64Str(signatureByte));
+        signedUTicket.setIssuerSignature(SerializationUtil.signatureToBase64Str(signatureByte));
 
         return signedUTicket;
     }

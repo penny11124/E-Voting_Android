@@ -440,7 +440,7 @@ public class MsgVerifierRTicket {
     // Verify ECC Signature on RTicket
     private boolean _verifyDeviceSignatureOnRTicket(RTicket signedRTicket, ECPublicKey eccPublicKey) {
         // Get Signature on RTicket
-        byte[] signatureByte = SerializationUtil.base64StrBackToByte(signedRTicket.getDeviceSignature());
+        byte[] signatureByte = SerializationUtil.base64StrToSignature(signedRTicket.getDeviceSignature());
 
         // Verify Signature on Signed RTicket, but Prevent side effect on Signed RTicket
         RTicket unsignedRTicket;

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- USB host permission for accessing USB devices -->
+    <uses-feature android:name="android.hardware.usb.host" />
+
+    <uses-permission android:name="android.permission.USB_PERMISSION" />
 
     <application
         android:allowBackup="true"
@@ -12,6 +16,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UrekaApp"
         tools:targetApi="31">
+        <activity
+            android:name=".VoterAgentResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminAgentResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VoterAgentVotingActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="android.hardware.usb.host"
+            android:value="true" />
+
         <activity
             android:name=".VotingMachineActivity"
             android:exported="false" />
