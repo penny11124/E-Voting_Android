@@ -8,9 +8,24 @@
     tools:context=".VotingMachineActivity">
 
     <TextView
+        android:id="@+id/textViewDeviceType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Device type: Voting Machine"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/textVotingMachineState"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
         android:id="@+id/textVotingMachineState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="State: Idle"
+        android:textSize="32sp"
+        tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

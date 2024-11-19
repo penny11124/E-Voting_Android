@@ -123,7 +123,7 @@ public class MsgGeneratorRTicket {
 //        } catch (IOException | ClassNotFoundException e) {
 //            throw new RuntimeException(e);
 //        }
-        signedRTicket.setDeviceSignature(SerializationUtil.byteToBase64Str(signatureByte));
+        signedRTicket.setDeviceSignature(SerializationUtil.signatureToBase64Str(signatureByte));
 
         return signedRTicket;
     }
