@@ -1,11 +1,13 @@
 package ureka.framework.logic.stage_worker;
 
+import com.example.urekaapp.ble.BLEManager;
+import com.example.urekaapp.communication.NearbyManager;
+
 import ureka.framework.Environment;
 import ureka.framework.model.SharedData;
 import ureka.framework.model.message_model.Message;
 import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
-import ureka.framework.resource.communication.bluetooth.BluetoothService;
 import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
@@ -15,6 +17,8 @@ import java.util.Map;
 public class MsgSender {
     private SharedData sharedData;
     private MeasureHelper measureHelper;
+    private BLEManager bleManager;
+    private NearbyManager nearbyManager;
 
     public void setSharedData(SharedData sharedData) {
         this.sharedData = sharedData;
@@ -24,17 +28,23 @@ public class MsgSender {
         return sharedData;
     }
 
-    public void setMeasureHelper(MeasureHelper measureHelper) {
-        this.measureHelper = measureHelper;
-    }
+    public void setMeasureHelper(MeasureHelper measureHelper) {this.measureHelper = measureHelper;}
 
     public MeasureHelper getMeasureHelper() {
         return measureHelper;
     }
 
-    public MsgSender(SharedData sharedData, MeasureHelper measureHelper) {
+    public void setBLEManager(BLEManager bleManager) { this.bleManager = bleManager; }
+
+    public BLEManager getBLEManager() {
+        return bleManager;
+    }
+
+    public MsgSender(SharedData sharedData, MeasureHelper measureHelper, BLEManager bleManager, NearbyManager nearbyManager) {
         this.sharedData = sharedData;
         this.measureHelper = measureHelper;
+        this.bleManager = bleManager;
+        this.nearbyManager = nearbyManager;
     }
 
     // Resource (Simulated Comm)
@@ -87,7 +97,7 @@ public class MsgSender {
     private void _sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws InterruptedException {
         // Generate Message
         if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) || messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
-            (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
+                (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
 
             Map<String, String> messageRequest = new HashMap<>();
             messageRequest.put("messageOperation", messageOperation);
@@ -96,8 +106,79 @@ public class MsgSender {
 
             try {
                 Message newMessage = new Message(messageRequest);
-                String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
-                Environment.transmittedMessage = newMessageJson;
+                String newMessageJson = Message.messageToJsonstr(newMessage);
+//                if (!bleManager.isConnected()) {
+//                    throw new IllegalStateException("BLE is not connected.");
+//                }
+                bleManager.sendData(newMessageJson);
+//                Environment.transmittedMessage = newMessageJson;
+                // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
+            } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
+                throw new RuntimeException("Weird M-Request: " + error);
+            }
+        } else { // pragma: no cover -> Weird M-Request
+            throw new RuntimeException("Weird M-Request");
+        }
+
+        if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
+//            SimpleLogger.simpleLog("info"
+//                ,"+ " + this.sharedData.getThisDevice().getDeviceName() + " is sending message to " +
+//                    this.sharedData.getSimulatedCommChannel().getEnd().getSharedData().getThisDevice().getDeviceName() + "...");
+
+            // Simulate Network Delay
+            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
+                SimpleLogger.simpleLog("info", "network delay");
+                SimpleLogger.simpleLog("info", "network delay");
+                SimpleLogger.simpleLog("info", "network delay");
+                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
+                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
+                }
+            }
+//            Map<String, String> messageRequest = new HashMap<>();
+//            messageRequest.put("messageOperation", messageOperation);
+//            messageRequest.put("messageType", messageType);
+//            messageRequest.put("messageStr", sentMessageJson);
+
+//            try {
+//                Message newMessage = new Message(messageRequest);
+//                String newMessageJson = Message.messageToJsonstr(newMessage); // something to fixed
+//                Environment.transmittedMessage = newMessageJson;
+//                // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
+//                // this.sharedData.getSimulatedCommChannel().getSenderQueue().offer(newMessageJson);
+//            } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
+//                throw new RuntimeException("Weird M-Request: " + error);
+//            }
+        } else { // pragma: no cover -> PRODUCTION
+//            SimpleLogger.simpleLog("info", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is sending message to BT_address or BT_name...");
+//            this.sharedData.getConnectionSocket().sendMessage(newMessageJson);
+        }
+    }
+
+    // [STAGE: (S)] Send Message By Nearby
+    public void sendXxxMessageByNearby(String messageOperation, String messageType, String sentMessageJson) throws InterruptedException {
+        SimpleMeasurer.measureWorkerFuncWithException(this::_sendXxxMessageByNearby, messageOperation, messageType, sentMessageJson); // something to fixed
+    }
+    private void _sendXxxMessageByNearby(String messageOperation, String messageType, String sentMessageJson) throws InterruptedException {
+        // Generate Message
+        if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) || messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
+                (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
+
+            Map<String, String> messageRequest = new HashMap<>();
+            messageRequest.put("messageOperation", messageOperation);
+            messageRequest.put("messageType", messageType);
+            messageRequest.put("messageStr", sentMessageJson);
+
+            try {
+                Message newMessage = new Message(messageRequest);
+                String newMessageJson = Message.messageToJsonstr(newMessage);
+
+                if (nearbyManager != null) {
+                    nearbyManager.sendMessage(Environment.connectedEndpointId, newMessageJson);
+                } else {
+                    throw new IllegalStateException("NearbyManager is not initialized.");
+                }
+
+//                Environment.transmittedMessage = newMessageJson;
                 // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
             } catch (IllegalArgumentException error) { // pragma: no cover -> Weird M-Request
                 throw new RuntimeException("Weird M-Request: " + error);

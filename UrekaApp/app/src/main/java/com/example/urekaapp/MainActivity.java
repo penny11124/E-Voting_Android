@@ -19,10 +19,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialPort;
-import com.hoho.android.usbserial.driver.UsbSerialProber;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,6 +40,7 @@ import ureka.framework.resource.crypto.ECC;
 import ureka.framework.resource.crypto.ECDH;
 import ureka.framework.resource.crypto.SerializationUtil;
 import ureka.framework.resource.logger.SimpleLogger;
+import ureka.framework.Environment;
 import ureka.framework.test.operation.Test01SuccessWhenInitializeAgentOrServer;
 import ureka.framework.test.operation.Test02SuccessWhenInitializeDevice;
 import ureka.framework.test.operation.Test03SuccessWhenTransferDeviceOwnership;
@@ -57,14 +54,13 @@ import ureka.framework.test.operation.Test14FailWhenAccessDeviceByOwner;
 import ureka.framework.test.operation.Test15FailWhenAccessDeviceByOthers;
 import ureka.framework.test.operation.Test16FailWhenAccessDeviceByPrivateSession;
 
-import android_serialport_api.SerialPort;
-
 public class MainActivity extends AppCompatActivity {
     private String mode = "RUN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Environment.initialize(this);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -128,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                
+
 //                // Create an ExecutorService to run the tasks
 //                ExecutorService executorService = Executors.newSingleThreadExecutor();
 //

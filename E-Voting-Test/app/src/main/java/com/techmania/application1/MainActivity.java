@@ -84,31 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.d("Nearby", "Discovery failed", e));
     }
 
-    EndpointDiscoveryCallback endpointDiscoveryCallback = new EndpointDiscoveryCallback() {
-        @Override
-        public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
-            Log.d("Nearby", "Endpoint found: " + endpointId);
-            if (!isConnectedToEndpoint(endpointId)) {
-                connectionsClient.requestConnection(
-                                "TestDevice2",
-                                endpointId,
-                                connectionLifecycleCallback
-                        ).addOnSuccessListener(unused -> Log.d("Nearby", "Connection requested"))
-                        .addOnFailureListener(e -> Log.d("Nearby", "Connection request failed: " + e.getMessage()));
-            } else {
-                Log.d("Nearby", "Already connected to endpoint: " + endpointId);
-            }
-        }
 
-        @Override
-        public void onEndpointLost(String endpointId) {
-            Log.d("Nearby", "Endpoint lost: " + endpointId);
-        }
-
-        private boolean isConnectedToEndpoint(String endpointId) {
-            return connectedEndpoints.contains(endpointId);
-        }
-    };
 
     ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
         @Override

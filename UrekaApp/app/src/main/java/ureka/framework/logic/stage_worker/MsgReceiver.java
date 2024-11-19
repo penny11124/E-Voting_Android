@@ -131,18 +131,18 @@ public class MsgReceiver implements Runnable {
                (& all daemon threads, e.g. all receiverThreads will also be terminated)
            In production, we may need Ctrl+C or other shutdown method to stop this loop program
      */
-    public void createSimulatedCommConnection(DeviceController end) {
-        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is connecting with {end.sharedData.thisDevice.deviceName}...");
-
-        // Set Sender (on Main Thread)
-        this.sharedData.getSimulatedCommChannel().setEnd(end);
-        this.sharedData.getSimulatedCommChannel().setSenderQueue(end.getSharedData().getSimulatedCommChannel().getReceiverQueue());
-
-        // Start Receiver Thread
-        Thread receiverThread = new Thread(this::_recvXxxMessage);
-        receiverThread.setDaemon(true);
-        receiverThread.start();
-    }
+//    public void createSimulatedCommConnection(DeviceController end) {
+//        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is connecting with {end.sharedData.thisDevice.deviceName}...");
+//
+//        // Set Sender (on Main Thread)
+//        this.sharedData.getSimulatedCommChannel().setEnd(end);
+//        this.sharedData.getSimulatedCommChannel().setSenderQueue(end.getSharedData().getSimulatedCommChannel().getReceiverQueue());
+//
+//        // Start Receiver Thread
+//        Thread receiverThread = new Thread(this::_recvXxxMessage);
+//        receiverThread.setDaemon(true);
+//        receiverThread.start();
+//    }
 
     // Resource (Bluetooth Comm)
 //    public void acceptBluetoothComm() {
@@ -165,7 +165,7 @@ public class MsgReceiver implements Runnable {
 //    }
 
     // [STAGE: (R)] Receive Message
-    public void _recvXxxMessage() {
+    public void _recvXxxMessage(String data) {
 //        this.run();
 //        String receivedMessageWithHeader = null;
 //
@@ -176,7 +176,7 @@ public class MsgReceiver implements Runnable {
 //        }
         String receivedMessageWithHeader = "";
         if (Objects.equals(Environment.DEPLOYMENT_ENV, "TEST")) {
-            receivedMessageWithHeader = Environment.transmittedMessage;
+            receivedMessageWithHeader = data;
         }
         // Message Size Measurement
         this.measureHelper.measureMessageSize("_recvMessage", receivedMessageWithHeader);

@@ -76,8 +76,8 @@ public class Test02SuccessWhenInitializeDevice {
         // WHEN: Holder: DM's CS forward the accessUTicket to Uninitialized IoTD
         // createSimulatedCommConnection(this.cloudServerDm, this.iotDevice);
         this.cloudServerDm.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
-        this.iotDevice.getMsgReceiver()._recvXxxMessage();
-        this.cloudServerDm.getMsgReceiver()._recvXxxMessage();
+//        this.iotDevice.getMsgReceiver()._recvXxxMessage();
+//        this.cloudServerDm.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(this.cloudServerDm, this.iotDevice);
 
         // THEN: Succeed to initialize DM's IoTD

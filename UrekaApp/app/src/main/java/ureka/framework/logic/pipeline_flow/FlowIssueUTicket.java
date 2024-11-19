@@ -171,7 +171,7 @@ public class FlowIssueUTicket {
                 }
 
                 // [STAGE: (S)]
-                this.msgSender.sendXxxMessage(
+                this.msgSender.sendXxxMessageByNearby(
                         Message.MESSAGE_RECV_AND_STORE,
                         UTicket.MESSAGE_TYPE,
                         generatedUTicketJson
@@ -256,8 +256,8 @@ public class FlowIssueUTicket {
             this.receivedMsgStorer.storeReceivedXxxRTicket(receivedRTicket);
             String storedUTicketJson;
             if(receivedRTicket.getRTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET) ||
-                receivedRTicket.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET) ||
-                receivedRTicket.getRTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
+                    receivedRTicket.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET) ||
+                    receivedRTicket.getRTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
                 // Query Corresponding UTicket(s)
                 //    Notice that even Initialization UTicket is copied in the deviceTable["deviceId"]
                 // [STAGE: (VL)(L)]

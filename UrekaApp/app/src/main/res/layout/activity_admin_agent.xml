@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Device type: Admin Agent"
+        tools:ignore="HardcodedText"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/textViewConnectingStatus"
@@ -23,8 +24,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Not connected"
+        tools:ignore="HardcodedText"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="@+id/textViewDeviceType"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonScan"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/buttonScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect To Voting Machine"
+        app:layout_constraintTop_toTopOf="@+id/textViewConnectingStatus"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonAdvertising"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonAdvertising"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Advertising for Voter"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="@+id/buttonScan"
         app:layout_constraintBottom_toBottomOf="@+id/buttonInit"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -35,7 +59,7 @@
         android:layout_height="wrap_content"
         android:text="Init device"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/textViewConnectingStatus"
+        app:layout_constraintTop_toTopOf="@+id/buttonAdvertising"
         app:layout_constraintBottom_toBottomOf="@+id/buttonGetData"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

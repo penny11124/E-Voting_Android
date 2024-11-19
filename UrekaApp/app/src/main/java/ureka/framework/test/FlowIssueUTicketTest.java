@@ -64,10 +64,10 @@ public class FlowIssueUTicketTest {
         Executor executor = new Executor(sharedData, measureHelper, simpleStorage, msgVerifier);
         MsgGenerator msgGenerator = new MsgGenerator(sharedData, measureHelper);
         GeneratedMsgStorer generatedMsgStorer = new GeneratedMsgStorer(sharedData, measureHelper, simpleStorage);
-        MsgSender msgSender = new MsgSender(sharedData, measureHelper);
+        // MsgSender msgSender = new MsgSender(sharedData, measureHelper, );
 
-        flowIssueUTicket = new FlowIssueUTicket(sharedData, measureHelper, receivedMsgStorer,
-            msgVerifier, executor, msgGenerator, generatedMsgStorer, msgSender);
+        // flowIssueUTicket = new FlowIssueUTicket(sharedData, measureHelper, receivedMsgStorer,
+           //  msgVerifier, executor, msgGenerator, generatedMsgStorer, msgSender);
     }
 
     @Test

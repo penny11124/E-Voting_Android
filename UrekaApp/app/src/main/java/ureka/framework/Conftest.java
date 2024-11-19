@@ -75,32 +75,32 @@ public class Conftest {
     }
 
     // Helper Functions (Simulated Comm)
-    public static void createSimulatedCommConnection(DeviceController end1, DeviceController end2) {
-        // Set Sender (on Main Thread) & Start Receiver Thread
-        end1.getMsgReceiver().createSimulatedCommConnection(end2);
-        end2.getMsgReceiver().createSimulatedCommConnection(end1);
-
-        SimpleLogger.simpleLog("info", String.format("Connection between %s and %s is started...",
-                end1.getSharedData().getThisDevice().getDeviceName(),
-                end2.getSharedData().getThisDevice().getDeviceName()));
-    }
-
-    // Wait for all sender/receiver to finish their works (block last 1st make log beautiful)
-    public static void waitSimulatedCommCompleted(DeviceController end1, DeviceController end2) {
-        try {
-            end1.getMsgSender().waitSimulatedCommCompleted();
-            end2.getMsgSender().waitSimulatedCommCompleted();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        SimpleLogger.simpleLog("info", String.format("Connection between %s and %s is completed...",
-                end1.getSharedData().getThisDevice().getDeviceName(),
-                end2.getSharedData().getThisDevice().getDeviceName()));
-        SimpleLogger.simpleLog("info","");
-        SimpleLogger.simpleLog("info","");
-        SimpleLogger.simpleLog("info","");
-    }
+//    public static void createSimulatedCommConnection(DeviceController end1, DeviceController end2) {
+//        // Set Sender (on Main Thread) & Start Receiver Thread
+//        end1.getMsgReceiver().createSimulatedCommConnection(end2);
+//        end2.getMsgReceiver().createSimulatedCommConnection(end1);
+//
+//        SimpleLogger.simpleLog("info", String.format("Connection between %s and %s is started...",
+//                end1.getSharedData().getThisDevice().getDeviceName(),
+//                end2.getSharedData().getThisDevice().getDeviceName()));
+//    }
+//
+//    // Wait for all sender/receiver to finish their works (block last 1st make log beautiful)
+//    public static void waitSimulatedCommCompleted(DeviceController end1, DeviceController end2) {
+//        try {
+//            end1.getMsgSender().waitSimulatedCommCompleted();
+//            end2.getMsgSender().waitSimulatedCommCompleted();
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        SimpleLogger.simpleLog("info", String.format("Connection between %s and %s is completed...",
+//                end1.getSharedData().getThisDevice().getDeviceName(),
+//                end2.getSharedData().getThisDevice().getDeviceName()));
+//        SimpleLogger.simpleLog("info","");
+//        SimpleLogger.simpleLog("info","");
+//        SimpleLogger.simpleLog("info","");
+//    }
 
     // Helper Functions (Reusable Test Data)
     public static DeviceController deviceManufacturerServer() {
@@ -128,8 +128,8 @@ public class Conftest {
         cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
 
         cloudServerDM.getFlowApplyUTicket().holderApplyUTicket(idForInitializationUTicket);
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        cloudServerDM.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        cloudServerDM.getMsgReceiver()._recvXxxMessage();
 
         // waitSimulatedCommCompleted(cloudServerDM, iotDevice);
 
@@ -161,15 +161,15 @@ public class Conftest {
         generatedRequest.put("holderId", userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr());
         generatedRequest.put("uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET);
 
-        cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        userAgentDO.getMsgReceiver()._recvXxxMessage();
+        // cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+//        userAgentDO.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(userAgentDO, cloudServerDM);
 
         // WHEN: Holder: DO's UA forward the ownershipUTicket
         // createSimulatedCommConnection(userAgentDO, iotDevice);
         userAgentDO.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId);
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        userAgentDO.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        userAgentDO.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(userAgentDO, iotDevice);
 
         return new Pair(userAgentDO, iotDevice);
@@ -196,13 +196,13 @@ public class Conftest {
         userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId, generatedRequest);
 
         // WHEN: Holder: DO's UA forward the self_access_u_ticket
-        createSimulatedCommConnection(userAgentDO, iotDevice);
+        // createSimulatedCommConnection(userAgentDO, iotDevice);
         String generatedCommand = "HELLO-1";
         userAgentDO.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        userAgentDO.getMsgReceiver()._recvXxxMessage();
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        userAgentDO.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        userAgentDO.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        userAgentDO.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(userAgentDO, iotDevice);
 
         return new Pair(userAgentDO, iotDevice);
@@ -235,18 +235,18 @@ public class Conftest {
         generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
         generatedRequest.put("taskScope", generatedTaskScope);
 
-        userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+//        cloudServerEP.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket
         // createSimulatedCommConnection(cloudServerEP, iotDevice);
         String generatedCommand = "HELLO-1";
         cloudServerEP.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        cloudServerEP.getMsgReceiver()._recvXxxMessage();
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        cloudServerEP.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(cloudServerEP, iotDevice);
 
         return new Triple(userAgentDO, cloudServerEP, iotDevice);
@@ -275,18 +275,18 @@ public class Conftest {
         generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
         generatedRequest.put("taskScope", generatedTaskScope);
 
-        userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
-        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+        // userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
+//        cloudServerEP.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(cloudServerEP, userAgentDO);
 
         // WHEN: Holder: EP's CS forward the access_u_ticket
         // createSimulatedCommConnection(cloudServerEP, iotDevice);
         String generatedCommand = "HELLO-1";
         cloudServerEP.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId, generatedCommand);
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        cloudServerEP.getMsgReceiver()._recvXxxMessage();
-        iotDevice.getMsgReceiver()._recvXxxMessage();
-        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        cloudServerEP.getMsgReceiver()._recvXxxMessage();
+//        iotDevice.getMsgReceiver()._recvXxxMessage();
+//        cloudServerEP.getMsgReceiver()._recvXxxMessage();
         // waitSimulatedCommCompleted(cloudServerEP, iotDevice);
 
         return new Triple(userAgentDO, cloudServerEP, iotDevice);

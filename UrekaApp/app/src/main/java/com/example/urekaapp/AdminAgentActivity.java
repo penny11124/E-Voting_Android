@@ -7,10 +7,17 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.urekaapp.ble.BLEManager;
+import com.example.urekaapp.ble.BLEPermissionHelper;
+import com.example.urekaapp.ble.BLEViewModel;
+import com.example.urekaapp.communication.NearbyManager;
 
 import org.checkerframework.checker.units.qual.A;
 import org.junit.platform.commons.util.StringUtils;
@@ -21,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.UTicket;
@@ -35,6 +43,19 @@ public class AdminAgentActivity extends AppCompatActivity {
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
     private String connectedDeviceId; // The deviceId of the voting machine
 
+
+    private Button buttonScan;
+    private Button buttonAdvertising;
+    private Button buttonInit;
+    private Button buttonGetData;
+    private Button buttonApplyInitUTicket;
+    private Button buttonApplyTallyUTicket;
+    private Button buttonShowRTickets;
+
+    private BLEViewModel bleViewModel;
+
+    private NearbyManager nearbyManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,9 +67,17 @@ public class AdminAgentActivity extends AppCompatActivity {
             return insets;
         });
 
+        if (!BLEPermissionHelper.hasPermissions(this)) {
+            BLEPermissionHelper.requestPermissions(this);
+        }
+
+        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyManager = new NearbyManager(this);
+
         // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+        nearbyManager.setMsgReceiver(deviceController.getMsgReceiver());
 
         // components initialization
         Button buttonInit = findViewById(R.id.buttonInit);
@@ -65,6 +94,29 @@ public class AdminAgentActivity extends AppCompatActivity {
             buttonApplyTallyUTicket.setEnabled(false);
             buttonShowRTickets.setEnabled(false);
         }
+        buttonScan = findViewById(R.id.buttonScan);
+        buttonAdvertising = findViewById(R.id.buttonAdvertising);
+
+        buttonScan.setOnClickListener(view -> {
+            nearbyManager.stopAllActions();
+            deviceController.connectToDevice("HC-04BLE",
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(true);
+                        buttonGetData.setEnabled(true);
+                    }),
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(false);
+                        buttonGetData.setEnabled(false);
+                    })
+            );
+        });
+
+        buttonAdvertising.setOnClickListener(view -> {
+            bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
+            nearbyManager.startAdvertising("AdminAgent");
+        });
 
         // buttonInit: Assign the admin agent with the voting machine
         buttonInit.setOnClickListener(new View.OnClickListener() {
@@ -247,5 +299,27 @@ public class AdminAgentActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        BLEPermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+
+        if (BLEPermissionHelper.hasPermissions(this)) {
+            Toast.makeText(this, "Permissions granted, you can now use BLE features.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (bleViewModel != null) {
+            BLEManager bleManager = bleViewModel.getBLEManager(this);
+            if (bleManager != null) {
+                bleManager.disconnect();
+            }
+        }
     }
 }
