@@ -1,21 +1,27 @@
 package com.example.urekaapp.communication;
 
+import static com.google.common.reflect.Reflection.getPackageName;
+
 import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 import com.google.android.gms.nearby.connection.ConnectionsClient;
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
+import com.google.android.gms.nearby.connection.DiscoveryOptions;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
+
+import java.util.Objects;
 
 import ureka.framework.Environment;
 import ureka.framework.logic.stage_worker.MsgReceiver;
@@ -23,40 +29,31 @@ import ureka.framework.logic.stage_worker.MsgReceiver;
 public class NearbyManager {
     private static final String TAG = "NearbyManager";
     private static final String SERVICE_ID = "com.example.urekaapp.SERVICE_ID";
-    private final ConnectionsClient connectionsClient;
-    private final Context context;
+    private ConnectionsClient connectionsClient;
     private MsgReceiver msgReceiver;
 
-    public NearbyManager(Context context) {
-        this.context = context;
+    public NearbyManager(Context context, MsgReceiver msgReceiver) {
         this.connectionsClient = Nearby.getConnectionsClient(context);
-    }
-
-    public void setMsgReceiver(MsgReceiver msgReceiver) {
         this.msgReceiver = msgReceiver;
     }
 
-    public void startAdvertising(String deviceName) {
+    public void startAdvertising() {
         connectionsClient.startAdvertising(
-                        deviceName,
-                        SERVICE_ID,
+                        "Admin Agent",
+                        SERVICE_ID,  // Service ID
                         connectionLifecycleCallback,
-                        new com.google.android.gms.nearby.connection.AdvertisingOptions.Builder()
-                                .setStrategy(Strategy.P2P_STAR)
-                                .build()
-                ).addOnSuccessListener(unused -> Log.d(TAG, "Advertising started"))
-                .addOnFailureListener(e -> Log.e(TAG, "Advertising failed", e));
+                        new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()  // P2P
+                ).addOnSuccessListener(unused -> Log.d("Nearby", "Advertising started"))
+                .addOnFailureListener(e -> Log.d("Nearby", "Advertising failed", e));
     }
 
-    public void startDiscovery(String deviceName) {
+    public void startDiscovery() {
         connectionsClient.startDiscovery(
                         SERVICE_ID,
                         endpointDiscoveryCallback,
-                        new com.google.android.gms.nearby.connection.DiscoveryOptions.Builder()
-                                .setStrategy(Strategy.P2P_STAR)
-                                .build()
+                        new DiscoveryOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()
                 ).addOnSuccessListener(unused -> Log.d(TAG, "Discovery started"))
-                .addOnFailureListener(e -> Log.e(TAG, "Discovery failed", e));
+                .addOnFailureListener(e -> Log.d("Nearby", "Discovery failed", e));
     }
 
     public void stopAllActions() {
@@ -73,14 +70,14 @@ public class NearbyManager {
 
     private final ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
         @Override
-        public void onConnectionInitiated(@NonNull String endpointId, @NonNull ConnectionInfo connectionInfo) {
+        public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
             // Automatically accept the connection on connection initiation
             connectionsClient.acceptConnection(endpointId, payloadCallback);
             Log.d(TAG, "Connection initiated with " + endpointId);
         }
 
         @Override
-        public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution result) {
+        public void onConnectionResult(String endpointId, ConnectionResolution result) {
             if (result.getStatus().isSuccess()) {
                 Log.d(TAG, "Connected to " + endpointId);
                 Environment.connectedEndpointId = endpointId;
@@ -90,32 +87,40 @@ public class NearbyManager {
         }
 
         @Override
-        public void onDisconnected(@NonNull String endpointId) {
+        public void onDisconnected(String endpointId) {
             Log.d(TAG, "Disconnected from " + endpointId);
             Environment.connectedEndpointId = null;
         }
     };
 
-    private final EndpointDiscoveryCallback endpointDiscoveryCallback =
+     final EndpointDiscoveryCallback endpointDiscoveryCallback =
             new EndpointDiscoveryCallback() {
                 @Override
-                public void onEndpointFound(@NonNull String endpointId, @NonNull DiscoveredEndpointInfo info) {
+                public void onEndpointFound(String endpointId, DiscoveredEndpointInfo info) {
                     Log.d(TAG, "Endpoint found: " + endpointId);
                     // Automatically request a connection to the found endpoint
-                    connectionsClient.requestConnection("NearbyManager", endpointId, connectionLifecycleCallback)
-                            .addOnSuccessListener(unused -> Log.d(TAG, "Connection request sent"))
-                            .addOnFailureListener(e -> Log.e(TAG, "Connection request failed", e));
+                    if (!isConnectedToEndpoint(endpointId)) {
+                        connectionsClient.requestConnection(TAG, endpointId, connectionLifecycleCallback)
+                                .addOnSuccessListener(unused -> Log.d(TAG, "Connection request sent"))
+                                .addOnFailureListener(e -> Log.e(TAG, "Connection request failed", e));
+                    } else {
+                        Log.d("Nearby", "Already connected to endpoint: " + endpointId);
+                    }
                 }
 
                 @Override
-                public void onEndpointLost(@NonNull String endpointId) {
+                public void onEndpointLost(String endpointId) {
                     Log.d(TAG, "Endpoint lost: " + endpointId);
+                }
+
+                private boolean isConnectedToEndpoint(String endpointId) {
+                    return Objects.equals(Environment.connectedEndpointId, endpointId);
                 }
             };
 
     private final PayloadCallback payloadCallback = new PayloadCallback() {
         @Override
-        public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
+        public void onPayloadReceived(String endpointId, Payload payload) {
             String message = new String(payload.asBytes());
             Log.d(TAG, "Payload received from " + endpointId + ": " + message);
             if (msgReceiver != null) {

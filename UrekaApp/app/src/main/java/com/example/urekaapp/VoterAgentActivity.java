@@ -18,6 +18,7 @@ import com.example.urekaapp.ble.BLEManager;
 import com.example.urekaapp.ble.BLEPermissionHelper;
 import com.example.urekaapp.ble.BLEViewModel;
 import com.example.urekaapp.communication.NearbyManager;
+import com.example.urekaapp.communication.NearbyViewModel;
 
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class VoterAgentActivity extends AppCompatActivity {
     private Button buttonShowRTicket;
 
     private BLEViewModel bleViewModel;
-    private NearbyManager nearbyManager;
+    private NearbyViewModel nearbyViewModel;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -56,11 +57,10 @@ public class VoterAgentActivity extends AppCompatActivity {
         }
 
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
-        nearbyManager = new NearbyManager(this);
+        nearbyViewModel = new ViewModelProvider(this).get(NearbyViewModel.class);
 
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "User Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
-        nearbyManager.setMsgReceiver(deviceController.getMsgReceiver());
 
         buttonScan = findViewById(R.id.buttonScanDevice);
         buttonConnect = findViewById(R.id.buttonConnect);
@@ -73,7 +73,7 @@ public class VoterAgentActivity extends AppCompatActivity {
 
         buttonConnect.setOnClickListener(view -> {
             bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
-            nearbyManager.startDiscovery("VoterAgent");
+            nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
         });
 
         buttonRequestUTicket.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +95,7 @@ public class VoterAgentActivity extends AppCompatActivity {
         });
 
         buttonScan.setOnClickListener(view -> {
-            nearbyManager.stopAllActions();
+            nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).stopAllActions();
             deviceController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
                         Toast.makeText(VoterAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
