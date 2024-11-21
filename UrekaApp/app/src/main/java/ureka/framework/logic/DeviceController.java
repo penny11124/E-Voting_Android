@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.urekaapp.ble.BLEViewModel;
 import com.example.urekaapp.ble.BLEManager;
 import com.example.urekaapp.communication.NearbyManager;
+import com.example.urekaapp.communication.NearbyViewModel;
 
 import java.util.HashMap;
 
@@ -47,6 +48,7 @@ public class DeviceController {
     private MsgSender msgSender;
     private MsgReceiver msgReceiver;
     private BLEManager bleManager;
+    private NearbyManager nearbyManager;
     // Flow
     private FlowIssueUTicket flowIssuerIssueUTicket;
     private FlowOpenSession flowOpenSession;
@@ -58,6 +60,7 @@ public class DeviceController {
     }
     private void _initialize(String deviceType, String deviceName, Context context) {
         BLEViewModel bleViewModel = new ViewModelProvider((AppCompatActivity) context).get(BLEViewModel.class);
+        NearbyViewModel nearbyViewModel = new ViewModelProvider((AppCompatActivity) context).get(NearbyViewModel.class);
 
         this.sharedData = new SharedData(new ThisDevice(), new CurrentSession(), new ThisPerson());
         this.simpleStorage = new SimpleStorage(deviceName);
@@ -76,8 +79,8 @@ public class DeviceController {
         this.msgGenerator = new MsgGenerator(this.sharedData, this.measureHelper);
         this.generatedMsgStorer = new GeneratedMsgStorer(this.sharedData, this.measureHelper, this.simpleStorage);
         this.bleManager = bleViewModel.getBLEManager(context);
-        NearbyManager nearbyManager = new NearbyManager(context);
-        this.msgSender = new MsgSender(this.sharedData, this.measureHelper, bleManager, nearbyManager);
+        this.nearbyManager = nearbyViewModel.getNearbyManager(context, this.msgReceiver);
+        this.msgSender = new MsgSender(this.sharedData, this.measureHelper, this.bleManager, this.nearbyManager);
 
         // Flow
         this.flowIssuerIssueUTicket = new FlowIssueUTicket(
