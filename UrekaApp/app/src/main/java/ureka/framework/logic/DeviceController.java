@@ -1,6 +1,9 @@
 package ureka.framework.logic;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -241,23 +244,32 @@ public class DeviceController {
         this.flowIssueUToken = flowIssueUToken;
     }
 
-    public void connectToDevice(String deviceName, Runnable onConnected, Runnable onDisconnected) {
+    public void connectToDevice(String deviceName, Runnable onConnected, Runnable onDisconnected, TextView textView) {
         this.bleManager.startScan(deviceName, new BLEManager.BLECallback() {
             @Override
             public void onConnected() {
                 SimpleLogger.simpleLog("info", "Device connected!");
+                new Handler(Looper.getMainLooper()).post(() ->
+                        textView.setText("Device connected!")
+                );
                 onConnected.run();
             }
 
             @Override
             public void onDisconnected() {
                 SimpleLogger.simpleLog("info", "Device disconnected!");
+                new Handler(Looper.getMainLooper()).post(() ->
+                        textView.setText("Device disconnected!")
+                );
                 onDisconnected.run();
             }
 
             @Override
             public void onDataReceived(String data) {
                 SimpleLogger.simpleLog("info", "Received data: " + data);
+                new Handler(Looper.getMainLooper()).post(() ->
+                        textView.setText("Received data:'" + data + "'")
+                );
                 msgReceiver._recvXxxMessage(data);
             }
         });

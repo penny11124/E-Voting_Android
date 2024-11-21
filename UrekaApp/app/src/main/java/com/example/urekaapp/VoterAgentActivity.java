@@ -6,9 +6,11 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -33,6 +35,7 @@ import java.util.Objects;
 import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
+import ureka.framework.model.message_model.Message;
 import ureka.framework.model.message_model.UTicket;
 import ureka.framework.resource.crypto.SerializationUtil;
 
@@ -41,11 +44,12 @@ public class VoterAgentActivity extends AppCompatActivity {
     private String connectedDeviceId; // The deviceId of the voting machine
     private int votedCandidate;
 
-    private Button buttonScan = findViewById(R.id.buttonScanDevice);
-    private Button buttonConnect = findViewById(R.id.buttonConnect);
-    private final Button buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
-    private final Button buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
-    private final Button buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
+    private Button buttonScan;
+    private Button buttonConnect;
+    private Button buttonRequestUTicket;
+    private Button buttonApplyUTicket;
+    private Button buttonShowRTicket;
+    private TextView textViewConnectingStatus;
 
     private final ActivityResultLauncher<Intent> activityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -68,8 +72,6 @@ public class VoterAgentActivity extends AppCompatActivity {
                 }
             });
 
-
-
     private BLEViewModel bleViewModel;
     private NearbyManager nearbyManager;
 
@@ -90,14 +92,19 @@ public class VoterAgentActivity extends AppCompatActivity {
             BLEPermissionHelper.requestPermissions(this);
         }
 
-        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
-        nearbyManager = new NearbyManager(this);
-
+        // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "User Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyManager = new NearbyManager(this);
         nearbyManager.setMsgReceiver(deviceController.getMsgReceiver());
 
-        // components initialization
+        buttonScan = findViewById(R.id.buttonScanDevice);
+        buttonConnect = findViewById(R.id.buttonConnect);
+        buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
+        buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
+        buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
+        textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         String mode = getIntent().getStringExtra("mode");
         if (!Objects.equals(mode, "TEST")) {
             buttonRequestUTicket.setEnabled(false);
@@ -113,17 +120,21 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonRequestUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
-                // TODO: fix the next line
-                String targetDeviceId = ""; // = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
                 String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
                 Map<String, String> generatedRequest = Map.of(
-                        "deviceId", targetDeviceId,
                         "holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
                         "uTicketType", UTicket.TYPE_ACCESS_UTICKET,
                         "taskScope", generatedTaskScope
                 );
-                deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
+                try {
+                    deviceController.getMsgSender().sendXxxMessageByNearby(
+                            Message.MESSAGE_REQUEST,
+                            Message.MESSAGE_REQUEST,
+                            SerializationUtil.dictToJsonStr(generatedRequest)
+                    );
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 //                deviceController.getMsgReceiver()._recvXxxMessage();
             }
         });
@@ -138,7 +149,8 @@ public class VoterAgentActivity extends AppCompatActivity {
                     () -> runOnUiThread(() -> {
                         Toast.makeText(VoterAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
                         buttonApplyUTicket.setEnabled(false);
-                    })
+                    }),
+                    textViewConnectingStatus
             );
         });
 
@@ -179,6 +191,14 @@ public class VoterAgentActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // Register a callback to handle back button presses
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {}
+        };
+        // Add the callback to the dispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override

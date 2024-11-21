@@ -1,5 +1,7 @@
 package ureka.framework.logic.pipeline_flow;
 
+import com.example.urekaapp.AdminAgentActivity;
+
 import java.security.KeyException;
 import java.util.Map;
 
@@ -150,14 +152,17 @@ public class FlowIssueUTicket {
         }
     }
 
-    public void issuerIssueUTicketToHolder(String deviceId, Map<String, String> arbitraryDict) {
+    public void issuerIssueUTicketToHolder(Map<String, String> arbitraryDict) {
         // Start Process Measurement
         this.measureHelper.measureProcessPerfStart();
         try {
             // [STAGE: (VL)]
-            if (this.sharedData.getDeviceTable().containsKey(deviceId)) {
+            if (this.sharedData.getDeviceTable().containsKey(AdminAgentActivity.connectedDeviceId)) {
                 // [STAGE: (G)]
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(arbitraryDict);
+                UTicket generatedUTicket = UTicket.jsonStrToUTicket(generatedUTicketJson);
+                generatedUTicket.setDeviceId(AdminAgentActivity.connectedDeviceId);
+                generatedUTicketJson = UTicket.uTicketToJsonStr(generatedUTicket);
 
                 // [STAGE: (SG)]
                 this.generatedMsgStorer.storeGeneratedXxxUTicket(generatedUTicketJson);

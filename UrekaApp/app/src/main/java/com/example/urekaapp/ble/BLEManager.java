@@ -14,6 +14,7 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
@@ -140,6 +141,24 @@ public class BLEManager {
     }
 
     public void sendData(String json) {
+//        if (writeCharacteristic != null && isConnected()) {
+//            int chunkSize = 20;
+//            for (int i = 0; i < json.length(); i += chunkSize) {
+//                int end = Math.min(i + chunkSize, json.length());
+//                String chunk = json.substring(i, end);
+//                writeCharacteristic.setValue(chunk.getBytes(StandardCharsets.UTF_8));
+//
+//                if (ActivityCompat.checkSelfPermission(Environment.applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+//                    return;
+//                }
+//                boolean success = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+//
+//                if (!success) {
+//                    Toast.makeText(Environment.applicationContext, "Failed to send data", Toast.LENGTH_SHORT).show();
+//                    break;
+//                }
+//            }
+//        }
         if (writeCharacteristic != null && isConnected()) {
             writeCharacteristic.setValue(json.getBytes(StandardCharsets.UTF_8));
             if (ActivityCompat.checkSelfPermission(Environment.applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {

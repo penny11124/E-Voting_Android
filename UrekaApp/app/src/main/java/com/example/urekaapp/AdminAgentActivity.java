@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -37,13 +39,14 @@ import ureka.framework.resource.crypto.SerializationUtil;
 public class AdminAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
 
+    // Data
     private ArrayList<String> candidates; // The names of the candidates
     private ArrayList<Integer> candidateVotes; // The votes od the candidates
     private ArrayList<String> voters; // The public key of the voters
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
-    private String connectedDeviceId; // The deviceId of the voting machine
+    public static String connectedDeviceId; // The deviceId of the voting machine
 
-
+    // Components
     private Button buttonScan;
     private Button buttonAdvertising;
     private Button buttonInit;
@@ -51,9 +54,10 @@ public class AdminAgentActivity extends AppCompatActivity {
     private Button buttonApplyInitUTicket;
     private Button buttonApplyTallyUTicket;
     private Button buttonShowRTickets;
+    private TextView textViewConnectingStatus;
 
+    // Bluetooth connection
     private BLEViewModel bleViewModel;
-
     private NearbyManager nearbyManager;
 
     @Override
@@ -71,21 +75,21 @@ public class AdminAgentActivity extends AppCompatActivity {
             BLEPermissionHelper.requestPermissions(this);
         }
 
-        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
-        nearbyManager = new NearbyManager(this);
-
         // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyManager = new NearbyManager(this);
         nearbyManager.setMsgReceiver(deviceController.getMsgReceiver());
 
-        // components initialization
-        Button buttonInit = findViewById(R.id.buttonInit);
-        Button buttonGetData = findViewById(R.id.buttonGetData);
-        Button buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
-        Button buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
-        Button buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
-
+        buttonScan = findViewById(R.id.buttonScan);
+        buttonAdvertising = findViewById(R.id.buttonAdvertising);
+        buttonInit = findViewById(R.id.buttonInit);
+        buttonGetData = findViewById(R.id.buttonGetData);
+        buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
+        buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
+        buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
+        textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         String mode = getIntent().getStringExtra("mode");
         if (!Objects.equals(mode, "TEST")) {
             buttonInit.setEnabled(false);
@@ -94,9 +98,8 @@ public class AdminAgentActivity extends AppCompatActivity {
             buttonApplyTallyUTicket.setEnabled(false);
             buttonShowRTickets.setEnabled(false);
         }
-        buttonScan = findViewById(R.id.buttonScan);
-        buttonAdvertising = findViewById(R.id.buttonAdvertising);
 
+        // buttonScan: Connect to the voting machine
         buttonScan.setOnClickListener(view -> {
             nearbyManager.stopAllActions();
             deviceController.connectToDevice("HC-04BLE",
@@ -109,10 +112,12 @@ public class AdminAgentActivity extends AppCompatActivity {
                         Toast.makeText(AdminAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
                         buttonInit.setEnabled(false);
                         buttonGetData.setEnabled(false);
-                    })
+                    }),
+                    textViewConnectingStatus
             );
         });
 
+        // buttonAdvertising: Start advertising for the voter agent
         buttonAdvertising.setOnClickListener(view -> {
             bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
             nearbyManager.startAdvertising("AdminAgent");
@@ -123,11 +128,12 @@ public class AdminAgentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Check if the device table is empty, i.e. uninitialized
-                if (!deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().isEmpty()) {
-                    String errorMessage = "Device Table is not empty";
-                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                // TODO: Uncomment this part after basic tests
+//                if (!deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().isEmpty()) {
+//                    String errorMessage = "Device Table is not empty";
+//                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
                 Map<String, String> arbitraryDict = new HashMap<>();
                 arbitraryDict.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
                 arbitraryDict.put("deviceId", "noId");
@@ -139,6 +145,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 for (String key : deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().keySet()) {
                     connectedDeviceId = key;
                 }
+                buttonApplyInitUTicket.setEnabled(true);
             }
         });
 
@@ -196,6 +203,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
 //                this.iotDevice.getMsgReceiver()._recvXxxMessage();
 //                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+                buttonApplyTallyUTicket.setEnabled(true);
             }
         });
 
@@ -274,6 +282,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
 //                this.iotDevice.getMsgReceiver()._recvXxxMessage();
 //                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+                buttonShowRTickets.setEnabled(true);
             }
         });
 
@@ -299,6 +308,14 @@ public class AdminAgentActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // Register a callback to handle back button presses
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {}
+        };
+        // Add the callback to the dispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override

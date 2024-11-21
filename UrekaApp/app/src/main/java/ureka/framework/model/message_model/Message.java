@@ -8,10 +8,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Message {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static final Gson gson = new Gson();
     //////////////////////////////////////////////////////
     // Message Operation
     //////////////////////////////////////////////////////
+    public static final String MESSAGE_REQUEST = "MESSAGE_REQUEST"; // Only used when voter request UTicket from admin
     public static final String MESSAGE_RECV_AND_STORE = "MESSAGE_RECV_AND_STORE";
     public static final String MESSAGE_VERIFY_AND_EXECUTE = "MESSAGE_VERIFY_AND_EXECUTE";
 

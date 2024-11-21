@@ -65,6 +65,7 @@ public class Environment {
 
 
     public static void initialize(Context context) {
-        applicationContext = context.getApplicationContext();
+//        applicationContext = context.getApplicationContext();
+        applicationContext = context;
     }
 }

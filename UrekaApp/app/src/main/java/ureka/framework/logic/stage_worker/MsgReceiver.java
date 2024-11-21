@@ -1,5 +1,6 @@
 package ureka.framework.logic.stage_worker;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -17,6 +18,7 @@ import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
 import ureka.framework.resource.communication.bluetooth.BluetoothService;
+import ureka.framework.resource.crypto.SerializationUtil;
 import ureka.framework.resource.logger.SimpleLogger;
 
 public class MsgReceiver implements Runnable {
@@ -166,14 +168,15 @@ public class MsgReceiver implements Runnable {
 
     // [STAGE: (R)] Receive Message
     public void _recvXxxMessage(String data) {
-//        this.run();
-//        String receivedMessageWithHeader = null;
-//
-//        Queue<String> receiverQueue = this.sharedData.getSimulatedCommChannel().getReceiverQueue();
-//        if (Environment.DEPLOYMENT_ENV.equals("TEST")) {
-//            // This will block until message is received
-//            receivedMessageWithHeader = receiverQueue.poll();
-//        }
+        if (data.contains("REQUEST: ")) {
+            int startIndex = data.indexOf("REQUEST: ");
+            int endIndex = startIndex + "REQUEST: ".length();
+            String croppedSubstring = data.substring(startIndex, endIndex);
+
+            Map<String, String> arbitraryDict = SerializationUtil.jsonStrToDict(croppedSubstring);
+            this.getFlowIssueUTicket().issuerIssueUTicketToHolder(arbitraryDict);
+        }
+
         String receivedMessageWithHeader = "";
         if (Objects.equals(Environment.DEPLOYMENT_ENV, "TEST")) {
             receivedMessageWithHeader = data;
