@@ -169,11 +169,9 @@ public class MsgReceiver implements Runnable {
     // [STAGE: (R)] Receive Message
     public void _recvXxxMessage(String data) {
         if (data.contains("REQUEST: ")) {
-            int startIndex = data.indexOf("REQUEST: ");
-            int endIndex = startIndex + "REQUEST: ".length();
-            String croppedSubstring = data.substring(startIndex, endIndex);
+            String croppedData = data.substring(0, "REQUEST: ".length());
 
-            Map<String, String> arbitraryDict = SerializationUtil.jsonStrToDict(croppedSubstring);
+            Map<String, String> arbitraryDict = SerializationUtil.jsonStrToDict(croppedData);
             this.getFlowIssueUTicket().issuerIssueUTicketToHolder(arbitraryDict);
         }
 

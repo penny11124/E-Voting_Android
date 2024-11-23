@@ -200,7 +200,7 @@ public class VoterAgentActivity extends AppCompatActivity {
             public void handleOnBackPressed() {}
         };
         // Add the callback to the dispatcher
-        getOnBackPressedDispatcher().addCallback(git this, callback);
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 
     @Override

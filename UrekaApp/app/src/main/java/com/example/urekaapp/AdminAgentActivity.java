@@ -59,7 +59,6 @@ public class AdminAgentActivity extends AppCompatActivity {
 
     // Bluetooth connection
     private BLEViewModel bleViewModel;
-    private NearbyManager nearbyManager;
     private NearbyViewModel nearbyViewModel;
 
     @Override
@@ -84,7 +83,6 @@ public class AdminAgentActivity extends AppCompatActivity {
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
-        nearbyManager = new NearbyManager(this, deviceController.getMsgReceiver());
 
         buttonScan = findViewById(R.id.buttonScan);
         buttonAdvertising = findViewById(R.id.buttonAdvertising);

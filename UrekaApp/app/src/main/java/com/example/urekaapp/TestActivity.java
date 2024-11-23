@@ -3,6 +3,7 @@ package com.example.urekaapp;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -68,6 +69,7 @@ public class TestActivity extends AppCompatActivity {
                     public void onDataReceived(String data) {
                         SimpleLogger.simpleLog("info", "Received data: " + data);
                         runOnUiThread(() -> {
+                            Log.d("TestActivity", data);
                             textViewDataReceived.setText("Data received: " + data);
                         });
                     }
@@ -78,16 +80,9 @@ public class TestActivity extends AppCompatActivity {
         buttonSendData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StringBuilder message = new StringBuilder();
-                for (int i = 0; i < 26; i++) {
-                    char c = (char) ('A' + i);
-                    for (int j = 0; j < i; j++) {
-                        message.append(c);
-                    }
-                }
-                message.append("$");
-                textViewDataSent.setText("Data sent.");
-                bleManager.sendData(message.toString());
+                String message = "{\"message_operation\":\"MESSAGE_VERIFY_AND_EXECUTE\",\"message_type\":\"UTICKET\",\"message_str\":\"{\\\"protocol_version\\\":\\\"UREKA-1.0\\\",\\\"u_ticket_id\\\":\\\"CI3T1XsBos4MEEFMLuK0Wy2/h+rzghjkXDH0AwxoRCA=\\\",\\\"u_ticket_type\\\":\\\"INITIALIZATION\\\",\\\"device_id\\\":\\\"no_id\\\",\\\"ticket_order\\\":0,\\\"holder_id\\\":\\\"Vp0YwOXAkVf7wNO5gqfVqveAwcNh7YY42Lzk/7kc7kg=-fb2eO4YWd0mhg4e3rGePzUjn4RBpgTm9EnIoCXBwamg=\\\"}\"}$";
+                textViewDataSent.setText(message);
+                bleManager.sendData(message);
             }
         });
     }

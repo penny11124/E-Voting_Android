@@ -3,6 +3,7 @@ package ureka.framework.logic;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,9 @@ import com.example.urekaapp.ble.BLEViewModel;
 import com.example.urekaapp.ble.BLEManager;
 import com.example.urekaapp.communication.NearbyManager;
 import com.example.urekaapp.communication.NearbyViewModel;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import java.util.HashMap;
 
@@ -249,6 +253,7 @@ public class DeviceController {
 
     public void connectToDevice(String deviceName, Runnable onConnected, Runnable onDisconnected, TextView textView) {
         this.bleManager.startScan(deviceName, new BLEManager.BLECallback() {
+            final StringBuilder jsonBuilder = new StringBuilder();
             @Override
             public void onConnected() {
                 SimpleLogger.simpleLog("info", "Device connected!");
@@ -271,13 +276,17 @@ public class DeviceController {
             public void onDataReceived(String data) {
                 SimpleLogger.simpleLog("info", "Received data: " + data);
                 new Handler(Looper.getMainLooper()).post(() ->
-                        textView.setText("Received data:'" + data + "'")
+                        textView.setText("Data received.")
                 );
-                msgReceiver._recvXxxMessage(data);
+                jsonBuilder.append(data);
+
+                if (data.contains("$")) {
+                    msgReceiver._recvXxxMessage(jsonBuilder.toString());
+                    jsonBuilder.setLength(0);
+                } else {
+                    Log.d("Bluetooth.onDataReceived", "Waiting for more data to complete JSON.");
+                }
             }
         });
     }
 }
-// TODO:
-// 1. Handle with SimulatedCommChannel initialization at Line 42.
-// 2. Handle with Bluetooth initialization at Line 43~47.
