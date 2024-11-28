@@ -1,7 +1,9 @@
 package com.example.urekaapp;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -20,6 +22,7 @@ import com.example.urekaapp.ble.BLEManager;
 import com.example.urekaapp.ble.BLEPermissionHelper;
 import com.example.urekaapp.ble.BLEViewModel;
 import com.example.urekaapp.communication.NearbyManager;
+import com.example.urekaapp.communication.NearbyPermissionHelper;
 import com.example.urekaapp.communication.NearbyViewModel;
 
 import org.checkerframework.checker.units.qual.A;
@@ -75,6 +78,9 @@ public class AdminAgentActivity extends AppCompatActivity {
         if (!BLEPermissionHelper.hasPermissions(this)) {
             BLEPermissionHelper.requestPermissions(this);
         }
+        if (!NearbyPermissionHelper.hasPermissions(this)) {
+            NearbyPermissionHelper.requestPermissions(this);
+        }
 
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
         nearbyViewModel = new ViewModelProvider(this).get(NearbyViewModel.class);
@@ -83,6 +89,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyViewModel.getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).setViewModel(nearbyViewModel);
 
         buttonScan = findViewById(R.id.buttonScan);
         buttonAdvertising = findViewById(R.id.buttonAdvertising);
@@ -99,7 +106,14 @@ public class AdminAgentActivity extends AppCompatActivity {
             buttonApplyInitUTicket.setEnabled(false);
             buttonApplyTallyUTicket.setEnabled(false);
             buttonShowRTickets.setEnabled(false);
-        }
+        };
+        nearbyViewModel.getIsConnected().observe(this, isConnected -> {
+            if (isConnected != null && isConnected) {
+                textViewConnectingStatus.setText("Connected to Voter Agent");
+            } else {
+                textViewConnectingStatus.setText("Not connected");
+            }
+        });
 
         // buttonScan: Connect to the voting machine
         buttonScan.setOnClickListener(view -> {

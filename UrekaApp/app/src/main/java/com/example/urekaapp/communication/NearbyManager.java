@@ -1,7 +1,5 @@
 package com.example.urekaapp.communication;
 
-import static com.google.common.reflect.Reflection.getPackageName;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -28,23 +26,28 @@ import ureka.framework.logic.stage_worker.MsgReceiver;
 
 public class NearbyManager {
     private static final String TAG = "NearbyManager";
-    private static final String SERVICE_ID = "com.example.urekaapp.SERVICE_ID";
+    private static final String SERVICE_ID = "com.example.urekaapp.communication";
     private ConnectionsClient connectionsClient;
     private MsgReceiver msgReceiver;
+    private NearbyViewModel nearbyViewModel = null;
 
     public NearbyManager(Context context, MsgReceiver msgReceiver) {
         this.connectionsClient = Nearby.getConnectionsClient(context);
         this.msgReceiver = msgReceiver;
     }
 
+    public void setViewModel(NearbyViewModel nearbyViewModel) {
+        this.nearbyViewModel = nearbyViewModel;
+    }
+
     public void startAdvertising() {
         connectionsClient.startAdvertising(
-                        "Admin Agent",
+                        "AdminAgent",
                         SERVICE_ID,  // Service ID
                         connectionLifecycleCallback,
                         new AdvertisingOptions.Builder().setStrategy(Strategy.P2P_CLUSTER).build()  // P2P
                 ).addOnSuccessListener(unused -> Log.d("Nearby", "Advertising started"))
-                .addOnFailureListener(e -> Log.d("Nearby", "Advertising failed", e));
+                .addOnFailureListener(e -> Log.d("Nearby", "Advertising failed" + e.getMessage(), e));
     }
 
     public void startDiscovery() {
@@ -81,6 +84,9 @@ public class NearbyManager {
             if (result.getStatus().isSuccess()) {
                 Log.d(TAG, "Connected to " + endpointId);
                 Environment.connectedEndpointId = endpointId;
+                if (nearbyViewModel != null) {
+                    nearbyViewModel.setConnected(true);
+                }
             } else {
                 Log.e(TAG, "Connection failed to " + endpointId);
             }
@@ -90,6 +96,9 @@ public class NearbyManager {
         public void onDisconnected(String endpointId) {
             Log.d(TAG, "Disconnected from " + endpointId);
             Environment.connectedEndpointId = null;
+            if (nearbyViewModel != null) {
+                nearbyViewModel.setConnected(false);
+            }
         }
     };
 
@@ -100,7 +109,7 @@ public class NearbyManager {
                     Log.d(TAG, "Endpoint found: " + endpointId);
                     // Automatically request a connection to the found endpoint
                     if (!isConnectedToEndpoint(endpointId)) {
-                        connectionsClient.requestConnection(TAG, endpointId, connectionLifecycleCallback)
+                        connectionsClient.requestConnection("VoterAgent", endpointId, connectionLifecycleCallback)
                                 .addOnSuccessListener(unused -> Log.d(TAG, "Connection request sent"))
                                 .addOnFailureListener(e -> Log.e(TAG, "Connection request failed", e));
                     } else {
