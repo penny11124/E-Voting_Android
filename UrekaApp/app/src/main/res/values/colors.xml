@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray">#FF888888</color> <!-- 禁用狀態顏色 -->
+    <color name="primary">#FF6200EE</color> <!-- 啟用狀態顏色 -->
+    <color name="enabledText">#FFFFFFFF</color> <!-- 啟用文字顏色（白色）-->
+    <color name="disabledText">#FFCCCCCC</color> <!-- 禁用文字顏色（淺灰色）-->
 </resources>

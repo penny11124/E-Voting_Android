@@ -43,14 +43,6 @@ android {
             excludes += "META-INF/LICENSE-notice.md"
         }
     }
-
-    // Added for NDK use
-    externalNativeBuild {
-        ndkBuild {
-            path = file("src/main/jni/Android.mk")
-        }
-    }
-    ndkVersion = "28.0.12433566"
 }
 
 dependencies {
@@ -72,6 +64,7 @@ dependencies {
     implementation(libs.prov) // SpongyCastle
     implementation("com.madgag.spongycastle:core:1.58.0.0") // SpongyCastle
     implementation("com.madgag.spongycastle:prov:1.58.0.0") // SpongyCastle
-    implementation("com.github.mik3y:usb-serial-for-android:3.8.1")
+    implementation(libs.google.play.nearby) // Nearby
+    implementation(libs.play.services.nearby.v1800)
 
 }

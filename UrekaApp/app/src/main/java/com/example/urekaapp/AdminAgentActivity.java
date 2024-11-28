@@ -1,16 +1,29 @@
 package com.example.urekaapp;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.urekaapp.ble.BLEManager;
+import com.example.urekaapp.ble.BLEPermissionHelper;
+import com.example.urekaapp.ble.BLEViewModel;
+import com.example.urekaapp.communication.NearbyManager;
+import com.example.urekaapp.communication.NearbyPermissionHelper;
+import com.example.urekaapp.communication.NearbyViewModel;
 
 import org.checkerframework.checker.units.qual.A;
 import org.junit.platform.commons.util.StringUtils;
@@ -21,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.UTicket;
@@ -29,11 +43,26 @@ import ureka.framework.resource.crypto.SerializationUtil;
 public class AdminAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
 
+    // Data
     private ArrayList<String> candidates; // The names of the candidates
     private ArrayList<Integer> candidateVotes; // The votes od the candidates
     private ArrayList<String> voters; // The public key of the voters
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
-    private String connectedDeviceId; // The deviceId of the voting machine
+    public static String connectedDeviceId; // The deviceId of the voting machine
+
+    // Components
+    private Button buttonScan;
+    private Button buttonAdvertising;
+    private Button buttonInit;
+    private Button buttonGetData;
+    private Button buttonApplyInitUTicket;
+    private Button buttonApplyTallyUTicket;
+    private Button buttonShowRTickets;
+    private TextView textViewConnectingStatus;
+
+    // Bluetooth connection
+    private BLEViewModel bleViewModel;
+    private NearbyViewModel nearbyViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +75,30 @@ public class AdminAgentActivity extends AppCompatActivity {
             return insets;
         });
 
+        if (!BLEPermissionHelper.hasPermissions(this)) {
+            BLEPermissionHelper.requestPermissions(this);
+        }
+        if (!NearbyPermissionHelper.hasPermissions(this)) {
+            NearbyPermissionHelper.requestPermissions(this);
+        }
+
+        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyViewModel = new ViewModelProvider(this).get(NearbyViewModel.class);
+
         // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyViewModel.getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).setViewModel(nearbyViewModel);
 
-        // components initialization
-        Button buttonInit = findViewById(R.id.buttonInit);
-        Button buttonGetData = findViewById(R.id.buttonGetData);
-        Button buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
-        Button buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
-        Button buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
-
+        buttonScan = findViewById(R.id.buttonScan);
+        buttonAdvertising = findViewById(R.id.buttonAdvertising);
+        buttonInit = findViewById(R.id.buttonInit);
+        buttonGetData = findViewById(R.id.buttonGetData);
+        buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
+        buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
+        buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
+        textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         String mode = getIntent().getStringExtra("mode");
         if (!Objects.equals(mode, "TEST")) {
             buttonInit.setEnabled(false);
@@ -64,18 +106,50 @@ public class AdminAgentActivity extends AppCompatActivity {
             buttonApplyInitUTicket.setEnabled(false);
             buttonApplyTallyUTicket.setEnabled(false);
             buttonShowRTickets.setEnabled(false);
-        }
+        };
+        nearbyViewModel.getIsConnected().observe(this, isConnected -> {
+            if (isConnected != null && isConnected) {
+                textViewConnectingStatus.setText("Connected to Voter Agent");
+            } else {
+                textViewConnectingStatus.setText("Not connected");
+            }
+        });
+
+        // buttonScan: Connect to the voting machine
+        buttonScan.setOnClickListener(view -> {
+            nearbyViewModel.getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).stopAllActions();
+            deviceController.connectToDevice("HC-04BLE",
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(true);
+                        buttonGetData.setEnabled(true);
+                    }),
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(false);
+                        buttonGetData.setEnabled(false);
+                    }),
+                    textViewConnectingStatus
+            );
+        });
+
+        // buttonAdvertising: Start advertising for the voter agent
+        buttonAdvertising.setOnClickListener(view -> {
+            bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
+            nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startAdvertising();
+        });
 
         // buttonInit: Assign the admin agent with the voting machine
         buttonInit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Check if the device table is empty, i.e. uninitialized
-                if (!deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().isEmpty()) {
-                    String errorMessage = "Device Table is not empty";
-                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                // TODO: Uncomment this part after basic tests
+//                if (!deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().isEmpty()) {
+//                    String errorMessage = "Device Table is not empty";
+//                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
                 Map<String, String> arbitraryDict = new HashMap<>();
                 arbitraryDict.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
                 arbitraryDict.put("deviceId", "noId");
@@ -87,6 +161,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 for (String key : deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().keySet()) {
                     connectedDeviceId = key;
                 }
+                buttonApplyInitUTicket.setEnabled(true);
             }
         });
 
@@ -144,6 +219,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
 //                this.iotDevice.getMsgReceiver()._recvXxxMessage();
 //                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+                buttonApplyTallyUTicket.setEnabled(true);
             }
         });
 
@@ -222,6 +298,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
 //                this.iotDevice.getMsgReceiver()._recvXxxMessage();
 //                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+                buttonShowRTickets.setEnabled(true);
             }
         });
 
@@ -247,5 +324,35 @@ public class AdminAgentActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        // Register a callback to handle back button presses
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {}
+        };
+        // Add the callback to the dispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        BLEPermissionHelper.handlePermissionResult(this, requestCode, permissions, grantResults);
+
+        if (BLEPermissionHelper.hasPermissions(this)) {
+            Toast.makeText(this, "Permissions granted, you can now use BLE features.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (bleViewModel != null) {
+            BLEManager bleManager = bleViewModel.getBLEManager(this);
+            if (bleManager != null) {
+                bleManager.disconnect();
+            }
+        }
     }
 }

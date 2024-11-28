@@ -11,7 +11,7 @@ import com.google.gson.GsonBuilder;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 public class UTicket {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static final Gson gson = new Gson();
     //////////////////////////////////////////////////////
     // Protocol Version
     //////////////////////////////////////////////////////

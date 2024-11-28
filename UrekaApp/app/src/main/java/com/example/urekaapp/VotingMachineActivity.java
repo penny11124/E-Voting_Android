@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -38,5 +39,13 @@ public class VotingMachineActivity extends AppCompatActivity {
         });
 
         TextView textVotingMachineState = findViewById(R.id.textVotingMachineState);
+
+        // Register a callback to handle back button presses
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {}
+        };
+        // Add the callback to the dispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
     }
 }

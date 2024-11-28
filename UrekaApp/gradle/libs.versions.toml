@@ -14,6 +14,7 @@ material = "1.10.0"
 activity = "1.9.2"
 constraintlayout = "2.1.4"
 junitJupiter = "5.8.1"
+playServicesNearby = "18.0.0"
 
 [libraries]
 bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcprovJdk15on" }
@@ -29,8 +30,12 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiter" }
+play-services-nearby-v1800 = { module = "com.google.android.gms:play-services-nearby", version.ref = "playServicesNearby" }
 prov = { module = "com.madgag.spongycastle:prov", version.ref = "core" }
+google-play-nearby = "com.google.android.gms:play-services-nearby:18.0.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+
+
 

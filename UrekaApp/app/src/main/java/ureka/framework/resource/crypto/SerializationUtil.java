@@ -1,7 +1,6 @@
 package ureka.framework.resource.crypto;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.spongycastle.asn1.ASN1Integer;
 import org.spongycastle.asn1.ASN1Sequence;
@@ -69,7 +68,7 @@ public class SerializationUtil {
     }
 
     ////////// Dict <-> JSONStr //////////
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson = new Gson();
 
     public static String dictToJsonStr(Map<String, String> dict) {
         return gson.toJson(dict);
@@ -157,6 +156,14 @@ public class SerializationUtil {
             byte[] xBytes = x.toByteArray();
             byte[] yBytes = y.toByteArray();
 
+            // Ensure no leading 0x00 byte for Base64 encoding (optional but recommended)
+            if (xBytes[0] == 0) {
+                xBytes = Arrays.copyOfRange(xBytes, 1, xBytes.length);
+            }
+            if (yBytes[0] == 0) {
+                yBytes = Arrays.copyOfRange(yBytes, 1, yBytes.length);
+            }
+
             // Encode the byte arrays to Base64 strings
             String xBase64 = Base64.getEncoder().encodeToString(xBytes);
             String yBase64 = Base64.getEncoder().encodeToString(yBytes);
@@ -190,8 +197,8 @@ public class SerializationUtil {
                 // Create an ECPoint from x and y
                 ECPoint ecPoint = new ECPoint(x, y);
 
-                // Get the ECParameterSpec for the curve (e.g., secp256r1)
-                // This example uses the standard named curve "secp256r1"
+                // Get the ECParameterSpec for the curve (e.g., secp256k1)
+                // This example uses the standard named curve "secp256k1"
                 ECGenParameterSpec ecGenSpec = new java.security.spec.ECGenParameterSpec("secp256k1");
                 KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance("EC", "SC");
                 kpg.initialize(ecGenSpec);

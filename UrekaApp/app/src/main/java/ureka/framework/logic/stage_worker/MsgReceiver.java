@@ -1,5 +1,6 @@
 package ureka.framework.logic.stage_worker;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -17,6 +18,7 @@ import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
 import ureka.framework.resource.communication.bluetooth.BluetoothService;
+import ureka.framework.resource.crypto.SerializationUtil;
 import ureka.framework.resource.logger.SimpleLogger;
 
 public class MsgReceiver implements Runnable {
@@ -131,18 +133,18 @@ public class MsgReceiver implements Runnable {
                (& all daemon threads, e.g. all receiverThreads will also be terminated)
            In production, we may need Ctrl+C or other shutdown method to stop this loop program
      */
-    public void createSimulatedCommConnection(DeviceController end) {
-        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is connecting with {end.sharedData.thisDevice.deviceName}...");
-
-        // Set Sender (on Main Thread)
-        this.sharedData.getSimulatedCommChannel().setEnd(end);
-        this.sharedData.getSimulatedCommChannel().setSenderQueue(end.getSharedData().getSimulatedCommChannel().getReceiverQueue());
-
-        // Start Receiver Thread
-        Thread receiverThread = new Thread(this::_recvXxxMessage);
-        receiverThread.setDaemon(true);
-        receiverThread.start();
-    }
+//    public void createSimulatedCommConnection(DeviceController end) {
+//        SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is connecting with {end.sharedData.thisDevice.deviceName}...");
+//
+//        // Set Sender (on Main Thread)
+//        this.sharedData.getSimulatedCommChannel().setEnd(end);
+//        this.sharedData.getSimulatedCommChannel().setSenderQueue(end.getSharedData().getSimulatedCommChannel().getReceiverQueue());
+//
+//        // Start Receiver Thread
+//        Thread receiverThread = new Thread(this::_recvXxxMessage);
+//        receiverThread.setDaemon(true);
+//        receiverThread.start();
+//    }
 
     // Resource (Bluetooth Comm)
 //    public void acceptBluetoothComm() {
@@ -165,18 +167,17 @@ public class MsgReceiver implements Runnable {
 //    }
 
     // [STAGE: (R)] Receive Message
-    public void _recvXxxMessage() {
-//        this.run();
-//        String receivedMessageWithHeader = null;
-//
-//        Queue<String> receiverQueue = this.sharedData.getSimulatedCommChannel().getReceiverQueue();
-//        if (Environment.DEPLOYMENT_ENV.equals("TEST")) {
-//            // This will block until message is received
-//            receivedMessageWithHeader = receiverQueue.poll();
-//        }
+    public void _recvXxxMessage(String data) {
+        if (data.contains("REQUEST: ")) {
+            String croppedData = data.substring(0, "REQUEST: ".length());
+
+            Map<String, String> arbitraryDict = SerializationUtil.jsonStrToDict(croppedData);
+            this.getFlowIssueUTicket().issuerIssueUTicketToHolder(arbitraryDict);
+        }
+
         String receivedMessageWithHeader = "";
         if (Objects.equals(Environment.DEPLOYMENT_ENV, "TEST")) {
-            receivedMessageWithHeader = Environment.transmittedMessage;
+            receivedMessageWithHeader = data;
         }
         // Message Size Measurement
         this.measureHelper.measureMessageSize("_recvMessage", receivedMessageWithHeader);

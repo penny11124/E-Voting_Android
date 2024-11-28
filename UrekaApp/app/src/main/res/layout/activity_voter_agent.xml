@@ -7,22 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".VoterAgentActivity">
 
-<!--    <Button-->
-<!--        android:id="@+id/buttonDiscover"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Discover"-->
-<!--        tools:ignore="HardcodedText"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/buttonRequestUTicket"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"/>-->
-
     <TextView
         android:id="@+id/textViewDeviceType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Device type: Voter Agent"
+        tools:ignore="HardcodedText"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@+id/textViewConnectingStatus"
@@ -34,8 +24,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Not connected"
+        tools:ignore="HardcodedText"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="@+id/textViewDeviceType"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonConnect"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/buttonConnect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect To Admin Agent"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="@+id/textViewConnectingStatus"
         app:layout_constraintBottom_toBottomOf="@+id/buttonRequestUTicket"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -46,7 +48,18 @@
         android:layout_height="wrap_content"
         android:text="Request UTicket"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/textViewConnectingStatus"
+        app:layout_constraintTop_toTopOf="@+id/buttonConnect"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonScanDevice"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/buttonScanDevice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connect To Voting Machine"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="@+id/buttonRequestUTicket"
         app:layout_constraintBottom_toBottomOf="@+id/buttonApplyUTicket"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -57,7 +70,7 @@
         android:layout_height="wrap_content"
         android:text="Apply UTicket"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonRequestUTicket"
+        app:layout_constraintTop_toTopOf="@+id/buttonScanDevice"
         app:layout_constraintBottom_toBottomOf="@+id/buttonShowRTicket"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
