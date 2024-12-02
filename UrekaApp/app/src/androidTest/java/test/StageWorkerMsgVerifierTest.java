@@ -172,14 +172,14 @@ public class StageWorkerMsgVerifierTest {
 
     @Test
     public void verifyCmdIsInTaskScopeTest() {
-        Map<String, String> taskScope = new HashMap<>();
-        taskScope.put("ALL", "allow");
-        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(taskScope));
+        Map<String, String> task_scope = new HashMap<>();
+        task_scope.put("ALL", "allow");
+        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(task_scope));
         msgVerifier.verifyCmdIsInTaskScope("foo");
 
-        taskScope.clear();
-        taskScope.put("SAY-HELLO-3", "allow");
-        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(taskScope));
+        task_scope.clear();
+        task_scope.put("SAY-HELLO-3", "allow");
+        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(task_scope));
         msgVerifier.verifyCmdIsInTaskScope("HELLO-3");
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {

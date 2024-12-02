@@ -122,12 +122,12 @@ public class FlowIssueUTicket {
             (e.g., if CR or PS is Timeout, device can revert to the WAIT_FOR_UT state)
     */
 
-    public void issuerIssueUTicketToHerself(String deviceId, Map<String, String> arbitraryDict) {
+    public void issuerIssueUTicketToHerself(String device_id, Map<String, String> arbitraryDict) {
         // Start Process Measurement
         this.measureHelper.measureProcessPerfStart();
         try {
             // [STAGE: (VL)]
-            if (this.sharedData.getDeviceTable().containsKey(deviceId) || "noId".equals(deviceId)) {
+            if (this.sharedData.getDeviceTable().containsKey(device_id) || "noId".equals(device_id)) {
                 // [STAGE: (G)]
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(arbitraryDict);
 
@@ -223,12 +223,12 @@ public class FlowIssueUTicket {
         }
     }
 
-    public void holderSendRTicketToIssuer(String deviceId) {
+    public void holderSendRTicketToIssuer(String device_id) {
         // Start Process Measurement
         this.measureHelper.measureProcessPerfStart();
         try {
             // [STAGE: (VL)(L)]
-            String storedRTicketJson = this.sharedData.getDeviceTable().get(deviceId).getDeviceRTicketForOwner();
+            String storedRTicketJson = this.sharedData.getDeviceTable().get(device_id).getDeviceRTicketForOwner();
 
             // End Process Measurement
             this.measureHelper.measureRecvCliPerfTime("holderSendRTicketToIssuer");
@@ -264,7 +264,7 @@ public class FlowIssueUTicket {
                     receivedRTicket.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET) ||
                     receivedRTicket.getRTicketType().equals(UTicket.TYPE_ACCESS_END_UTOKEN)) {
                 // Query Corresponding UTicket(s)
-                //    Notice that even Initialization UTicket is copied in the deviceTable["deviceId"]
+                //    Notice that even Initialization UTicket is copied in the deviceTable["device_id"]
                 // [STAGE: (VL)(L)]
                 if(receivedRTicket.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET)) {
                     storedUTicketJson = this.sharedData.getDeviceTable().get(receivedRTicket.getDeviceId()).getDeviceOwnershipUTicketForOthers();

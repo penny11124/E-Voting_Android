@@ -16,6 +16,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.security.KeyPair;
+import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
 
 import ureka.framework.Environment;
@@ -49,7 +50,14 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        TextView textTest = findViewById(R.id.textTest);
+        KeyPair keyPair1, keyPair2, keyPair3;
+        try {
+            keyPair1 = ECC.generateKeyPair();
+            keyPair2 = ECC.generateKeyPair();
+            keyPair3 = ECC.generateKeyPair();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         Button buttonAdminAgent = findViewById(R.id.buttonAdminAgent);
         buttonAdminAgent.setOnClickListener(new View.OnClickListener() {
@@ -57,26 +65,45 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AdminAgentActivity.class);
                 intent.putExtra("mode", mode);
+                intent.putExtra("key1", SerializationUtil.keyToStr(keyPair1.getPublic()));
+                intent.putExtra("key2", SerializationUtil.keyToStr(keyPair2.getPublic()));
+                intent.putExtra("key3", SerializationUtil.keyToStr(keyPair3.getPublic()));
                 startActivity(intent);
             }
         });
 
-        Button buttonVoterAgent = findViewById(R.id.buttonVoterAgent);
-        buttonVoterAgent.setOnClickListener(new View.OnClickListener() {
+        Button buttonVoterAgent1 = findViewById(R.id.buttonVoterAgent1);
+        buttonVoterAgent1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
                 intent.putExtra("mode", mode);
+                intent.putExtra("publicKey", SerializationUtil.keyToStr(keyPair1.getPublic(), "eccPublicKey"));
+                intent.putExtra("privateKey", SerializationUtil.keyToStr(keyPair1.getPrivate(), "eccPrivateKey"));
                 startActivity(intent);
             }
         });
 
-        Button buttonVotingMachine = findViewById(R.id.buttonVotingMachine);
-        buttonVotingMachine.setOnClickListener(new View.OnClickListener() {
+        Button buttonVoterAgent2 = findViewById(R.id.buttonVoterAgent2);
+        buttonVoterAgent2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, VotingMachineActivity.class);
+                Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
                 intent.putExtra("mode", mode);
+                intent.putExtra("publicKey", SerializationUtil.keyToStr(keyPair2.getPublic(), "eccPublicKey"));
+                intent.putExtra("privateKey", SerializationUtil.keyToStr(keyPair2.getPrivate(), "eccPrivateKey"));
+                startActivity(intent);
+            }
+        });
+
+        Button buttonVoterAgent3 = findViewById(R.id.buttonVoterAgent3);
+        buttonVoterAgent3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
+                intent.putExtra("mode", mode);
+                intent.putExtra("publicKey", SerializationUtil.keyToStr(keyPair3.getPublic(), "eccPublicKey"));
+                intent.putExtra("privateKey", SerializationUtil.keyToStr(keyPair3.getPrivate(), "eccPrivateKey"));
                 startActivity(intent);
             }
         });

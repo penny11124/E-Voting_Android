@@ -44,13 +44,13 @@ public class StageWorkerMsgGeneratorTest {
     @Test
     public void generateXxxUTicketTest() {
         Map<String, String> validUTicket = new HashMap<>();
-        validUTicket.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
-        validUTicket.put("deviceId", "foo");
+        validUTicket.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
+        validUTicket.put("device_id", "foo");
         String validUTicketJson = msgGenerator.generateXxxUTicket(validUTicket);
         msgVerifier._classifyUTicketIsDefinedType(validUTicketJson);
 
         Map<String, String> invalidUTicket = new HashMap<>();
-        invalidUTicket.put("uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET);
+        invalidUTicket.put("u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET);
         String invalidUTicketJson = msgGenerator.generateXxxUTicket(invalidUTicket);
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             msgVerifier._classifyUTicketIsDefinedType(invalidUTicketJson);
@@ -61,13 +61,13 @@ public class StageWorkerMsgGeneratorTest {
     @Test
     public void generateXxxRTicketTest() {
         Map<String, String> validRTicket = new HashMap<>();
-        validRTicket.put("rTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
-        validRTicket.put("deviceId", "foo");
+        validRTicket.put("r_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
+        validRTicket.put("device_id", "foo");
         String validRTicketJson = msgGenerator.generateXxxRTicket(validRTicket);
         msgVerifier._classifyRTicketIsDefinedType(validRTicketJson);
 
         Map<String, String> invalidRTicket = new HashMap<>();
-        invalidRTicket.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
+        invalidRTicket.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
         String invalidRTicketJson = msgGenerator.generateXxxUTicket(invalidRTicket);
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             msgVerifier._classifyUTicketIsDefinedType(invalidRTicketJson);

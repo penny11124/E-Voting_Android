@@ -44,7 +44,7 @@ public class ThisDevice {
     private Boolean hasDeviceType = false;
 
     // Ticket Order
-    private Integer ticketOrder = null;
+    private Integer ticket_order = null;
 
     // Generate Device Key after Initialization
     private ECPrivateKey devicePrivKey = null;
@@ -104,11 +104,11 @@ public class ThisDevice {
     }
 
     public Integer getTicketOrder() {
-        return ticketOrder;
+        return ticket_order;
     }
 
-    public void setTicketOrder(Integer ticketOrder) {
-        this.ticketOrder = ticketOrder;
+    public void setTicketOrder(Integer ticket_order) {
+        this.ticket_order = ticket_order;
     }
 
     public ECPrivateKey getDevicePrivKey() {

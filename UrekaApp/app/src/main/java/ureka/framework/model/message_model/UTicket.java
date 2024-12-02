@@ -45,20 +45,20 @@ public class UTicket {
     };
 
     // UT
-    private String protocolVersion;
-    private String uTicketId;
-    private String uTicketType;
-    private String deviceId;
-    private Integer ticketOrder;
-    private String holderId;
-    private String taskScope;
-    private String issuerSignature;
+    private String protocol_version;
+    private String u_ticket_id;
+    private String u_ticket_type;
+    private String device_id;
+    private Integer ticket_order;
+    private String holder_id;
+    private String task_scope;
+    private String issuer_signature;
     // PS-Cmd
-    private String associatedPlaintextCmd;
-    private String ciphertextCmd;
-    private String gcmAuthenticationTagCmd;
+    private String associated_plaintext_cmd;
+    private String ciphertext_cmd;
+    private String gcm_authentication_tag_cmd;
     // PS-Data
-    private String ivData;
+    private String iv_data;
 
     public UTicket() {}
     public UTicket(Map<String, String> values) {
@@ -77,7 +77,7 @@ public class UTicket {
                 if (field.getType().equals(Integer.class)) {
                     field.set(this, fieldValue != null ? Integer.valueOf(fieldValue) : null);
                 } else {
-                    if (fieldName.equals("protocolVersion")) {
+                    if (fieldName.equals("protocol_version")) {
                         field.set(this, fieldValue != null ? fieldValue : UTicket.PROTOCOL_VERSION);
                     } else {
                         field.set(this, fieldValue);
@@ -112,105 +112,105 @@ public class UTicket {
     public boolean equals(Object obj) {
         if (obj instanceof UTicket) {
             UTicket ut = (UTicket) obj;
-            return Objects.equals(this.uTicketId, ut.uTicketId);
+            return Objects.equals(this.u_ticket_id, ut.u_ticket_id);
         }
         return false;
     }
 
-    public void setProtocolVersion(String protocolVersion) {
-        this.protocolVersion = protocolVersion;
+    public void setProtocolVersion(String protocol_version) {
+        this.protocol_version = protocol_version;
     }
 
     public String getProtocolVersion() {
-        return protocolVersion;
+        return protocol_version;
     }
 
     public String getUTicketId() {
-        return uTicketId;
+        return u_ticket_id;
     }
 
-    public void setUTicketId(String uTicketId) {
-        this.uTicketId = uTicketId;
+    public void setUTicketId(String u_ticket_id) {
+        this.u_ticket_id = u_ticket_id;
     }
 
     public String getUTicketType() {
-        return uTicketType;
+        return u_ticket_type;
     }
 
-    public void setUTicketType(String uTicketType) {
-        this.uTicketType = uTicketType;
+    public void setUTicketType(String u_ticket_type) {
+        this.u_ticket_type = u_ticket_type;
     }
 
     public String getDeviceId() {
-        return deviceId;
+        return device_id;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceId(String device_id) {
+        this.device_id = device_id;
     }
 
     public Integer getTicketOrder() {
-        return ticketOrder;
+        return ticket_order;
     }
 
-    public void setTicketOrder(Integer ticketOrder) {
-        this.ticketOrder = ticketOrder;
+    public void setTicketOrder(Integer ticket_order) {
+        this.ticket_order = ticket_order;
     }
 
     public String getHolderId() {
-        return holderId;
+        return holder_id;
     }
 
-    public void setHolderId(String holderId) {
-        this.holderId = holderId;
+    public void setHolderId(String holder_id) {
+        this.holder_id = holder_id;
     }
 
     public String getTaskScope() {
-        return taskScope;
+        return task_scope;
     }
 
-    public void setTaskScope(String taskScope) {
-        this.taskScope = taskScope;
+    public void setTaskScope(String task_scope) {
+        this.task_scope = task_scope;
     }
 
     public String getIssuerSignature() {
-        return issuerSignature;
+        return issuer_signature;
     }
 
-    public void setIssuerSignature(String issuerSignature) {
-        this.issuerSignature = issuerSignature;
+    public void setIssuerSignature(String issuer_signature) {
+        this.issuer_signature = issuer_signature;
     }
 
     public String getAssociatedPlaintextCmd() {
-        return associatedPlaintextCmd;
+        return associated_plaintext_cmd;
     }
 
-    public void setAssociatedPlaintextCmd(String associatedPlaintextCmd) {
-        this.associatedPlaintextCmd = associatedPlaintextCmd;
+    public void setAssociatedPlaintextCmd(String associated_plaintext_cmd) {
+        this.associated_plaintext_cmd = associated_plaintext_cmd;
     }
 
     public String getCiphertextCmd() {
-        return ciphertextCmd;
+        return ciphertext_cmd;
     }
 
-    public void setCiphertextCmd(String ciphertextCmd) {
-        this.ciphertextCmd = ciphertextCmd;
+    public void setCiphertextCmd(String ciphertext_cmd) {
+        this.ciphertext_cmd = ciphertext_cmd;
     }
 
     public String getGcmAuthenticationTagCmd() {
-        return gcmAuthenticationTagCmd;
+        return gcm_authentication_tag_cmd;
     }
 
-    public void setGcmAuthenticationTagCmd(String gcmAuthenticationTagCmd) {
-        this.gcmAuthenticationTagCmd = gcmAuthenticationTagCmd;
+    public void setGcmAuthenticationTagCmd(String gcm_authentication_tag_cmd) {
+        this.gcm_authentication_tag_cmd = gcm_authentication_tag_cmd;
     }
 
     public String getIvData() {
-        return ivData;
+        return iv_data;
     }
 
-    public void setIvData(String ivData) {
-        this.ivData = ivData;
+    public void setIvData(String iv_data) {
+        this.iv_data = iv_data;
     }
 
     public static String uTicketToJsonStr(UTicket uTicket) {

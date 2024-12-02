@@ -276,11 +276,12 @@ public class DeviceController {
             public void onDataReceived(String data) {
                 SimpleLogger.simpleLog("info", "Received data: " + data);
                 new Handler(Looper.getMainLooper()).post(() ->
-                        textView.setText("Data received.")
+                        textView.setText("Data received from voting machine.")
                 );
                 jsonBuilder.append(data);
 
                 if (data.contains("$")) {
+                    Log.d("Bluetooth.onDataReceived", "Received complete JSON: starting process.");
                     msgReceiver._recvXxxMessage(jsonBuilder.toString());
                     jsonBuilder.setLength(0);
                 } else {

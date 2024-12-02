@@ -64,9 +64,9 @@ public class Test13FailWhenTransferDeviceOwnership {
         ));
         // WHEN: Forge Flow (issuer_issue_u_ticket_to_holder)
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId,
-                "holderId", this.cloudServerATK.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
+                "device_id", targetDeviceId,
+                "holder_id", this.cloudServerATK.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET
         );
         String generatedUTicketJson = this.cloudServerATK.getMsgGenerator().generateXxxUTicket(generatedRequest);
 
@@ -111,9 +111,9 @@ public class Test13FailWhenTransferDeviceOwnership {
         // createSimulatedCommConnection(this.cloudServerDM, this.userAgentDO);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId,
-                "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
+                "device_id", targetDeviceId,
+                "holder_id", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET
         );
         this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
         this.userAgentDO.getMsgReceiver()._recvXxxMessage();
@@ -161,9 +161,9 @@ public class Test13FailWhenTransferDeviceOwnership {
         // createSimulatedCommConnection(this.cloudServerDM, this.userAgentDO);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId,
-                "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
+                "device_id", targetDeviceId,
+                "holder_id", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET
         );
         this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
         this.userAgentDO.getMsgReceiver()._recvXxxMessage();

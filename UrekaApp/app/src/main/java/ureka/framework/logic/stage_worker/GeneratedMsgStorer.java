@@ -53,33 +53,33 @@ public class GeneratedMsgStorer {
 
             /* Because device hasn't created the id yet,
                we temporary store Initialization UTicket in device_table["noId"]
-               and the deviceTable will be updated by its RTicket with newly-created deviceId
+               and the deviceTable will be updated by its RTicket with newly-created device_id
              */
-            String deviceIdForUTicket;
+            String device_idForUTicket;
             if (generatedUTicket.getUTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET)) {
                 // Holder (for Owner)
-                deviceIdForUTicket = "noId";
-                this.sharedData.getDeviceTable().put(deviceIdForUTicket, new OtherDevice(
-                        deviceIdForUTicket, generatedUTicketJson));
+                device_idForUTicket = "noId";
+                this.sharedData.getDeviceTable().put(device_idForUTicket, new OtherDevice(
+                        device_idForUTicket, generatedUTicketJson));
             } else if (generatedUTicket.getUTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET)) {
                 // Issuer (for Others)
                 // Not create new table, just add u_ticket to existing table
-                deviceIdForUTicket = generatedUTicket.getDeviceId();
-                OtherDevice device = this.sharedData.getDeviceTable().get(deviceIdForUTicket);
+                device_idForUTicket = generatedUTicket.getDeviceId();
+                OtherDevice device = this.sharedData.getDeviceTable().get(device_idForUTicket);
                 System.out.println("OOOOOOOOOOOO");
                 device.setDeviceOwnershipUTicketForOthers(generatedUTicketJson);
                 System.out.println(device.getDeviceOwnershipUTicketForOthers());
             } else if (generatedUTicket.getUTicketType().equals(UTicket.TYPE_SELFACCESS_UTICKET)) {
                 // Holder (for Owner)
                 // Not create new table, just add u_ticket to existing table
-                deviceIdForUTicket = generatedUTicket.getDeviceId();
-                OtherDevice device = this.sharedData.getDeviceTable().get(deviceIdForUTicket);
+                device_idForUTicket = generatedUTicket.getDeviceId();
+                OtherDevice device = this.sharedData.getDeviceTable().get(device_idForUTicket);
                 device.setDeviceUTicketForOwner(generatedUTicketJson);
             } else if (generatedUTicket.getUTicketType().equals(UTicket.TYPE_ACCESS_UTICKET)) {
                 // Issuer (for Others)
                 // Not create new table, just add u_ticket to existing table
-                deviceIdForUTicket = generatedUTicket.getDeviceId();
-                OtherDevice device = this.sharedData.getDeviceTable().get(deviceIdForUTicket);
+                device_idForUTicket = generatedUTicket.getDeviceId();
+                OtherDevice device = this.sharedData.getDeviceTable().get(device_idForUTicket);
                 device.setDeviceAccessUTicketForOthers(generatedUTicketJson);
             } else {
                 throw new RuntimeException("Not implemented yet");

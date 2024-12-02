@@ -32,8 +32,8 @@ public class ModelMessageModelTest {
         uTicket.setUTicketType(UTicket.TYPE_INITIALIZATION_UTICKET);
 
         Map<String, String> map = new HashMap<>();
-        map.put("uTicketId", "foobar");
-        map.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
+        map.put("u_ticket_id", "foobar");
+        map.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
         UTicket mapUTicket = new UTicket(map);
         assert  (uTicket.equals(mapUTicket));
     }

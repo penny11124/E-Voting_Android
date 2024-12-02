@@ -47,12 +47,12 @@ public class FlowIssueUTokenTest {
         ThisDevice thisDevice = new ThisDevice();
         CurrentSession currentSession = new CurrentSession();
         ThisPerson thisPerson = new ThisPerson();
-        SimpleStorage simpleStorage = new SimpleStorage("deviceId");
+        SimpleStorage simpleStorage = new SimpleStorage("device_id");
 
         thisDevice.setDeviceName("deviceName");
-        Map<String, String> taskScope = new HashMap<>();
-        taskScope.put("ALL", "allow");
-        currentSession.setCurrentTaskScope(SerializationUtil.dictToJsonStr(taskScope));
+        Map<String, String> task_scope = new HashMap<>();
+        task_scope.put("ALL", "allow");
+        currentSession.setCurrentTaskScope(SerializationUtil.dictToJsonStr(task_scope));
 
         SharedData sharedData = new SharedData(thisDevice, currentSession, thisPerson);
         sharedData.setDeviceTable(new HashMap<>());
@@ -78,16 +78,16 @@ public class FlowIssueUTokenTest {
 
     @Test
     public void holderSendCmdTest() throws Exception {
-        String deviceId = "deviceId", cmd = "cmd";
-        flowIssueUToken.getSharedData().getDeviceTable().put(deviceId, new OtherDevice());
+        String device_id = "device_id", cmd = "cmd";
+        flowIssueUToken.getSharedData().getDeviceTable().put(device_id, new OtherDevice());
         KeyPair k1 = ECC.generateKeyPair(), k2 = ECC.generateKeyPair();
         byte[] salt = ECDH.generateRandomByte(32);
         byte[] ecdh_key = ECDH.generateEcdhKey((ECPrivateKey) k1.getPrivate(), salt, null, (ECPublicKey) k2.getPublic());
         flowIssueUToken.getSharedData().getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.byteToBase64Str(ecdh_key));
-        flowIssueUToken.getSharedData().getCurrentSession().setCurrentDeviceId(deviceId);
+        flowIssueUToken.getSharedData().getCurrentSession().setCurrentDeviceId(device_id);
         flowIssueUToken.getSharedData().getCurrentSession().setIvData(SerializationUtil.byteToBase64Str(ECDH.gcmGenIv()));
 
-        flowIssueUToken.holderSendCmd(deviceId, cmd, false);
+        flowIssueUToken.holderSendCmd(device_id, cmd, false);
         assert (Objects.equals(flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getPlaintextCmd(), cmd));
         assert (Objects.equals(flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextCmd(), "additional unencrypted cmd"));
         assert (flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getCiphertextCmd() != null);
@@ -99,12 +99,12 @@ public class FlowIssueUTokenTest {
         assert (Objects.equals(message.getMessageOperation(), Message.MESSAGE_VERIFY_AND_EXECUTE));
         assert (Objects.equals(message.getMessageType(), UTicket.MESSAGE_TYPE));
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", flowIssueUToken.getSharedData().getCurrentSession().getCurrentDeviceId());
-        generatedRequest.put("uTicketType", UTicket.TYPE_CMD_UTOKEN);
-        generatedRequest.put("associatedPlaintextCmd", flowIssueUToken.getSharedData().getCurrentSession().getAssociatedPlaintextCmd());
-        generatedRequest.put("ciphertextCmd", flowIssueUToken.getSharedData().getCurrentSession().getCiphertextCmd());
-        generatedRequest.put("gcmAuthenticationTagCmd", flowIssueUToken.getSharedData().getCurrentSession().getGcmAuthenticationTagCmd());
-        generatedRequest.put("ivData", flowIssueUToken.getSharedData().getCurrentSession().getIvData());
+        generatedRequest.put("device_id", flowIssueUToken.getSharedData().getCurrentSession().getCurrentDeviceId());
+        generatedRequest.put("u_ticket_type", UTicket.TYPE_CMD_UTOKEN);
+        generatedRequest.put("associated_plaintext_cmd", flowIssueUToken.getSharedData().getCurrentSession().getAssociatedPlaintextCmd());
+        generatedRequest.put("ciphertext_cmd", flowIssueUToken.getSharedData().getCurrentSession().getCiphertextCmd());
+        generatedRequest.put("gcm_authentication_tag_cmd", flowIssueUToken.getSharedData().getCurrentSession().getGcmAuthenticationTagCmd());
+        generatedRequest.put("iv_data", flowIssueUToken.getSharedData().getCurrentSession().getIvData());
         assert (Objects.equals(message.getMessageStr(), flowIssueUToken.getMsgGenerator().generateXxxUTicket(generatedRequest)));
     }
 

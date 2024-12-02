@@ -122,16 +122,16 @@ public class FlowOpenSession {
             // [STAGE: (G)]
             Map<String, String> rTicketRequest = new HashMap<>();
             if (resultMessage.contains("SUCCESS")) {
-                rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE1_RTICKET);
-                rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                rTicketRequest.put("r_ticket_type", RTicket.TYPE_CRKE1_RTICKET);
+                rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 rTicketRequest.put("result", resultMessage);
-                rTicketRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
+                rTicketRequest.put("audit_start", this.sharedData.getCurrentSession().getCurrentUTicketId());
                 rTicketRequest.put("challenge1", this.sharedData.getCurrentSession().getChallenge1());
                 rTicketRequest.put("keyExchangeSalt1", this.sharedData.getCurrentSession().getKeyExchangeSalt1());
                 rTicketRequest.put("ivCmd", this.sharedData.getCurrentSession().getIvCmd());
             } else {
-                rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE1_RTICKET);
-                rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                rTicketRequest.put("r_ticket_type", RTicket.TYPE_CRKE1_RTICKET);
+                rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 rTicketRequest.put("result", resultMessage);
             }
 
@@ -192,17 +192,17 @@ public class FlowOpenSession {
         try {
             // [STAGE: (G)]
             Map<String, String> rTicketRequest = new HashMap<>();
-            rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE2_RTICKET);
-            rTicketRequest.put("deviceId", this.sharedData.getCurrentSession().getCurrentDeviceId());
+            rTicketRequest.put("r_ticket_type", RTicket.TYPE_CRKE2_RTICKET);
+            rTicketRequest.put("device_id", this.sharedData.getCurrentSession().getCurrentDeviceId());
             rTicketRequest.put("result", resultMessage);
-            rTicketRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
+            rTicketRequest.put("audit_start", this.sharedData.getCurrentSession().getCurrentUTicketId());
             rTicketRequest.put("challenge1", this.sharedData.getCurrentSession().getChallenge1());
             rTicketRequest.put("challenge2", this.sharedData.getCurrentSession().getChallenge2());
             rTicketRequest.put("keyExchangeSalt2", this.sharedData.getCurrentSession().getKeyExchangeSalt2());
-            rTicketRequest.put("associatedPlaintextCmd", this.sharedData.getCurrentSession().getAssociatedPlaintextCmd());
-            rTicketRequest.put("ciphertextCmd", this.sharedData.getCurrentSession().getCiphertextCmd());
-            rTicketRequest.put("gcmAuthenticationTagCmd", this.sharedData.getCurrentSession().getGcmAuthenticationTagCmd());
-            rTicketRequest.put("ivData", this.sharedData.getCurrentSession().getIvData());
+            rTicketRequest.put("associated_plaintext_cmd", this.sharedData.getCurrentSession().getAssociatedPlaintextCmd());
+            rTicketRequest.put("ciphertext_cmd", this.sharedData.getCurrentSession().getCiphertextCmd());
+            rTicketRequest.put("gcm_authentication_tag_cmd", this.sharedData.getCurrentSession().getGcmAuthenticationTagCmd());
+            rTicketRequest.put("iv_data", this.sharedData.getCurrentSession().getIvData());
 
             String generatedRTicketJson = this.msgGenerator.generateXxxRTicket(rTicketRequest);
 
@@ -262,18 +262,18 @@ public class FlowOpenSession {
             // [STAGE: (G)]
             Map<String, String> rTicketRequest = new HashMap<>();
             if (resultMessage.contains("SUCCESS")) {
-                rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE3_RTICKET);
-                rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                rTicketRequest.put("r_ticket_type", RTicket.TYPE_CRKE3_RTICKET);
+                rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 rTicketRequest.put("result", resultMessage);
-                rTicketRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
+                rTicketRequest.put("audit_start", this.sharedData.getCurrentSession().getCurrentUTicketId());
                 rTicketRequest.put("challenge2", this.sharedData.getCurrentSession().getChallenge2());
-                rTicketRequest.put("associatedPlaintextData", this.sharedData.getCurrentSession().getAssociatedPlaintextData());
+                rTicketRequest.put("associated_plaintext_data", this.sharedData.getCurrentSession().getAssociatedPlaintextData());
                 rTicketRequest.put("ciphertextData", this.sharedData.getCurrentSession().getCiphertextData());
                 rTicketRequest.put("gcmAuthenticationTagData", this.sharedData.getCurrentSession().getGcmAuthenticationTagData());
                 rTicketRequest.put("ivCmd", this.sharedData.getCurrentSession().getIvCmd());
             } else {
-                rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE3_RTICKET);
-                rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                rTicketRequest.put("r_ticket_type", RTicket.TYPE_CRKE3_RTICKET);
+                rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 rTicketRequest.put("result", resultMessage);
             }
 

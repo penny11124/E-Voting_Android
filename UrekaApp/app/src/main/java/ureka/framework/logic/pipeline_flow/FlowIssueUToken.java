@@ -135,37 +135,37 @@ public class FlowIssueUToken {
            holderSendCmd(ACCESS_END) -> _deviceRecvCmd(ACCESS_END)
            _holderRecvRTicket() <- _deviceSendRTicket()
      */
-    public void holderSendCmd(String deviceId, String cmd, boolean accessEnd) {
+    public void holderSendCmd(String device_id, String cmd, boolean accessEnd) {
         // Start Process Measurement
         this.measureHelper.measureProcessPerfStart();
 
         try {
             // Stage: (VL)
-            if (this.sharedData.getDeviceTable().containsKey(deviceId)) {
+            if (this.sharedData.getDeviceTable().containsKey(device_id)) {
                 // Stage: (E)
                 this.executor.executePs("sendUToken", null, cmd, null);
 
-                String uTicketType;
+                String u_ticket_type;
                 if (!accessEnd) {
                     // Stage: (C)
                     this.executor.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_DATA);
                     // Stage: (G)
-                    uTicketType = UTicket.TYPE_CMD_UTOKEN;
+                    u_ticket_type = UTicket.TYPE_CMD_UTOKEN;
                 } else {
                     // Stage: (C)
                     this.executor.changeState(ThisDevice.STATE_AGENT_WAIT_FOR_RT);
                     // Stage: (G)
-                    uTicketType = UTicket.TYPE_ACCESS_END_UTOKEN;
+                    u_ticket_type = UTicket.TYPE_ACCESS_END_UTOKEN;
                 }
 
                 // Stage: (G)
                 Map<String, String> generatedRequest = new HashMap<>();
-                generatedRequest.put("deviceId", this.sharedData.getCurrentSession().getCurrentDeviceId());
-                generatedRequest.put("uTicketType", uTicketType);
-                generatedRequest.put("associatedPlaintextCmd", this.sharedData.getCurrentSession().getAssociatedPlaintextCmd());
-                generatedRequest.put("ciphertextCmd", this.sharedData.getCurrentSession().getCiphertextCmd());
-                generatedRequest.put("gcmAuthenticationTagCmd", this.sharedData.getCurrentSession().getGcmAuthenticationTagCmd());
-                generatedRequest.put("ivData", this.sharedData.getCurrentSession().getIvData());
+                generatedRequest.put("device_id", this.sharedData.getCurrentSession().getCurrentDeviceId());
+                generatedRequest.put("u_ticket_type", u_ticket_type);
+                generatedRequest.put("associated_plaintext_cmd", this.sharedData.getCurrentSession().getAssociatedPlaintextCmd());
+                generatedRequest.put("ciphertext_cmd", this.sharedData.getCurrentSession().getCiphertextCmd());
+                generatedRequest.put("gcm_authentication_tag_cmd", this.sharedData.getCurrentSession().getGcmAuthenticationTagCmd());
+                generatedRequest.put("iv_data", this.sharedData.getCurrentSession().getIvData());
 
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(generatedRequest);
 
@@ -185,7 +185,7 @@ public class FlowIssueUToken {
                 this.msgSender.sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE, UTicket.MESSAGE_TYPE, generatedUTicketJson);
 
             } else {
-                throw new NoSuchElementException("Device ID not found in device table: " + deviceId);
+                throw new NoSuchElementException("Device ID not found in device table: " + device_id);
             }
 
         } catch (NoSuchElementException e) {
@@ -251,17 +251,17 @@ public class FlowIssueUToken {
             Map<String, String> generatedRequest = new HashMap<>();
             // // [STAGE: (G)]
             if (resultMessage.contains("SUCCESS")) {
-                generatedRequest.put("rTicketType", RTicket.TYPE_DATA_RTOKEN);
-                generatedRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                generatedRequest.put("r_ticket_type", RTicket.TYPE_DATA_RTOKEN);
+                generatedRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 generatedRequest.put("result", resultMessage);
-                generatedRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
-                generatedRequest.put("associatedPlaintextData", this.sharedData.getCurrentSession().getAssociatedPlaintextData());
+                generatedRequest.put("audit_start", this.sharedData.getCurrentSession().getCurrentUTicketId());
+                generatedRequest.put("associated_plaintext_data", this.sharedData.getCurrentSession().getAssociatedPlaintextData());
                 generatedRequest.put("ciphertextData", this.sharedData.getCurrentSession().getCiphertextData());
                 generatedRequest.put("gcmAuthenticationTagData", this.sharedData.getCurrentSession().getGcmAuthenticationTagData());
                 generatedRequest.put("ivCmd", this.sharedData.getCurrentSession().getIvCmd());
             } else {
-                generatedRequest.put("rTicketType", RTicket.TYPE_DATA_RTOKEN);
-                generatedRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                generatedRequest.put("r_ticket_type", RTicket.TYPE_DATA_RTOKEN);
+                generatedRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                 generatedRequest.put("result", resultMessage);
             }
 
@@ -300,8 +300,8 @@ public class FlowIssueUToken {
 
             // Query Corresponding UTicket
             // [STAGE: (VL)(L)]
-            String deviceId = receivedRTicket.getDeviceId();
-            String storedUTicketJson = this.sharedData.getDeviceTable().get(deviceId).getDeviceUTicketForOwner();
+            String device_id = receivedRTicket.getDeviceId();
+            String storedUTicketJson = this.sharedData.getDeviceTable().get(device_id).getDeviceUTicketForOwner();
 
             SimpleLogger.simpleLog("debug","Corresponding UTicket: " + storedUTicketJson);
 

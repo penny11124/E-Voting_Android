@@ -85,7 +85,7 @@ public class ReceivedMsgStorer {
         try {
             String receivedRTicketJson = RTicket.rTicketToJsonStr(receivedRTicket);
 
-            // We store this RTicket (but not verified) in deviceTable["deviceId"]
+            // We store this RTicket (but not verified) in deviceTable["device_id"]
             if (receivedRTicket.getRTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET)) {
                 // Holder (for Owner)
                 String createdDeviceId = receivedRTicket.getDeviceId();

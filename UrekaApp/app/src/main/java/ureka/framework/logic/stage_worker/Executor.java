@@ -434,10 +434,10 @@ public class Executor {
                     this.sharedData.getCurrentSession().getAssociatedPlaintextCmd()
             );
             String plaintextData = (String) dataProcessed.getPairFirst();
-            String associatedPlaintextData = (String) dataProcessed.getPairSecond();
+            String associated_plaintext_data = (String) dataProcessed.getPairSecond();
 
             // Update Session: PS-Data
-            this.executePs("sendCrke3", ticketIn, plaintextData, associatedPlaintextData);
+            this.executePs("sendCrke3", ticketIn, plaintextData, associated_plaintext_data);
         } else if (ticketIn != null && (ticketIn.getRTicketType().equals(RTicket.TYPE_CRKE3_RTICKET))) {
             // Update Session: PS-Data
             this.executePs("recvCrke3", ticketIn, null, null);
@@ -827,13 +827,13 @@ public class Executor {
     }
 
     // Execute Application & Data Processing
-    private Pair _executeDataProcessing(String plaintextCmd, String associatedPlaintextCmd) {
+    private Pair _executeDataProcessing(String plaintextCmd, String associated_plaintext_cmd) {
         SimpleLogger.simpleLog("debug", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is executing application...");
 
         String plaintextData = "DATA: " + plaintextCmd;
-        String associatedPlaintextData = "DATA: " + associatedPlaintextCmd;
+        String associated_plaintext_data = "DATA: " + associated_plaintext_cmd;
 
-        return new Pair(plaintextData,associatedPlaintextData);
+        return new Pair(plaintextData,associated_plaintext_data);
     }
 
     /* [STAGE: (O)] Update Ticket Order

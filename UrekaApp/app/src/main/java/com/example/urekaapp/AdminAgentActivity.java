@@ -26,6 +26,7 @@ import org.checkerframework.checker.units.qual.A;
 import org.junit.platform.commons.util.StringUtils;
 
 import java.io.Serializable;
+import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +46,7 @@ public class AdminAgentActivity extends AppCompatActivity {
     private ArrayList<Integer> candidateVotes; // The votes od the candidates
     private ArrayList<String> voters; // The public key of the voters
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
-    public static String connectedDeviceId; // The deviceId of the voting machine
+    public static String connectedDeviceId; // The device_id of the voting machine
 
     // Components
     private Button buttonScan;
@@ -114,6 +115,8 @@ public class AdminAgentActivity extends AppCompatActivity {
                         Toast.makeText(AdminAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
                         buttonInit.setEnabled(false);
                         buttonGetData.setEnabled(false);
+                        buttonApplyInitUTicket.setEnabled(false);
+                        buttonApplyTallyUTicket.setEnabled(false);
                     }),
                     textViewConnectingStatus
             );
@@ -137,13 +140,12 @@ public class AdminAgentActivity extends AppCompatActivity {
 //                    return;
 //                }
                 Map<String, String> arbitraryDict = new HashMap<>();
-                arbitraryDict.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
-                arbitraryDict.put("deviceId", "noId");
-                arbitraryDict.put("holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr());
+                arbitraryDict.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
+                arbitraryDict.put("device_id", "noId");
+                arbitraryDict.put("holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr());
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("noId", arbitraryDict);
                 deviceController.getFlowApplyUTicket().holderApplyUTicket("noId");
-                // this.iotDevice.getMsgReceiver()._recvXxxMessage();
-                // deviceController.getMsgReceiver()._recvXxxMessage();
+
                 for (String key : deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().keySet()) {
                     connectedDeviceId = key;
                 }
@@ -158,11 +160,11 @@ public class AdminAgentActivity extends AppCompatActivity {
                 candidates = new ArrayList<>();
                 candidates.add("Alice");
                 candidates.add("Bob");
-                candidates.add("Carol");
 
                 voters = new ArrayList<>();
-                voters.add("G27PEAvPwj985TT9kWYJ1Z+3vYezpNts0hz5shKLPTY=-pxGy2l6X9NWbnqxYAufqj9crC+fig8XJcrqOLxYTJbQ=");
-                voters.add("bQuwtyMQ/0D1dWGPPlP7A38Ua3MbRKS96Fh9d8oanH0=-Gp7tEaPD1mrFtkt8wMNgOKkxehARmprzUhhmZm2d864=");
+                voters.add(getIntent().getStringExtra("key1"));
+                voters.add(getIntent().getStringExtra("key2"));
+                voters.add(getIntent().getStringExtra("key3"));
             }
         });
 
@@ -172,10 +174,10 @@ public class AdminAgentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
                 Map<String, String> generatedRequest = Map.of(
-                        "deviceId", connectedDeviceId,
-                        "holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                        "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                        "taskScope", generatedTaskScope
+                        "device_id", connectedDeviceId,
+                        "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                        "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                        "task_scope", generatedTaskScope
                 );
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(connectedDeviceId, generatedRequest);
 
@@ -215,10 +217,10 @@ public class AdminAgentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
                 Map<String, String> generatedRequest = Map.of(
-                        "deviceId", connectedDeviceId,
-                        "holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                        "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                        "taskScope", generatedTaskScope
+                        "device_id", connectedDeviceId,
+                        "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                        "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                        "task_scope", generatedTaskScope
                 );
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(connectedDeviceId,generatedRequest);
 

@@ -41,28 +41,28 @@ public class RTicket {
     };
 
     // RT
-    private String protocolVersion;
-    private String rTicketId;
-    private String rTicketType;
-    private String deviceId;
+    private String protocol_version;
+    private String r_ticket_id;
+    private String r_ticket_type;
+    private String device_id;
     private String result;
-    private Integer ticketOrder;
-    private String auditStart;
-    private String auditEnd;
+    private Integer ticket_order;
+    private String audit_start;
+    private String audit_end;
     // CR-KE
     private String challenge1;
     private String challenge2;
     private String keyExchangeSalt1;
     private String keyExchangeSalt2;
     // PS-Cmd
-    private String associatedPlaintextCmd;
-    private String ciphertextCmd;
+    private String associated_plaintext_cmd;
+    private String ciphertext_cmd;
     private String ivCmd;
-    private String gcmAuthenticationTagCmd;
+    private String gcm_authentication_tag_cmd;
     // PS-Data
-    private String associatedPlaintextData;
+    private String associated_plaintext_data;
     private String ciphertextData;
-    private String ivData;
+    private String iv_data;
     private String gcmAuthenticationTagData;
     // RT
     private String deviceSignature;
@@ -84,7 +84,7 @@ public class RTicket {
                 if (field.getType().equals(Integer.class)) {
                     field.set(this, fieldValue != null ? Integer.valueOf(fieldValue) : null);
                 } else {
-                    if (fieldName.equals("protocolVersion")) {
+                    if (fieldName.equals("protocol_version")) {
                         field.set(this, fieldValue != null ? fieldValue : UTicket.PROTOCOL_VERSION);
                     } else {
                         field.set(this, fieldValue);
@@ -119,41 +119,41 @@ public class RTicket {
     public boolean equals(Object obj) {
         if (obj instanceof RTicket) {
             RTicket rt = (RTicket) obj;
-            return Objects.equals(this.rTicketId, rt.rTicketId);
+            return Objects.equals(this.r_ticket_id, rt.r_ticket_id);
         }
         return false;
     }
 
     public String getProtocolVersion() {
-        return protocolVersion;
+        return protocol_version;
     }
 
-    public void setProtocolVersion(String protocolVersion) {
-        this.protocolVersion = protocolVersion;
+    public void setProtocolVersion(String protocol_version) {
+        this.protocol_version = protocol_version;
     }
 
     public String getRTicketId() {
-        return rTicketId;
+        return r_ticket_id;
     }
 
-    public void setRTicketId(String rTicketId) {
-        this.rTicketId = rTicketId;
+    public void setRTicketId(String r_ticket_id) {
+        this.r_ticket_id = r_ticket_id;
     }
 
     public String getRTicketType() {
-        return rTicketType;
+        return r_ticket_type;
     }
 
-    public void setRTicketType(String rTicketType) {
-        this.rTicketType = rTicketType;
+    public void setRTicketType(String r_ticket_type) {
+        this.r_ticket_type = r_ticket_type;
     }
 
     public String getDeviceId() {
-        return deviceId;
+        return device_id;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceId(String device_id) {
+        this.device_id = device_id;
     }
 
     public String getResult() {
@@ -165,27 +165,27 @@ public class RTicket {
     }
 
     public Integer getTicketOrder() {
-        return ticketOrder;
+        return ticket_order;
     }
 
-    public void setTicketOrder(Integer ticketOrder) {
-        this.ticketOrder = ticketOrder;
+    public void setTicketOrder(Integer ticket_order) {
+        this.ticket_order = ticket_order;
     }
 
     public String getAuditStart() {
-        return auditStart;
+        return audit_start;
     }
 
-    public void setAuditStart(String auditStart) {
-        this.auditStart = auditStart;
+    public void setAuditStart(String audit_start) {
+        this.audit_start = audit_start;
     }
 
     public String getAuditEnd() {
-        return auditEnd;
+        return audit_end;
     }
 
-    public void setAuditEnd(String auditEnd) {
-        this.auditEnd = auditEnd;
+    public void setAuditEnd(String audit_end) {
+        this.audit_end = audit_end;
     }
 
     public String getChallenge1() {
@@ -221,19 +221,19 @@ public class RTicket {
     }
 
     public String getAssociatedPlaintextCmd() {
-        return associatedPlaintextCmd;
+        return associated_plaintext_cmd;
     }
 
-    public void setAssociatedPlaintextCmd(String associatedPlaintextCmd) {
-        this.associatedPlaintextCmd = associatedPlaintextCmd;
+    public void setAssociatedPlaintextCmd(String associated_plaintext_cmd) {
+        this.associated_plaintext_cmd = associated_plaintext_cmd;
     }
 
     public String getCiphertextCmd() {
-        return ciphertextCmd;
+        return ciphertext_cmd;
     }
 
-    public void setCiphertextCmd(String ciphertextCmd) {
-        this.ciphertextCmd = ciphertextCmd;
+    public void setCiphertextCmd(String ciphertext_cmd) {
+        this.ciphertext_cmd = ciphertext_cmd;
     }
 
     public String getIvCmd() {
@@ -245,19 +245,19 @@ public class RTicket {
     }
 
     public String getGcmAuthenticationTagCmd() {
-        return gcmAuthenticationTagCmd;
+        return gcm_authentication_tag_cmd;
     }
 
-    public void setGcmAuthenticationTagCmd(String gcmAuthenticationTagCmd) {
-        this.gcmAuthenticationTagCmd = gcmAuthenticationTagCmd;
+    public void setGcmAuthenticationTagCmd(String gcm_authentication_tag_cmd) {
+        this.gcm_authentication_tag_cmd = gcm_authentication_tag_cmd;
     }
 
     public String getAssociatedPlaintextData() {
-        return associatedPlaintextData;
+        return associated_plaintext_data;
     }
 
-    public void setAssociatedPlaintextData(String associatedPlaintextData) {
-        this.associatedPlaintextData = associatedPlaintextData;
+    public void setAssociatedPlaintextData(String associated_plaintext_data) {
+        this.associated_plaintext_data = associated_plaintext_data;
     }
 
     public String getCiphertextData() {
@@ -269,11 +269,11 @@ public class RTicket {
     }
 
     public String getIvData() {
-        return ivData;
+        return iv_data;
     }
 
-    public void setIvData(String ivData) {
-        this.ivData = ivData;
+    public void setIvData(String iv_data) {
+        this.iv_data = iv_data;
     }
 
     public String getGcmAuthenticationTagData() {

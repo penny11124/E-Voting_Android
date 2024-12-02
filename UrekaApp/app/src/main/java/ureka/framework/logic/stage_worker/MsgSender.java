@@ -107,6 +107,7 @@ public class MsgSender {
             try {
                 Message newMessage = new Message(messageRequest);
                 String newMessageJson = Message.messageToJsonstr(newMessage);
+                newMessageJson += "$";
 //                if (!bleManager.isConnected()) {
 //                    throw new IllegalStateException("BLE is not connected.");
 //                }
