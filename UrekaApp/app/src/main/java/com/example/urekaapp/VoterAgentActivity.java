@@ -24,6 +24,7 @@ import com.example.urekaapp.ble.BLEManager;
 import com.example.urekaapp.ble.BLEPermissionHelper;
 import com.example.urekaapp.ble.BLEViewModel;
 import com.example.urekaapp.communication.NearbyManager;
+import com.example.urekaapp.communication.NearbyPermissionHelper;
 import com.example.urekaapp.communication.NearbyViewModel;
 
 import java.io.Serializable;
@@ -92,6 +93,9 @@ public class VoterAgentActivity extends AppCompatActivity {
         if (!BLEPermissionHelper.hasPermissions(this)) {
             BLEPermissionHelper.requestPermissions(this);
         }
+        if (!NearbyPermissionHelper.hasPermissions(this)) {
+            NearbyPermissionHelper.requestPermissions(this);
+        }
 
         // private fields initialization
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
@@ -100,6 +104,7 @@ public class VoterAgentActivity extends AppCompatActivity {
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "User Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
+        nearbyViewModel.getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).setViewModel(nearbyViewModel);
 
         buttonScan = findViewById(R.id.buttonScanDevice);
         buttonConnect = findViewById(R.id.buttonConnect);
@@ -113,6 +118,15 @@ public class VoterAgentActivity extends AppCompatActivity {
             buttonApplyUTicket.setEnabled(false);
             buttonShowRTicket.setEnabled(false);
         }
+        nearbyViewModel.getIsConnected().observe(this, isConnected -> {
+            if (isConnected != null && isConnected) {
+                buttonRequestUTicket.setEnabled(true);
+                textViewConnectingStatus.setText("Connected to Admin Agent");
+            } else {
+                buttonRequestUTicket.setEnabled(false);
+                textViewConnectingStatus.setText("Not connected");
+            }
+        });
 
         buttonConnect.setOnClickListener(view -> {
             bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
