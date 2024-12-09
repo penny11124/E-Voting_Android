@@ -21,12 +21,17 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ureka.framework.Environment;
 import ureka.framework.resource.logger.SimpleLogger;
 
 public class BLEManager {
+    private boolean isWriteInProgress = false;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothGatt bluetoothGatt;
@@ -134,36 +139,49 @@ public class BLEManager {
 
             @Override
             public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                if (status != BluetoothGatt.GATT_SUCCESS) {
+                if (status == BluetoothGatt.GATT_SUCCESS) {
+                    SimpleLogger.simpleLog("info", "Chunk written successfully");
+                } else {
+                    SimpleLogger.simpleLog("error", "Write failed with status: " + status);
                 }
+                isWriteInProgress = false; // Allow the next chunk to be written
             }
         });
     }
 
     public void sendData(String json) {
         if (writeCharacteristic != null && isConnected()) {
-            int chunkSize = 20;
-            for (int i = 0; i < json.length(); i += chunkSize) {
-                int end = Math.min(i + chunkSize, json.length());
-                String chunk = json.substring(i, end);
-                writeCharacteristic.setValue(chunk.getBytes(StandardCharsets.UTF_8));
+            executorService.submit(() -> {
+                int chunkSize = 41;
+                for (int i = 0; i < json.length(); i += chunkSize) {
+                    int end = Math.min(i + chunkSize, json.length());
+                    String chunk = json.substring(i, end);
 
-                if (ActivityCompat.checkSelfPermission(Environment.applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                boolean success = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+                    writeCharacteristic.setValue(chunk.getBytes(StandardCharsets.UTF_8));
 
-                if (!success) {
-                    Toast.makeText(Environment.applicationContext, "Failed to send data, i = " + i, Toast.LENGTH_SHORT).show();
-                    break;
-                }
+                    if (ActivityCompat.checkSelfPermission(Environment.applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        SimpleLogger.simpleLog("Error", "Permission denied");
+                        return;
+                    }
 
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    isWriteInProgress = true;
+                    boolean success = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+                    if (!success) {
+                        SimpleLogger.simpleLog("error", "Failed to initiate send data: " + chunk);
+                        break;
+                    }
+
+                    // Wait for the write to complete
+                    while (isWriteInProgress) {
+                        try {
+                            Thread.sleep(10); // Small delay to avoid CPU spinning
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    }
                 }
-            }
+            });
 //        }
 //        if (writeCharacteristic != null && isConnected()) {
 //            writeCharacteristic.setValue(json.getBytes(StandardCharsets.UTF_8));

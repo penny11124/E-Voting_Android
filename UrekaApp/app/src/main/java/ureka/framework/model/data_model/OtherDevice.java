@@ -13,8 +13,8 @@ import java.util.Map;
 
 public class OtherDevice {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-    private String deviceId = null;
-    private Integer ticketOrder = null;
+    private String device_id = null;
+    private Integer ticket_order = null;
     // URequest, UTicket, UReject, etc.
     private String deviceUTicketForOwner = null;
     private String deviceOwnershipUTicketForOthers = null;
@@ -26,19 +26,19 @@ public class OtherDevice {
     private String deviceAccessEndRTicketForOthers = null;
 
     public OtherDevice() {}
-    public OtherDevice(String deviceId, String deviceUTicketForOwner, String deviceRTicketForOwner, Integer ticketOrder) {
-        this.deviceId = deviceId;
+    public OtherDevice(String device_id, String deviceUTicketForOwner, String deviceRTicketForOwner, Integer ticket_order) {
+        this.device_id = device_id;
         this.deviceUTicketForOwner = deviceUTicketForOwner;
         this.deviceRTicketForOwner = deviceRTicketForOwner;
-        this.ticketOrder = ticketOrder;
+        this.ticket_order = ticket_order;
     }
-    public OtherDevice(String deviceId, String deviceUTicketForOwner, String deviceRTicketForOwner) {
-        this.deviceId = deviceId;
+    public OtherDevice(String device_id, String deviceUTicketForOwner, String deviceRTicketForOwner) {
+        this.device_id = device_id;
         this.deviceUTicketForOwner = deviceUTicketForOwner;
         this.deviceRTicketForOwner = deviceRTicketForOwner;
     }
-    public OtherDevice(String deviceId, String deviceUTicketForOwner) {
-        this.deviceId = deviceId;
+    public OtherDevice(String device_id, String deviceUTicketForOwner) {
+        this.device_id = device_id;
         this.deviceUTicketForOwner = deviceUTicketForOwner;
     }
 
@@ -67,19 +67,19 @@ public class OtherDevice {
     }
 
     public String getDeviceId() {
-        return deviceId;
+        return device_id;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceId(String device_id) {
+        this.device_id = device_id;
     }
 
     public Integer getTicketOrder() {
-        return ticketOrder;
+        return ticket_order;
     }
 
-    public void setTicketOrder(Integer ticketOrder) {
-        this.ticketOrder = ticketOrder;
+    public void setTicketOrder(Integer ticket_order) {
+        this.ticket_order = ticket_order;
     }
 
     public String getDeviceUTicketForOwner() {

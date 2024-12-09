@@ -7,6 +7,7 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.AEADBadTagException;
@@ -104,8 +105,7 @@ public class Executor {
         KeyPair deviceKeyPair;
         try {
             deviceKeyPair = ECC.generateKeyPair();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException |
-                 InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         // RAM
@@ -117,8 +117,7 @@ public class Executor {
         KeyPair personKeyPair = null;
         try {
             personKeyPair = ECC.generateKeyPair();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException |
-                 InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         this.sharedData.getThisPerson().setPersonPrivKey((ECPrivateKey) personKeyPair.getPrivate());
@@ -280,8 +279,7 @@ public class Executor {
         KeyPair keyPair;
         try {
             keyPair = ECC.generateKeyPair();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException |
-                 InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         // RAM
@@ -434,10 +432,10 @@ public class Executor {
                     this.sharedData.getCurrentSession().getAssociatedPlaintextCmd()
             );
             String plaintextData = (String) dataProcessed.getPairFirst();
-            String associatedPlaintextData = (String) dataProcessed.getPairSecond();
+            String associated_plaintext_data = (String) dataProcessed.getPairSecond();
 
             // Update Session: PS-Data
-            this.executePs("sendCrke3", ticketIn, plaintextData, associatedPlaintextData);
+            this.executePs("sendCrke3", ticketIn, plaintextData, associated_plaintext_data);
         } else if (ticketIn != null && (ticketIn.getRTicketType().equals(RTicket.TYPE_CRKE3_RTICKET))) {
             // Update Session: PS-Data
             this.executePs("recvCrke3", ticketIn, null, null);
@@ -827,13 +825,13 @@ public class Executor {
     }
 
     // Execute Application & Data Processing
-    private Pair _executeDataProcessing(String plaintextCmd, String associatedPlaintextCmd) {
+    private Pair _executeDataProcessing(String plaintextCmd, String associated_plaintext_cmd) {
         SimpleLogger.simpleLog("debug", "+ " + this.sharedData.getThisDevice().getDeviceName() + " is executing application...");
 
         String plaintextData = "DATA: " + plaintextCmd;
-        String associatedPlaintextData = "DATA: " + associatedPlaintextCmd;
+        String associated_plaintext_data = "DATA: " + associated_plaintext_cmd;
 
-        return new Pair(plaintextData,associatedPlaintextData);
+        return new Pair(plaintextData,associated_plaintext_data);
     }
 
     /* [STAGE: (O)] Update Ticket Order

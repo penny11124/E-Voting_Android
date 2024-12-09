@@ -7,11 +7,12 @@ import java.util.Objects;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 public class RTicket {
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     //////////////////////////////////////////////////////
     // Message Type
     //////////////////////////////////////////////////////
@@ -41,31 +42,31 @@ public class RTicket {
     };
 
     // RT
-    private String protocolVersion;
-    private String rTicketId;
-    private String rTicketType;
-    private String deviceId;
+    private String protocol_version;
+    private String r_ticket_id;
+    private String r_ticket_type;
+    private String device_id;
     private String result;
-    private Integer ticketOrder;
-    private String auditStart;
-    private String auditEnd;
+    private Integer ticket_order;
+    private String audit_start;
+    private String audit_end;
     // CR-KE
-    private String challenge1;
-    private String challenge2;
-    private String keyExchangeSalt1;
-    private String keyExchangeSalt2;
+    private String challenge_1;
+    private String challenge_2;
+    private String key_exchange_salt_1;
+    private String key_exchange_salt_2;
     // PS-Cmd
-    private String associatedPlaintextCmd;
-    private String ciphertextCmd;
-    private String ivCmd;
-    private String gcmAuthenticationTagCmd;
+    private String associated_plaintext_cmd;
+    private String ciphertext_cmd;
+    private String iv_cmd;
+    private String gcm_authentication_tag_cmd;
     // PS-Data
-    private String associatedPlaintextData;
+    private String associated_plaintext_data;
     private String ciphertextData;
-    private String ivData;
-    private String gcmAuthenticationTagData;
+    private String iv_data;
+    private String gcm_authentication_tag_data;
     // RT
-    private String deviceSignature;
+    private String device_signature;
 
     public RTicket() {}
     public RTicket(Map<String, String> values) {
@@ -84,7 +85,7 @@ public class RTicket {
                 if (field.getType().equals(Integer.class)) {
                     field.set(this, fieldValue != null ? Integer.valueOf(fieldValue) : null);
                 } else {
-                    if (fieldName.equals("protocolVersion")) {
+                    if (fieldName.equals("protocol_version")) {
                         field.set(this, fieldValue != null ? fieldValue : UTicket.PROTOCOL_VERSION);
                     } else {
                         field.set(this, fieldValue);
@@ -119,41 +120,41 @@ public class RTicket {
     public boolean equals(Object obj) {
         if (obj instanceof RTicket) {
             RTicket rt = (RTicket) obj;
-            return Objects.equals(this.rTicketId, rt.rTicketId);
+            return Objects.equals(this.r_ticket_id, rt.r_ticket_id);
         }
         return false;
     }
 
     public String getProtocolVersion() {
-        return protocolVersion;
+        return protocol_version;
     }
 
-    public void setProtocolVersion(String protocolVersion) {
-        this.protocolVersion = protocolVersion;
+    public void setProtocolVersion(String protocol_version) {
+        this.protocol_version = protocol_version;
     }
 
     public String getRTicketId() {
-        return rTicketId;
+        return r_ticket_id;
     }
 
-    public void setRTicketId(String rTicketId) {
-        this.rTicketId = rTicketId;
+    public void setRTicketId(String r_ticket_id) {
+        this.r_ticket_id = r_ticket_id;
     }
 
     public String getRTicketType() {
-        return rTicketType;
+        return r_ticket_type;
     }
 
-    public void setRTicketType(String rTicketType) {
-        this.rTicketType = rTicketType;
+    public void setRTicketType(String r_ticket_type) {
+        this.r_ticket_type = r_ticket_type;
     }
 
     public String getDeviceId() {
-        return deviceId;
+        return device_id;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setDeviceId(String device_id) {
+        this.device_id = device_id;
     }
 
     public String getResult() {
@@ -165,99 +166,99 @@ public class RTicket {
     }
 
     public Integer getTicketOrder() {
-        return ticketOrder;
+        return ticket_order;
     }
 
-    public void setTicketOrder(Integer ticketOrder) {
-        this.ticketOrder = ticketOrder;
+    public void setTicketOrder(Integer ticket_order) {
+        this.ticket_order = ticket_order;
     }
 
     public String getAuditStart() {
-        return auditStart;
+        return audit_start;
     }
 
-    public void setAuditStart(String auditStart) {
-        this.auditStart = auditStart;
+    public void setAuditStart(String audit_start) {
+        this.audit_start = audit_start;
     }
 
     public String getAuditEnd() {
-        return auditEnd;
+        return audit_end;
     }
 
-    public void setAuditEnd(String auditEnd) {
-        this.auditEnd = auditEnd;
+    public void setAuditEnd(String audit_end) {
+        this.audit_end = audit_end;
     }
 
     public String getChallenge1() {
-        return challenge1;
+        return challenge_1;
     }
 
-    public void setChallenge1(String challenge1) {
-        this.challenge1 = challenge1;
+    public void setChallenge1(String challenge_1) {
+        this.challenge_1 = challenge_1;
     }
 
     public String getChallenge2() {
-        return challenge2;
+        return challenge_2;
     }
 
-    public void setChallenge2(String challenge2) {
-        this.challenge2 = challenge2;
+    public void setChallenge2(String challenge_2) {
+        this.challenge_2 = challenge_2;
     }
 
     public String getKeyExchangeSalt1() {
-        return keyExchangeSalt1;
+        return key_exchange_salt_1;
     }
 
-    public void setKeyExchangeSalt1(String keyExchangeSalt1) {
-        this.keyExchangeSalt1 = keyExchangeSalt1;
+    public void setKeyExchangeSalt1(String key_exchange_salt_1) {
+        this.key_exchange_salt_1 = key_exchange_salt_1;
     }
 
     public String getKeyExchangeSalt2() {
-        return keyExchangeSalt2;
+        return key_exchange_salt_2;
     }
 
-    public void setKeyExchangeSalt2(String keyExchangeSalt2) {
-        this.keyExchangeSalt2 = keyExchangeSalt2;
+    public void setKeyExchangeSalt2(String key_exchange_salt_2) {
+        this.key_exchange_salt_2 = key_exchange_salt_2;
     }
 
     public String getAssociatedPlaintextCmd() {
-        return associatedPlaintextCmd;
+        return associated_plaintext_cmd;
     }
 
-    public void setAssociatedPlaintextCmd(String associatedPlaintextCmd) {
-        this.associatedPlaintextCmd = associatedPlaintextCmd;
+    public void setAssociatedPlaintextCmd(String associated_plaintext_cmd) {
+        this.associated_plaintext_cmd = associated_plaintext_cmd;
     }
 
     public String getCiphertextCmd() {
-        return ciphertextCmd;
+        return ciphertext_cmd;
     }
 
-    public void setCiphertextCmd(String ciphertextCmd) {
-        this.ciphertextCmd = ciphertextCmd;
+    public void setCiphertextCmd(String ciphertext_cmd) {
+        this.ciphertext_cmd = ciphertext_cmd;
     }
 
     public String getIvCmd() {
-        return ivCmd;
+        return iv_cmd;
     }
 
-    public void setIvCmd(String ivCmd) {
-        this.ivCmd = ivCmd;
+    public void setIvCmd(String iv_cmd) {
+        this.iv_cmd = iv_cmd;
     }
 
     public String getGcmAuthenticationTagCmd() {
-        return gcmAuthenticationTagCmd;
+        return gcm_authentication_tag_cmd;
     }
 
-    public void setGcmAuthenticationTagCmd(String gcmAuthenticationTagCmd) {
-        this.gcmAuthenticationTagCmd = gcmAuthenticationTagCmd;
+    public void setGcmAuthenticationTagCmd(String gcm_authentication_tag_cmd) {
+        this.gcm_authentication_tag_cmd = gcm_authentication_tag_cmd;
     }
 
     public String getAssociatedPlaintextData() {
-        return associatedPlaintextData;
+        return associated_plaintext_data;
     }
 
-    public void setAssociatedPlaintextData(String associatedPlaintextData) {
-        this.associatedPlaintextData = associatedPlaintextData;
+    public void setAssociatedPlaintextData(String associated_plaintext_data) {
+        this.associated_plaintext_data = associated_plaintext_data;
     }
 
     public String getCiphertextData() {
@@ -269,34 +270,98 @@ public class RTicket {
     }
 
     public String getIvData() {
-        return ivData;
+        return iv_data;
     }
 
-    public void setIvData(String ivData) {
-        this.ivData = ivData;
+    public void setIvData(String iv_data) {
+        this.iv_data = iv_data;
     }
 
     public String getGcmAuthenticationTagData() {
-        return gcmAuthenticationTagData;
+        return gcm_authentication_tag_data;
     }
 
-    public void setGcmAuthenticationTagData(String gcmAuthenticationTagData) {
-        this.gcmAuthenticationTagData = gcmAuthenticationTagData;
+    public void setGcmAuthenticationTagData(String gcm_authentication_tag_data) {
+        this.gcm_authentication_tag_data = gcm_authentication_tag_data;
     }
 
     public String getDeviceSignature() {
-        return deviceSignature;
+        return device_signature;
     }
 
-    public void setDeviceSignature(String deviceSignature) {
-        this.deviceSignature = deviceSignature;
+    public void setDeviceSignature(String device_signature) {
+        this.device_signature = device_signature;
     }
 
     public static String rTicketToJsonStr(RTicket rTicket) {
         return SimpleMeasurer.measureWorkerFunc(RTicket::_rTicketToJsonStr, rTicket);
     }
     private static String _rTicketToJsonStr(RTicket rTicket) {
-        return gson.toJson(rTicket);
+//        return gson.toJson(rTicket);
+        JsonObject jsonObject = new JsonObject();
+        if (rTicket.protocol_version != null) {
+            jsonObject.addProperty("protocol_version", rTicket.protocol_version);
+        }
+        if (rTicket.r_ticket_id != null) {
+            jsonObject.addProperty("r_ticket_id", rTicket.r_ticket_id);
+        }
+        if (rTicket.r_ticket_type != null) {
+            jsonObject.addProperty("r_ticket_type", rTicket.r_ticket_type);
+        }
+        if (rTicket.device_id != null) {
+            jsonObject.addProperty("device_id", rTicket.device_id);
+        }
+        if (rTicket.result != null) {
+            jsonObject.addProperty("result", rTicket.result);
+        }
+        jsonObject.addProperty("ticket_order", rTicket.ticket_order);
+        if (rTicket.audit_start != null) {
+            jsonObject.addProperty("audit_start", rTicket.audit_start);
+        }
+        if (rTicket.audit_end != null) {
+            jsonObject.addProperty("audit_end", rTicket.audit_end);
+        }
+        if (rTicket.challenge_1 != null) {
+            jsonObject.addProperty("challenge_1", rTicket.challenge_1);
+        }
+        if (rTicket.challenge_2 != null) {
+            jsonObject.addProperty("challenge_2", rTicket.challenge_2);
+        }
+        if (rTicket.key_exchange_salt_1 != null) {
+            jsonObject.addProperty("key_exchange_salt_1", rTicket.key_exchange_salt_1);
+        }
+        if (rTicket.key_exchange_salt_2 != null) {
+            jsonObject.addProperty("key_exchange_salt_2", rTicket.key_exchange_salt_2);
+        }
+        if (rTicket.associated_plaintext_cmd != null) {
+            jsonObject.addProperty("associated_plaintext_cmd", rTicket.associated_plaintext_cmd);
+        }
+        if (rTicket.ciphertext_cmd != null) {
+            jsonObject.addProperty("ciphertext_cmd", rTicket.ciphertext_cmd);
+        }
+        if (rTicket.iv_cmd != null) {
+            jsonObject.addProperty("iv_cmd", rTicket.iv_cmd);
+        }
+        if (rTicket.gcm_authentication_tag_cmd != null) {
+            jsonObject.addProperty("gcm_authentication_tag_cmd", rTicket.gcm_authentication_tag_cmd);
+        }
+        if (rTicket.associated_plaintext_data != null) {
+            jsonObject.addProperty("associated_plaintext_data", rTicket.associated_plaintext_data);
+        }
+        if (rTicket.ciphertextData != null) {
+            jsonObject.addProperty("ciphertextData", rTicket.ciphertextData);
+        }
+        if (rTicket.iv_data != null) {
+            jsonObject.addProperty("iv_data", rTicket.iv_data);
+        }
+        if (rTicket.gcm_authentication_tag_data != null) {
+            jsonObject.addProperty("gcm_authentication_tag_data", rTicket.gcm_authentication_tag_data);
+        }
+        if (rTicket.device_signature != null) {
+            jsonObject.addProperty("device_signature", rTicket.device_signature);
+        }
+
+        return jsonObject.toString();
     }
 
     public static RTicket jsonStrToRTicket(String json) {

@@ -43,7 +43,7 @@ import ureka.framework.resource.crypto.SerializationUtil;
 
 public class VoterAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
-    private String connectedDeviceId; // The deviceId of the voting machine
+    private String connectedDeviceId; // The device_id of the voting machine
     private int votedCandidate;
 
     private Button buttonScan;
@@ -138,9 +138,9 @@ public class VoterAgentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
                 Map<String, String> generatedRequest = Map.of(
-                        "holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                        "uTicketType", UTicket.TYPE_ACCESS_UTICKET,
-                        "taskScope", generatedTaskScope
+                        "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                        "u_ticket_type", UTicket.TYPE_ACCESS_UTICKET,
+                        "task_scope", generatedTaskScope
                 );
                 try {
                     deviceController.getMsgSender().sendXxxMessageByNearby(

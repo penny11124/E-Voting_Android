@@ -3,6 +3,7 @@ package com.example.urekaapp;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Telephony;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -28,7 +29,9 @@ import com.example.urekaapp.communication.NearbyViewModel;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.platform.commons.util.StringUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,9 +39,11 @@ import java.util.Objects;
 
 import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
+import ureka.framework.model.data_model.OtherDevice;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.UTicket;
 import ureka.framework.resource.crypto.SerializationUtil;
+import ureka.framework.resource.logger.SimpleLogger;
 
 public class AdminAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
@@ -48,7 +53,7 @@ public class AdminAgentActivity extends AppCompatActivity {
     private ArrayList<Integer> candidateVotes; // The votes od the candidates
     private ArrayList<String> voters; // The public key of the voters
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
-    public static String connectedDeviceId; // The deviceId of the voting machine
+    public static String connectedDeviceId; // The device_id of the voting machine
 
     // Components
     private Button buttonScan;
@@ -88,6 +93,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+
         bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
         nearbyViewModel.getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).setViewModel(nearbyViewModel);
 
@@ -128,6 +134,8 @@ public class AdminAgentActivity extends AppCompatActivity {
                         Toast.makeText(AdminAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
                         buttonInit.setEnabled(false);
                         buttonGetData.setEnabled(false);
+                        buttonApplyInitUTicket.setEnabled(false);
+                        buttonApplyTallyUTicket.setEnabled(false);
                     }),
                     textViewConnectingStatus
             );
@@ -144,23 +152,19 @@ public class AdminAgentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Check if the device table is empty, i.e. uninitialized
-                // TODO: Uncomment this part after basic tests
-//                if (!deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().isEmpty()) {
-//                    String errorMessage = "Device Table is not empty";
-//                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-                Map<String, String> arbitraryDict = new HashMap<>();
-                arbitraryDict.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
-                arbitraryDict.put("deviceId", "noId");
-                arbitraryDict.put("holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr());
-                deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("noId", arbitraryDict);
-                deviceController.getFlowApplyUTicket().holderApplyUTicket("noId");
-                // this.iotDevice.getMsgReceiver()._recvXxxMessage();
-                // deviceController.getMsgReceiver()._recvXxxMessage();
-                for (String key : deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().keySet()) {
-                    connectedDeviceId = key;
+                if (!deviceController.getFlowApplyUTicket().getReceivedMsgStorer().getSharedData().getDeviceTable().isEmpty()) {
+                    String errorMessage = "Device Table is not empty";
+                    Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+                    return;
                 }
+
+                Map<String, String> arbitraryDict = new HashMap<>();
+                arbitraryDict.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
+                arbitraryDict.put("device_id", "no_id");
+                arbitraryDict.put("holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr());
+                deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("no_id", arbitraryDict);
+                deviceController.getFlowApplyUTicket().holderApplyUTicket("no_id");
+
                 buttonApplyInitUTicket.setEnabled(true);
             }
         });
@@ -172,11 +176,11 @@ public class AdminAgentActivity extends AppCompatActivity {
                 candidates = new ArrayList<>();
                 candidates.add("Alice");
                 candidates.add("Bob");
-                candidates.add("Carol");
 
                 voters = new ArrayList<>();
-                voters.add("G27PEAvPwj985TT9kWYJ1Z+3vYezpNts0hz5shKLPTY=-pxGy2l6X9NWbnqxYAufqj9crC+fig8XJcrqOLxYTJbQ=");
-                voters.add("bQuwtyMQ/0D1dWGPPlP7A38Ua3MbRKS96Fh9d8oanH0=-Gp7tEaPD1mrFtkt8wMNgOKkxehARmprzUhhmZm2d864=");
+                voters.add(getIntent().getStringExtra("key1"));
+                voters.add(getIntent().getStringExtra("key2"));
+                voters.add(getIntent().getStringExtra("key3"));
             }
         });
 
@@ -184,41 +188,39 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyInitUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+                String generatedTaskScope = "{\"ALL\": \"allow\"}";
                 Map<String, String> generatedRequest = Map.of(
-                        "deviceId", connectedDeviceId,
-                        "holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                        "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                        "taskScope", generatedTaskScope
+                        "device_id", connectedDeviceId,
+                        "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                        "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                        "task_scope", generatedTaskScope
                 );
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(connectedDeviceId, generatedRequest);
 
                 // Apply UTicket + CRKE
                 String generatedCommand = "HELLO-1";
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(connectedDeviceId, generatedCommand);
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
+                while (deviceController.getSharedData().getCurrentSession().getCurrentSessionKeyStr() == null) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
 
                 // Send UToken: candidates and voters
-                for (String candidate: candidates) {
-                    String data = "C:" + candidate;
-                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-//                    this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                    this.userAgentDO.getMsgReceiver()._recvXxxMessage();
-                }
-                for (String voter: voters) {
-                    String data = "C-" + voter;
-                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-//                    this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                    this.userAgentDO.getMsgReceiver()._recvXxxMessage();
-                }
+//                for (String candidate: candidates) {
+//                    String data = "C:" + candidate;
+//                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
+//                }
+//                for (String voter: voters) {
+//                    String data = "C-" + voter;
+//                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
+//                }
+//
+//                // Access End + receive RTicket
+//                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
 
-                // Access End + receive RTicket
-                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
                 buttonApplyTallyUTicket.setEnabled(true);
             }
         });
@@ -229,26 +231,20 @@ public class AdminAgentActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
                 Map<String, String> generatedRequest = Map.of(
-                        "deviceId", connectedDeviceId,
-                        "holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                        "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                        "taskScope", generatedTaskScope
+                        "device_id", connectedDeviceId,
+                        "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                        "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                        "task_scope", generatedTaskScope
                 );
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(connectedDeviceId,generatedRequest);
 
                 // Apply UTicket + CRKE
                 String generatedCommand = "HELLO-1";
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(connectedDeviceId,generatedCommand);
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
 
                 // Send UToken: the votes of candidates
                 String data = "TC";
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
                 data = deviceController.getFlowIssueUToken().getExecutor().getSharedData().getCurrentSession().getPlaintextData();
 
                 candidateVotes = new ArrayList<>();
@@ -273,8 +269,6 @@ public class AdminAgentActivity extends AppCompatActivity {
                 for (int i = 0;; i++) {
                     data = "TV" + i;
                     deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-//                    this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                    this.userAgentDO.getMsgReceiver()._recvXxxMessage();
                     data = deviceController.getFlowIssueUToken().getExecutor().getSharedData().getCurrentSession().getPlaintextData();
 
                     if (Objects.equals(data, "---")) {
@@ -296,8 +290,6 @@ public class AdminAgentActivity extends AppCompatActivity {
 
                 // Access End + receive RTicket
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
                 buttonShowRTickets.setEnabled(true);
             }
         });

@@ -112,10 +112,10 @@ public class StageWorkerExecutorTest {
 
         uTicket = new UTicket();
         uTicket.setUTicketType(UTicket.TYPE_ACCESS_UTICKET);
-        uTicket.setUTicketId("uTicketId");
-        uTicket.setDeviceId("deviceId");
-        uTicket.setHolderId("holderId");
-        uTicket.setTaskScope("taskScope");
+        uTicket.setUTicketId("u_ticket_id");
+        uTicket.setDeviceId("device_id");
+        uTicket.setHolderId("holder_id");
+        uTicket.setTaskScope("task_scope");
         executor.getSharedData().setCurrentSession(new CurrentSession());
         executor.executeXxxUTicket(uTicket);
         assertEquals(uTicket.getUTicketId(), executor.getSharedData().getCurrentSession().getCurrentUTicketId());
@@ -153,9 +153,9 @@ public class StageWorkerExecutorTest {
         executor.getSharedData().getThisDevice().setDevicePrivKey((ECPrivateKey) deviceKey.getPrivate());
         executor.getSharedData().getCurrentSession().setCurrentDeviceId(SerializationUtil.keyToStr(deviceKey.getPublic()));
         executor.getSharedData().getCurrentSession().setCurrentHolderId(SerializationUtil.keyToStr(personKey.getPublic()));
-        Map<String, String> taskScope = SerializationUtil.jsonStrToDict(executor.getMsgVerifier().getSharedData().getCurrentSession().getCurrentTaskScope());
-        taskScope.put("ALL", "allow");
-        executor.getMsgVerifier().getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(taskScope));
+        Map<String, String> task_scope = SerializationUtil.jsonStrToDict(executor.getMsgVerifier().getSharedData().getCurrentSession().getCurrentTaskScope());
+        task_scope.put("ALL", "allow");
+        executor.getMsgVerifier().getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(task_scope));
 
         rTicket = new RTicket();
         rTicket.setRTicketType(UTicket.TYPE_INITIALIZATION_UTICKET);

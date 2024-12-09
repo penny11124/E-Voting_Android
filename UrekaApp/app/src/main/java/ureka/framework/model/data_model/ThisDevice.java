@@ -19,6 +19,7 @@ import java.util.Objects;
 import ureka.framework.model.message_model.Message;
 import ureka.framework.model.message_model.RTicket;
 import ureka.framework.resource.crypto.SerializationUtil;
+import ureka.framework.resource.logger.SimpleLogger;
 
 public class ThisDevice {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
@@ -44,7 +45,7 @@ public class ThisDevice {
     private Boolean hasDeviceType = false;
 
     // Ticket Order
-    private Integer ticketOrder = null;
+    private Integer ticket_order = null;
 
     // Generate Device Key after Initialization
     private ECPrivateKey devicePrivKey = null;
@@ -104,11 +105,11 @@ public class ThisDevice {
     }
 
     public Integer getTicketOrder() {
-        return ticketOrder;
+        return ticket_order;
     }
 
-    public void setTicketOrder(Integer ticketOrder) {
-        this.ticketOrder = ticketOrder;
+    public void setTicketOrder(Integer ticket_order) {
+        this.ticket_order = ticket_order;
     }
 
     public ECPrivateKey getDevicePrivKey() {
@@ -178,9 +179,9 @@ public class ThisDevice {
                     } else if (field.getType().equals(String.class)) {
                         thisDeviceMap.put(field.getName(), (String) value);
                     } else if (field.getType().equals(ECPrivateKey.class)) {
-                        thisDeviceMap.put(field.getName(), SerializationUtil.keyToStr(value));
+                        thisDeviceMap.put(field.getName(), SerializationUtil.keyToStr(value, "eccPrivateKey"));
                     } else if (field.getType().equals(ECPublicKey.class)) {
-                        thisDeviceMap.put(field.getName(), SerializationUtil.keyToStr(value));
+                        thisDeviceMap.put(field.getName(), SerializationUtil.keyToStr(value, "eccPublicKey"));
                     }
                 } else {
                     thisDeviceMap.put(field.getName(), null);

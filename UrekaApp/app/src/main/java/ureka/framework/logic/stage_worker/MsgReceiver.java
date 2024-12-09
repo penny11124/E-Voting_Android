@@ -168,6 +168,7 @@ public class MsgReceiver implements Runnable {
 
     // [STAGE: (R)] Receive Message
     public void _recvXxxMessage(String data) {
+        SimpleLogger.simpleLog("info", "Received: " + data);
         if (data.contains("REQUEST: ")) {
             String croppedData = data.substring(0, "REQUEST: ".length());
 

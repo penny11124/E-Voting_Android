@@ -81,10 +81,10 @@ public class FlowOpenSessionTest {
         assert (Objects.equals(message.getMessageOperation(), Message.MESSAGE_VERIFY_AND_EXECUTE));
         assert (Objects.equals(message.getMessageType(), RTicket.MESSAGE_TYPE));
         Map<String, String> rTicketRequest = new HashMap<>();
-        rTicketRequest.put("rTicketType", RTicket.TYPE_CRKE1_RTICKET);
-        rTicketRequest.put("deviceId", flowOpenSession.getSharedData().getThisDevice().getDevicePubKeyStr());
+        rTicketRequest.put("r_ticket_type", RTicket.TYPE_CRKE1_RTICKET);
+        rTicketRequest.put("device_id", flowOpenSession.getSharedData().getThisDevice().getDevicePubKeyStr());
         rTicketRequest.put("result", "SUCCESS");
-        rTicketRequest.put("auditStart", flowOpenSession.getSharedData().getCurrentSession().getCurrentUTicketId());
+        rTicketRequest.put("audit_start", flowOpenSession.getSharedData().getCurrentSession().getCurrentUTicketId());
         rTicketRequest.put("challenge1", flowOpenSession.getSharedData().getCurrentSession().getChallenge1());
         rTicketRequest.put("keyExchangeSalt1", flowOpenSession.getSharedData().getCurrentSession().getKeyExchangeSalt1());
         rTicketRequest.put("ivCmd", flowOpenSession.getSharedData().getCurrentSession().getIvCmd());

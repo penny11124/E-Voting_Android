@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import ureka.framework.Environment;
 import ureka.framework.logic.pipeline_flow.FlowApplyUTicket;
@@ -276,11 +277,16 @@ public class DeviceController {
             public void onDataReceived(String data) {
                 SimpleLogger.simpleLog("info", "Received data: " + data);
                 new Handler(Looper.getMainLooper()).post(() ->
-                        textView.setText("Data received.")
+                        textView.setText("Data received from voting machine.")
                 );
                 jsonBuilder.append(data);
 
-                if (data.contains("$")) {
+                if (data.contains("freed")) {
+                    SimpleLogger.simpleLog("info", "No hello thank you");
+                    jsonBuilder.setLength(0);
+                } else if (data.contains("$")) {
+                    Log.d("Bluetooth.onDataReceived", "Received complete JSON: starting process.");
+                    jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
                     msgReceiver._recvXxxMessage(jsonBuilder.toString());
                     jsonBuilder.setLength(0);
                 } else {

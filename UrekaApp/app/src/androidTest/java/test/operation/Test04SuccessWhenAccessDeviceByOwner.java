@@ -52,10 +52,10 @@ public class Test04SuccessWhenAccessDeviceByOwner {
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId,
-                "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                "taskScope", generatedTaskScope
+                "device_id", targetDeviceId,
+                "holder_id", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                "task_scope", generatedTaskScope
         );
         this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 

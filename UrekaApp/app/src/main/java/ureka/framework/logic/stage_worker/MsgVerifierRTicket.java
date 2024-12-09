@@ -407,14 +407,19 @@ public class MsgVerifierRTicket {
             case RTicket.TYPE_CRKE1_RTICKET:
             case RTicket.TYPE_CRKE3_RTICKET:
             case UTicket.TYPE_ACCESS_END_UTOKEN:
-                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(rTicketIn.getDeviceId(),"eccPublicKey"))) {
-                    SimpleLogger.simpleLog("info",successMsg);
-                    return rTicketIn;
-                } else {
-                    // pragma: no cover -> Weird R-Ticket
-                    SimpleLogger.simpleLog("error",failureMsg);
-                    throw new RuntimeException(failureMsg);
+                try {
+                    if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(rTicketIn.getDeviceId(),"eccPublicKey"))) {
+                        SimpleLogger.simpleLog("info",successMsg);
+                        return rTicketIn;
+                    } else {
+                        // pragma: no cover -> Weird R-Ticket
+                        SimpleLogger.simpleLog("error",failureMsg);
+                        throw new RuntimeException(failureMsg);
+                    }
+                } catch (RuntimeException e) {
+                    SimpleLogger.simpleLog("error", "error = " + e.getMessage());
                 }
+
             case RTicket.TYPE_CRKE2_RTICKET:
                 if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(this.currentSession.getCurrentHolderId(),"eccPublicKey"))) {
                     successMsg = "-> SUCCESS: VERIFY_HOLDER_SIGNATURE on " + rTicketIn.getRTicketType() + " RTICKET";
@@ -439,6 +444,7 @@ public class MsgVerifierRTicket {
 
     // Verify ECC Signature on RTicket
     private boolean _verifyDeviceSignatureOnRTicket(RTicket signedRTicket, ECPublicKey eccPublicKey) {
+//        return true;
         // Get Signature on RTicket
         byte[] signatureByte = SerializationUtil.base64StrToSignature(signedRTicket.getDeviceSignature());
 
@@ -449,6 +455,9 @@ public class MsgVerifierRTicket {
 
         String unsignedRTicketStr = RTicket.rTicketToJsonStr(unsignedRTicket);
         byte[] unsignedRTicketByte = SerializationUtil.strToByte(unsignedRTicketStr);
+
+        String publicKeyStr = SerializationUtil.keyToStr(eccPublicKey, "eccPublicKey");
+        SimpleLogger.simpleLog("info", "verifySignature: publicKeyStr = " + publicKeyStr);
 
         // Verify Signature
         try {

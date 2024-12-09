@@ -84,8 +84,8 @@ public class MenuIoTDevice {
 //                } else {
 //                    Map<String, String> insecureCmdDict = SerializationUtil.jsonStrToDict(insecureCmdJson);
 //                    Map<String, String> insecureDataDict = new HashMap<>();
-//                    insecureDataDict.put("protocolVersion", insecureCmdDict.get("protocolVersion"));
-//                    insecureDataDict.put("deviceId", insecureCmdDict.get("deviceId"));
+//                    insecureDataDict.put("protocol_version", insecureCmdDict.get("protocol_version"));
+//                    insecureDataDict.put("device_id", insecureCmdDict.get("device_id"));
 //                    insecureDataDict.put("insecureDataResponse", "Data: " + insecureCmdDict.get("insecureCommand"));
 //
 //                    insecureDataJson = SerializationUtil.dictToJsonStr(insecureDataDict);

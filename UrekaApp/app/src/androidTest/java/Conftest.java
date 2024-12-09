@@ -120,9 +120,9 @@ public class Conftest {
         // createSimulatedCommConnection(cloudServerDM, iotDevice);
         String idForInitializationUTicket = "noId";
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", idForInitializationUTicket);
-        generatedRequest.put("holderId", cloudServerDM.getSharedData().getThisPerson().getPersonPubKeyStr());
-        generatedRequest.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
+        generatedRequest.put("device_id", idForInitializationUTicket);
+        generatedRequest.put("holder_id", cloudServerDM.getSharedData().getThisPerson().getPersonPubKeyStr());
+        generatedRequest.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
 
         cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
 
@@ -156,9 +156,9 @@ public class Conftest {
         // createSimulatedCommConnection(cloudServerDM, userAgentDO);
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", targetDeviceId);
-        generatedRequest.put("holderId", userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr());
-        generatedRequest.put("uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET);
+        generatedRequest.put("device_id", targetDeviceId);
+        generatedRequest.put("holder_id", userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr());
+        generatedRequest.put("u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET);
 
         // cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
 //        userAgentDO.getMsgReceiver()._recvXxxMessage();
@@ -187,10 +187,10 @@ public class Conftest {
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", targetDeviceId);
-        generatedRequest.put("holderId", userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr());
-        generatedRequest.put("uTicketType", UTicket.TYPE_SELFACCESS_UTICKET);
-        generatedRequest.put("taskScope", generatedTaskScope);
+        generatedRequest.put("device_id", targetDeviceId);
+        generatedRequest.put("holder_id", userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr());
+        generatedRequest.put("u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET);
+        generatedRequest.put("task_scope", generatedTaskScope);
 
         userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId, generatedRequest);
 
@@ -229,10 +229,10 @@ public class Conftest {
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
         String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", targetDeviceId);
-        generatedRequest.put("holderId", cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr());
-        generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
-        generatedRequest.put("taskScope", generatedTaskScope);
+        generatedRequest.put("device_id", targetDeviceId);
+        generatedRequest.put("holder_id", cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr());
+        generatedRequest.put("u_ticket_type", UTicket.TYPE_ACCESS_UTICKET);
+        generatedRequest.put("task_scope", generatedTaskScope);
 
         // userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
 //        cloudServerEP.getMsgReceiver()._recvXxxMessage();
@@ -269,10 +269,10 @@ public class Conftest {
                 "SAY-HELLO-3", "forbid"
         ));
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", targetDeviceId);
-        generatedRequest.put("holderId", cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr());
-        generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
-        generatedRequest.put("taskScope", generatedTaskScope);
+        generatedRequest.put("device_id", targetDeviceId);
+        generatedRequest.put("holder_id", cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr());
+        generatedRequest.put("u_ticket_type", UTicket.TYPE_ACCESS_UTICKET);
+        generatedRequest.put("task_scope", generatedTaskScope);
 
         // userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
 //        cloudServerEP.getMsgReceiver()._recvXxxMessage();

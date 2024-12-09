@@ -21,14 +21,14 @@ public class CurrentSession {
     private String currentSessionKeyStr = null;
 
     private String plaintextCmd = null;
-    private String associatedPlaintextCmd = null;
+    private String associated_plaintext_cmd = null;
     private String ivCmd = null;
-    private String ciphertextCmd = null;
-    private String gcmAuthenticationTagCmd = null;
+    private String ciphertext_cmd = null;
+    private String gcm_authentication_tag_cmd = null;
 
     private String plaintextData = null;
-    private String associatedPlaintextData = null;
-    private String ivData = null;
+    private String associated_plaintext_data = null;
+    private String iv_data = null;
     private String ciphertextData = null;
     private String gcmAuthenticationTagData = null;
 
@@ -44,14 +44,14 @@ public class CurrentSession {
         this.keyExchangeSalt2 = values.getOrDefault("keyExchangeSalt2", null);
         this.currentSessionKeyStr = values.getOrDefault("currentSessionKeyStr", null);
         this.plaintextCmd = values.getOrDefault("plaintextCmd", null);
-        this.associatedPlaintextCmd = values.getOrDefault("associatedPlaintextCmd", null);
-        this.ciphertextCmd = values.getOrDefault("ciphertextCmd", null);
+        this.associated_plaintext_cmd = values.getOrDefault("associated_plaintext_cmd", null);
+        this.ciphertext_cmd = values.getOrDefault("ciphertext_cmd", null);
         this.ivCmd = values.getOrDefault("ivCmd", null);
-        this.gcmAuthenticationTagCmd = values.getOrDefault("gcmAuthenticationTagCmd", null);
+        this.gcm_authentication_tag_cmd = values.getOrDefault("gcm_authentication_tag_cmd", null);
         this.plaintextData = values.getOrDefault("plaintextData", null);
-        this.associatedPlaintextData = values.getOrDefault("associatedPlaintextData", null);
+        this.associated_plaintext_data = values.getOrDefault("associated_plaintext_data", null);
         this.ciphertextData = values.getOrDefault("ciphertextData", null);
-        this.ivData = values.getOrDefault("ivData", null);
+        this.iv_data = values.getOrDefault("iv_data", null);
         this.gcmAuthenticationTagData = values.getOrDefault("gcmAuthenticationTagData", null);
     }
 
@@ -136,11 +136,11 @@ public class CurrentSession {
     }
 
     public String getAssociatedPlaintextCmd() {
-        return associatedPlaintextCmd;
+        return associated_plaintext_cmd;
     }
 
-    public void setAssociatedPlaintextCmd(String associatedPlaintextCmd) {
-        this.associatedPlaintextCmd = associatedPlaintextCmd;
+    public void setAssociatedPlaintextCmd(String associated_plaintext_cmd) {
+        this.associated_plaintext_cmd = associated_plaintext_cmd;
     }
 
     public String getIvCmd() {
@@ -152,19 +152,19 @@ public class CurrentSession {
     }
 
     public String getCiphertextCmd() {
-        return ciphertextCmd;
+        return ciphertext_cmd;
     }
 
-    public void setCiphertextCmd(String ciphertextCmd) {
-        this.ciphertextCmd = ciphertextCmd;
+    public void setCiphertextCmd(String ciphertext_cmd) {
+        this.ciphertext_cmd = ciphertext_cmd;
     }
 
     public String getGcmAuthenticationTagCmd() {
-        return gcmAuthenticationTagCmd;
+        return gcm_authentication_tag_cmd;
     }
 
-    public void setGcmAuthenticationTagCmd(String gcmAuthenticationTagCmd) {
-        this.gcmAuthenticationTagCmd = gcmAuthenticationTagCmd;
+    public void setGcmAuthenticationTagCmd(String gcm_authentication_tag_cmd) {
+        this.gcm_authentication_tag_cmd = gcm_authentication_tag_cmd;
     }
 
     public String getPlaintextData() {
@@ -176,19 +176,19 @@ public class CurrentSession {
     }
 
     public String getAssociatedPlaintextData() {
-        return associatedPlaintextData;
+        return associated_plaintext_data;
     }
 
-    public void setAssociatedPlaintextData(String associatedPlaintextData) {
-        this.associatedPlaintextData = associatedPlaintextData;
+    public void setAssociatedPlaintextData(String associated_plaintext_data) {
+        this.associated_plaintext_data = associated_plaintext_data;
     }
 
     public String getIvData() {
-        return ivData;
+        return iv_data;
     }
 
-    public void setIvData(String ivData) {
-        this.ivData = ivData;
+    public void setIvData(String iv_data) {
+        this.iv_data = iv_data;
     }
 
     public String getCiphertextData() {
