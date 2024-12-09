@@ -93,9 +93,9 @@ public class ThisPerson {
                     } else if (field.getType().equals(String.class)) {
                         thisPersonMap.put(field.getName(), (String) value);
                     } else if (field.getType().equals(ECPrivateKey.class)) {
-                        thisPersonMap.put(field.getName(), SerializationUtil.keyToStr(value));
+                        thisPersonMap.put(field.getName(), SerializationUtil.keyToStr(value, "eccPrivateKey"));
                     } else if (field.getType().equals(ECPublicKey.class)) {
-                        thisPersonMap.put(field.getName(), SerializationUtil.keyToStr(value));
+                        thisPersonMap.put(field.getName(), SerializationUtil.keyToStr(value, "eccPublicKey"));
                     }
                 } else {
                     thisPersonMap.put(field.getName(), null);

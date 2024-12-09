@@ -178,8 +178,6 @@ public class FlowOpenSession {
 
             if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
                 msgSender.completeSimulatedComm();
-//            } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
-//                msgSender.completeBluetoothComm();
             }
         } catch (Exception e) { // pragma: no cover -> Shouldn't Reach Here
             throw new RuntimeException("Shouldn't Reach Here", e);
@@ -196,9 +194,9 @@ public class FlowOpenSession {
             rTicketRequest.put("device_id", this.sharedData.getCurrentSession().getCurrentDeviceId());
             rTicketRequest.put("result", resultMessage);
             rTicketRequest.put("audit_start", this.sharedData.getCurrentSession().getCurrentUTicketId());
-            rTicketRequest.put("challenge1", this.sharedData.getCurrentSession().getChallenge1());
-            rTicketRequest.put("challenge2", this.sharedData.getCurrentSession().getChallenge2());
-            rTicketRequest.put("keyExchangeSalt2", this.sharedData.getCurrentSession().getKeyExchangeSalt2());
+            rTicketRequest.put("challenge_1", this.sharedData.getCurrentSession().getChallenge1());
+            rTicketRequest.put("challenge_2", this.sharedData.getCurrentSession().getChallenge2());
+            rTicketRequest.put("key_exchange_salt_2", this.sharedData.getCurrentSession().getKeyExchangeSalt2());
             rTicketRequest.put("associated_plaintext_cmd", this.sharedData.getCurrentSession().getAssociatedPlaintextCmd());
             rTicketRequest.put("ciphertext_cmd", this.sharedData.getCurrentSession().getCiphertextCmd());
             rTicketRequest.put("gcm_authentication_tag_cmd", this.sharedData.getCurrentSession().getGcmAuthenticationTagCmd());

@@ -7,11 +7,12 @@ import java.util.Objects;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 public class UTicket {
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     //////////////////////////////////////////////////////
     // Protocol Version
     //////////////////////////////////////////////////////
@@ -217,7 +218,44 @@ public class UTicket {
         return SimpleMeasurer.measureWorkerFunc(UTicket::_uTicketToJsonStr, uTicket);
     }
     private static String _uTicketToJsonStr(UTicket uTicket) {
-        return gson.toJson(uTicket);
+//        return gson.toJson(uTicket);
+        JsonObject jsonObject = new JsonObject();
+        if (uTicket.protocol_version != null) {
+            jsonObject.addProperty("protocol_version", uTicket.protocol_version);
+        }
+        if (uTicket.u_ticket_id != null) {
+            jsonObject.addProperty("u_ticket_id", uTicket.u_ticket_id);
+        }
+        if (uTicket.u_ticket_type != null) {
+            jsonObject.addProperty("u_ticket_type", uTicket.u_ticket_type);
+        }
+        if (uTicket.device_id != null) {
+            jsonObject.addProperty("device_id", uTicket.device_id);
+        }
+        jsonObject.addProperty("ticket_order", uTicket.ticket_order);
+        if (uTicket.holder_id != null) {
+            jsonObject.addProperty("holder_id", uTicket.holder_id);
+        }
+        if (uTicket.task_scope != null) {
+            jsonObject.addProperty("task_scope", uTicket.task_scope);
+        }
+        if (uTicket.issuer_signature != null) {
+            jsonObject.addProperty("issuer_signature", uTicket.issuer_signature);
+        }
+        if (uTicket.associated_plaintext_cmd != null) {
+            jsonObject.addProperty("associated_plaintext_cmd", uTicket.associated_plaintext_cmd);
+        }
+        if (uTicket.ciphertext_cmd != null) {
+            jsonObject.addProperty("ciphertext_cmd", uTicket.ciphertext_cmd);
+        }
+        if (uTicket.gcm_authentication_tag_cmd != null) {
+            jsonObject.addProperty("gcm_authentication_tag_cmd", uTicket.gcm_authentication_tag_cmd);
+        }
+        if (uTicket.iv_data != null) {
+            jsonObject.addProperty("iv_data", uTicket.iv_data);
+        }
+
+        return jsonObject.toString();
     }
 
     public static UTicket jsonStrToUTicket(String json) {

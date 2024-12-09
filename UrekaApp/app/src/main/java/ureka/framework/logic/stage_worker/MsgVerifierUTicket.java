@@ -107,7 +107,7 @@ public class MsgVerifierUTicket {
         String failure_msg = "-> FAILURE: VERIFY_DEVICE_ID = " + uticketIn.getDeviceId();
 
         if (Objects.equals(uticketIn.getUTicketType(), UTicket.TYPE_INITIALIZATION_UTICKET)) {
-            if (Objects.equals(uticketIn.getDeviceId(), "noId")) {
+            if (Objects.equals(uticketIn.getDeviceId(), "no_id")) {
                 SimpleLogger.simpleLog("info", success_msg);
                 return uticketIn;
             } else {

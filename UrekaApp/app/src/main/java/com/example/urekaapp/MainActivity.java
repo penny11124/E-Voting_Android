@@ -65,9 +65,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AdminAgentActivity.class);
                 intent.putExtra("mode", mode);
-                intent.putExtra("key1", SerializationUtil.keyToStr(keyPair1.getPublic()));
-                intent.putExtra("key2", SerializationUtil.keyToStr(keyPair2.getPublic()));
-                intent.putExtra("key3", SerializationUtil.keyToStr(keyPair3.getPublic()));
+                intent.putExtra("key1", SerializationUtil.keyToStr(keyPair1.getPublic(), "eccPublicKey"));
+                intent.putExtra("key2", SerializationUtil.keyToStr(keyPair2.getPublic(), "eccPublicKey"));
+                intent.putExtra("key3", SerializationUtil.keyToStr(keyPair3.getPublic(), "eccPublicKey"));
                 startActivity(intent);
             }
         });

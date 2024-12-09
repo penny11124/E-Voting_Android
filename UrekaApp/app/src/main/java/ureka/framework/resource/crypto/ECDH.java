@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -26,6 +27,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 public class ECDH {
@@ -64,26 +66,16 @@ public class ECDH {
         return SimpleMeasurer.measureResourceFunc(ECDH::_generateSha256HashBytes, message);
     }
     private static byte[] _generateSha256HashBytes(byte[] message)
-        throws NoSuchAlgorithmException, NoSuchProviderException {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256", "SC");
-            return digest.digest(message);
-        } catch (NoSuchAlgorithmException e) {
-            String failureMsg = "generateSha256HashBytes: NoSuchAlgorithmException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchProviderException e) {
-            String failureMsg = "generateSha256HashBytes: NoSuchProviderException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        }
+            throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256", "SC");
+        return digest.digest(message);
     }
 
     public static String generateSha256HashStr(String messageStr) throws Exception {
         return SimpleMeasurer.measureResourceFunc(ECDH::_generateSha256HashStr, messageStr);
     }
     private static String _generateSha256HashStr(String messageStr)
-        throws NoSuchAlgorithmException, NoSuchProviderException {
+            throws Exception {
         byte[] messageBytes = SerializationUtil.strToByte(messageStr);
         byte[] hashBytes = _generateSha256HashBytes(messageBytes);
         return SerializationUtil.byteToBase64Str(hashBytes);
@@ -279,7 +271,6 @@ public class ECDH {
             if (iv == null) {
                 iv = _generateRandomByte(12); // GCM standard recommends a 12-byte IV
             }
-
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "SC");
             SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
             GCMParameterSpec gcmSpec = new GCMParameterSpec(128, iv); // 128-bit authentication tag length
@@ -294,33 +285,8 @@ public class ECDH {
             System.arraycopy(ciphertext, 0, finalCiphertext, 0, ciphertext.length - 16);
 
             return new byte[][] { finalCiphertext, iv, tag };
-        } catch (IllegalBlockSizeException e) {
-            String failureMsg = "gcmEncrypt: IllegalBlockSizeException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (InvalidAlgorithmParameterException e) {
-            String failureMsg = "gcmEncrypt: InvalidAlgorithmParameterException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (InvalidKeyException e) {
-            String failureMsg = "gcmEncrypt: InvalidKeyException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (BadPaddingException e) {
-            String failureMsg = "gcmEncrypt: BadPaddingException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchAlgorithmException e) {
-            String failureMsg = "gcmEncrypt: NoSuchAlgorithmException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchPaddingException e) {
-            String failureMsg = "gcmEncrypt: NoSuchPaddingException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchProviderException e) {
-            String failureMsg = "gcmEncrypt: NoSuchProviderException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+        } catch (Exception e) {
+            SimpleLogger.simpleLog("error", e.getMessage());
             throw e;
         }
     }

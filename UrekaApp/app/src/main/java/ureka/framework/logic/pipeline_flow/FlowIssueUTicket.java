@@ -127,7 +127,7 @@ public class FlowIssueUTicket {
         this.measureHelper.measureProcessPerfStart();
         try {
             // [STAGE: (VL)]
-            if (this.sharedData.getDeviceTable().containsKey(device_id) || "noId".equals(device_id)) {
+            if (this.sharedData.getDeviceTable().containsKey(device_id) || "no_id".equals(device_id)) {
                 // [STAGE: (G)]
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(arbitraryDict);
 

@@ -7,6 +7,7 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.AEADBadTagException;
@@ -104,8 +105,7 @@ public class Executor {
         KeyPair deviceKeyPair;
         try {
             deviceKeyPair = ECC.generateKeyPair();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException |
-                 InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         // RAM
@@ -117,8 +117,7 @@ public class Executor {
         KeyPair personKeyPair = null;
         try {
             personKeyPair = ECC.generateKeyPair();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException |
-                 InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         this.sharedData.getThisPerson().setPersonPrivKey((ECPrivateKey) personKeyPair.getPrivate());
@@ -280,8 +279,7 @@ public class Executor {
         KeyPair keyPair;
         try {
             keyPair = ECC.generateKeyPair();
-        } catch (NoSuchAlgorithmException | NoSuchProviderException |
-                 InvalidAlgorithmParameterException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         // RAM

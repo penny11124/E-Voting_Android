@@ -168,7 +168,6 @@ public class FlowIssueUToken {
                 generatedRequest.put("iv_data", this.sharedData.getCurrentSession().getIvData());
 
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(generatedRequest);
-
                 // End Process Measurement
                 if (!accessEnd) {
                     this.measureHelper.measureRecvCliPerfTime("holderSendCmd");
@@ -183,7 +182,6 @@ public class FlowIssueUToken {
 
                 // Stage: (S)
                 this.msgSender.sendXxxMessage(Message.MESSAGE_VERIFY_AND_EXECUTE, UTicket.MESSAGE_TYPE, generatedUTicketJson);
-
             } else {
                 throw new NoSuchElementException("Device ID not found in device table: " + device_id);
             }
