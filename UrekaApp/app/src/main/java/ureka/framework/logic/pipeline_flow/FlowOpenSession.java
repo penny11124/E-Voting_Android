@@ -1,5 +1,7 @@
 package ureka.framework.logic.pipeline_flow;
 
+import com.example.urekaapp.AdminAgentActivity;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,16 +29,9 @@ public class FlowOpenSession {
     private GeneratedMsgStorer generatedMsgStorer;
     private MsgSender msgSender;
 
-    public FlowOpenSession(
-            SharedData sharedData,
-            MeasureHelper measureHelper,
-            ReceivedMsgStorer receivedMsgStorer,
-            MsgVerifier msgVerifier,
-            Executor executor,
-            MsgGenerator msgGenerator,
-            GeneratedMsgStorer generatedMsgStorer,
-            MsgSender msgSender
-    ) {
+    public FlowOpenSession(SharedData sharedData, MeasureHelper measureHelper, ReceivedMsgStorer receivedMsgStorer,
+            MsgVerifier msgVerifier, Executor executor, MsgGenerator msgGenerator,
+            GeneratedMsgStorer generatedMsgStorer, MsgSender msgSender) {
         this.sharedData = sharedData;
         this.measureHelper = measureHelper;
         this.receivedMsgStorer = receivedMsgStorer;
@@ -331,8 +326,6 @@ public class FlowOpenSession {
 
         if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
             this.msgSender.completeSimulatedComm();
-//        } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
-//            msgSender.completeBluetoothComm();
         }
 
         SimpleLogger.simpleLog("debug", "resultMessage = " + this.sharedData.getResultMessage());

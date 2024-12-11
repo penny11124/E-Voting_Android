@@ -108,7 +108,6 @@ public class MsgSender {
             try {
                 Message newMessage = new Message(messageRequest);
                 String newMessageJson = Message.messageToJsonstr(newMessage);
-                SimpleLogger.simpleLog("info", "message sent = " + newMessageJson);
                 newMessageJson += "$";
 //                if (!bleManager.isConnected()) {
 //                    throw new IllegalStateException("BLE is not connected.");
@@ -130,14 +129,14 @@ public class MsgSender {
 //                    this.sharedData.getSimulatedCommChannel().getEnd().getSharedData().getThisDevice().getDeviceName() + "...");
 
             // Simulate Network Delay
-            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
-                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
-                }
-            }
+//            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
+//                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
+//                }
+//            }
 //            Map<String, String> messageRequest = new HashMap<>();
 //            messageRequest.put("messageOperation", messageOperation);
 //            messageRequest.put("messageType", messageType);
@@ -197,14 +196,14 @@ public class MsgSender {
 //                    this.sharedData.getSimulatedCommChannel().getEnd().getSharedData().getThisDevice().getDeviceName() + "...");
 
             // Simulate Network Delay
-            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
-                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
-                }
-            }
+//            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
+//                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
+//                }
+//            }
 //            Map<String, String> messageRequest = new HashMap<>();
 //            messageRequest.put("messageOperation", messageOperation);
 //            messageRequest.put("messageType", messageType);

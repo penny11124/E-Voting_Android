@@ -7,14 +7,18 @@ import org.spongycastle.asn1.ASN1Integer;
 import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.jce.provider.BouncyCastleProvider; // SpongyCastle -> More preferred on Android
 
+import java.io.Serial;
 import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
@@ -58,39 +62,23 @@ public class ECC {
     //////////////////////////////////////////////////////
     // Sign ECC Signature
     //////////////////////////////////////////////////////
-    public static byte[] signSignature(byte[] message, ECPrivateKey privateKey) throws Exception {
+    public static byte[] signSignature(byte[] message, PrivateKey privateKey) throws Exception {
         return SimpleMeasurer.measureResourceFunc(ECC::_signSignature, message, privateKey);
     }
-    private static byte[] _signSignature(byte[] message, ECPrivateKey privateKey) throws Exception {
+    private static byte[] _signSignature(byte[] message, PrivateKey privateKey) throws Exception {
         Signature signer = Signature.getInstance("SHA256withECDSA", "SC");
         signer.initSign(privateKey);
         signer.update(message);
-        byte[] signatureBytes = signer.sign();
-
-        ASN1Sequence sequence = (ASN1Sequence) ASN1Sequence.fromByteArray(signatureBytes);
-        BigInteger r = ((ASN1Integer) sequence.getObjectAt(0)).getValue();
-        BigInteger s = ((ASN1Integer) sequence.getObjectAt(1)).getValue();
-
-        // Convert r and s to byte arrays (big-endian by default)
-        byte[] rBytes = SerializationUtil.reverseBytes(r.toByteArray()); // Convert to small-endian
-        byte[] sBytes = SerializationUtil.reverseBytes(s.toByteArray()); // Convert to small-endian
-
-        // Convert r and s to Base64\
-        String hexR = SerializationUtil.bytesToHex(rBytes);
-        String hexS = SerializationUtil.bytesToHex(sBytes);
-//        SimpleLogger.simpleLog("info", "MY R = " + hexR);
-//        SimpleLogger.simpleLog("info", "MY S = " + hexS);
-
-        return signatureBytes;
+        return signer.sign();
     }
 
     //////////////////////////////////////////////////////
     // Verify ECC Signature
     //////////////////////////////////////////////////////
-    public static boolean verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey) throws Exception {
+    public static boolean verifySignature(byte[] signatureIn, byte[] messageIn, PublicKey publicKey) throws Exception {
         return SimpleMeasurer.measureResourceFunc(ECC::_verifySignature, signatureIn, messageIn, publicKey);
     }
-    private static boolean _verifySignature(byte[] signatureIn, byte[] messageIn, ECPublicKey publicKey) throws Exception {
+    private static boolean _verifySignature(byte[] signatureIn, byte[] messageIn, PublicKey publicKey) throws Exception {
         Signature verifier = Signature.getInstance("SHA256withECDSA", "SC");
         verifier.initVerify(publicKey);
         verifier.update(messageIn);

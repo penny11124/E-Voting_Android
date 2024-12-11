@@ -48,7 +48,9 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.HexFormat;
+import java.util.Map;
 import java.util.Objects;
 
 import ureka.framework.Environment;
@@ -86,66 +88,35 @@ public class TestActivity extends AppCompatActivity {
         });
 
         try {
-            // Sign and Verify
-            // Message
-            String message = "hello";
-//            byte[] messageBytes = message.getBytes(StandardCharsets.UTF_8);
-            byte[] messageBytes = SerializationUtil.hexToBytes("24aec01891da122a72855fafa76f5686575f30c190fd2ef7b919994116b47f85");
-
-            // PublicKey
-            String xHex = "bd79c248bd7053198b7e62521e051b5d32ee52b8db081951c622d8907e7b47ad";
-            String yHex = "241291c8bb206f0aff82b1beb388ced439a4239deb5599285d1f536ff4f29277";
-//            String xBase64 = SerializationUtil.byteToBase64Str(SerializationUtil.hexToBytes(xHex));
-//            String yBase64 = SerializationUtil.byteToBase64Str(SerializationUtil.hexToBytes(yHex));
-
-            BigInteger x = new BigInteger(xHex, 16);
-            BigInteger y = new BigInteger(yHex, 16);
-            ECPoint ecPoint = new ECPoint(x, y);
-
-            ECGenParameterSpec ecGenSpec = new java.security.spec.ECGenParameterSpec("secp256k1");
-            KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance("EC", "SC");
-            kpg.initialize(ecGenSpec);
-            ECParameterSpec ecSpec = ((ECPublicKey) kpg.generateKeyPair().getPublic()).getParams();
-
-            ECPublicKeySpec ecPublicKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
-            KeyFactory keyFactory = KeyFactory.getInstance("EC", "SC");
-            PublicKey publicKey = keyFactory.generatePublic(ecPublicKeySpec);
-//            String publicKeyBase64 = xBase64 + "-" + yBase64;
-//            String publicKeyBase64 = "HyxOPKkWw6iBdnW9UsCvSIaTmtpAmqWcUZ0lTPKUFW8=-dr9x3JLY3+vEwwEYPG7GIQK7fRS5JktX7iOZQkFYxro=";
-//            ECPublicKey publicKey = (ECPublicKey) SerializationUtil.strToKey(publicKeyBase64, "eccPublicKey");
-
-            // PrivateKey
-            String privateKeyHex = "cdbddef053e9ecfdd155b3986a44c463c204d18c90bc4ce0c1c71e4a260c6f61";
-            byte[] privateKeyBytes = SerializationUtil.hexToBytes(privateKeyHex);
-
-            BigInteger privateKeyValue = new BigInteger(1, privateKeyBytes); // Ensure positive
-            org.spongycastle.jce.spec.ECPrivateKeySpec privateKeySpec = new org.spongycastle.jce.spec.ECPrivateKeySpec(privateKeyValue, ECNamedCurveTable.getParameterSpec("secp256k1"));
-            keyFactory = KeyFactory.getInstance("EC", "SC");
-            PrivateKey privateKey = keyFactory.generatePrivate(privateKeySpec);
-
-            // Signature
-            String signatureBase64 = "qqtQmnzOgbBw1kyC4KzrgpttWtDFFn2EKxbVxqcSIm0=-IcFFfeeTX7jSYUh6O2HvNkul/frxGPuLJ4xA5PDbhI8=";
-            String rBase64 = "qqtQmnzOgbBw1kyC4KzrgpttWtDFFn2EKxbVxqcSIm0";
-            String sbase64 = "IcFFfeeTX7jSYUh6O2HvNkul/frxGPuLJ4xA5PDbhI8";
-            byte[] rBytes = SerializationUtil.base64StrBackToByte(rBase64);
-            byte[] sBytes = SerializationUtil.base64StrBackToByte(sbase64);
-            rBase64 = SerializationUtil.byteToBase64Str(rBytes);
-            sbase64 = SerializationUtil.byteToBase64Str(sBytes);
-            signatureBase64 = rBase64 + "-" + sbase64;
+//            String publicKeyBase64 = "xyVam2yUMl2Zr7rbeiApICk4WrWBetK7wEusfMIIp44=-dvHta1ksfPsAkAlvkpc+VIoko9qloZixDePT2cmZyVY=";
+//            String privateKeyHex = "693e667770e6eb1a7699196a1fb52d59cf3a59dbabd0878e75e0a53cab177b98";
+//
+//            PublicKey publicKey = SerializationUtil.base64ToPublicKey(publicKeyBase64);
+//            PrivateKey privateKey = SerializationUtil.hexToPrivateKey(privateKeyHex);
+//
+//            String message = "{\"protocol_version\":\"UREKA-1.0\",\"r_ticket_type\":\"INITIALIZATION\",\"device_id\":\"xyVam2yUMl2Zr7rbeiApICk4WrWBetK7wEusfMIIp44=-dvHta1ksfPsAkAlvkpc+VIoko9qloZixDePT2cmZyVY=\",\"result\":\" -> SUCCESS: VERIFY_UT_CAN_EXECUTE\",\"ticket_order\":1,\"audit_start\":\"hs9BBZca9pU4NhrLOotEXA6PBWIrwHvs5rRDtuC+as0=\"}\n";
+//            byte[] messageBytes = SerializationUtil.strToBytes(message);
 //            byte[] signatureBytes = ECC.signSignature(messageBytes, privateKey);
-//            Signature signer = Signature.getInstance("SHA256withECDSA", "SC");
-//            signer.initSign(privateKey);
-//            signer.update(messageBytes);
-//            byte[] signatureBytes = signer.sign();
-            byte[] signatureBytes = SerializationUtil.base64StrToSignature(signatureBase64);
-            Signature verifier = Signature.getInstance("SHA256withECDSA", "SC");
-            verifier.initVerify(publicKey);
-            verifier.update(messageBytes);
-            boolean isValid = verifier.verify(signatureBytes);
-//            boolean isValid = ECC.verifySignature(messageBytes, signatureBytes, publicKey);
-            SimpleLogger.simpleLog("info", "isValid = " + isValid);
-            ///////////////////////////////////////////////////////////////////////////////////
+//            boolean result = ECC.verifySignature(signatureBytes, messageBytes, publicKey);
+//            SimpleLogger.simpleLog("info", "result = " + result);
+            // The result is true
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//            String xHex = "d4a7d75d580522fa6da9a8c341a0795fbb29e10fbd39910a70e63928cb4e51cd";
+//            String yHex = "2cf35542ef68415e62d7975213376e9421fbd94019ca6af82fd95e2209c6441a";
+//            PublicKey publicKey = SerializationUtil.hexToPublicKey(xHex, yHex);
+//
+//            String rHex = "0b99de8bf68920d612dfd3bbf9bb4f09e260a5539783cf5eef1ce361f75f1682";
+//            String sHex = "cfc2b3dee908ca61bb8fab7704a30f4cb18c742448e67225d102836b6d5b8248";
+//            byte[] signatureBytes = SerializationUtil.hexToSignature(rHex, sHex);
+//
+//            String message = "{\"protocol_version\":\"UREKA-1.0\",\"r_ticket_type\":\"INITIALIZATION\",\"device_id\":\"1KfXXVgFIvptqajDQaB5X7sp4Q+9OZEKcOY5KMtOUc0=-LPNVQu9oQV5i15dSEzdulCH72UAZymr4L9leIgnGRBo=\",\"result\":\" -> SUCCESS: VERIFY_UT_CAN_EXECUTE\",\"ticket_order\":1,\"audit_start\":\"h/Euv/2vTP1c80AJQoWQcV/QSA10yR7cVmIAOFFNnEU=\"}";
+//            byte[] messageBytes = SerializationUtil.strToBytes(message);
+//            boolean result = ECC.verifySignature(signatureBytes, messageBytes, publicKey);
+//            SimpleLogger.simpleLog("info", "result = " + result);
+            // The result is true
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         } catch (Exception e) {
+            SimpleLogger.simpleLog("error", "Test failed");
             throw new RuntimeException(e);
         }
 

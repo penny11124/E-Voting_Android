@@ -120,7 +120,7 @@ public class FlowApplyUTicketTest {
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getCurrentHolderId(), uTicket.getHolderId()));
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getCurrentTaskScope(), uTicket.getTaskScope()));
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getPlaintextCmd(), "holder"));
-        assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextCmd(), "additional unencrypted cmd"));
+        assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextCmd(), "AUC"));
     }
 
     @Test
@@ -146,8 +146,8 @@ public class FlowApplyUTicketTest {
         uTicket.setTicketOrder(flowApplyUTicket.getMsgVerifier().getSharedData().getThisDevice().getTicketOrder());
         uTicket.setTaskScope("task_scope");
         uTicket.setHolderId(SerializationUtil.keyToStr(ECC.generateKeyPair().getPublic()));
-        uTicket.setIssuerSignature(SerializationUtil.byteToBase64Str(ECC.signSignature
-            (SerializationUtil.strToByte(UTicket.uTicketToJsonStr(uTicket)),
+        uTicket.setIssuerSignature(SerializationUtil.bytesToBase64(ECC.signSignature
+            (SerializationUtil.strToBytes(UTicket.uTicketToJsonStr(uTicket)),
                 flowApplyUTicket.getMsgVerifier().getSharedData().getThisPerson().getPersonPrivKey())));
         flowApplyUTicket.getExecutor().getSharedData().getThisDevice().setDeviceType(ThisDevice.IOT_DEVICE);
         flowApplyUTicket._deviceRecvUTicket(uTicket);
@@ -177,7 +177,7 @@ public class FlowApplyUTicketTest {
         rTicket.setTicketOrder(1);
         rTicket.setAuditStart(uTicket.getUTicketId());
         rTicket.setRTicketId(flowApplyUTicket.getSharedData().getThisDevice().getDevicePubKeyStr());
-        rTicket.setDeviceSignature(SerializationUtil.byteToBase64Str(ECC.signSignature(SerializationUtil.strToByte(RTicket.rTicketToJsonStr(rTicket)),
+        rTicket.setDeviceSignature(SerializationUtil.bytesToBase64(ECC.signSignature(SerializationUtil.strToBytes(RTicket.rTicketToJsonStr(rTicket)),
             flowApplyUTicket.getSharedData().getThisDevice().getDevicePrivKey())));
 
         OtherDevice otherDevice = new OtherDevice();

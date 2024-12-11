@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.PrivateKey;
 import java.security.interfaces.ECPrivateKey;
 import java.util.Map;
 import java.util.Objects;
@@ -29,7 +30,7 @@ public class MsgGeneratorUTicket {
     }
 
     // Message Generation Flow
-    public UTicket generateArbitraryUTicket(Map<String, String> arbitraryDict) {
+    public UTicket generateArbitraryUTicket(Map<String, String> arbitraryDict) throws Exception {
         String successMsg = "-> SUCCESS: GENERATE_UTICKET";
         String failureMsg = "-> FAILURE: GENERATE_UTICKET";
 
@@ -75,10 +76,10 @@ public class MsgGeneratorUTicket {
     }
 
     // something to fixed
-    private UTicket _addIssuerSignatureOnUTicket(UTicket unsignedUTicket, ECPrivateKey privateKey) {
+    private UTicket _addIssuerSignatureOnUTicket(UTicket unsignedUTicket, PrivateKey privateKey) throws Exception {
         // Message
         String uTicketToJsonStr = UTicket.uTicketToJsonStr(unsignedUTicket);
-        byte[] unsignedUTicketByte = SerializationUtil.strToByte(uTicketToJsonStr);
+        byte[] unsignedUTicketByte = SerializationUtil.strToBytes(uTicketToJsonStr);
 
         // Sign Signature
         byte[] signatureByte;
@@ -90,12 +91,7 @@ public class MsgGeneratorUTicket {
 
         // Add Signature on New Signed UTicket, but Prevent side effect on Unsigned UTicket
         UTicket signedUTicket = new UTicket(unsignedUTicket);
-//        try {
-//            signedUTicket = deepCopy(unsignedUTicket);
-//        } catch (IOException | ClassNotFoundException e) {
-//            throw new RuntimeException(e);
-//        }
-        signedUTicket.setIssuerSignature(SerializationUtil.signatureToBase64Str(signatureByte));
+        signedUTicket.setIssuerSignature(SerializationUtil.signatureToBase64(signatureByte));
 
         return signedUTicket;
     }

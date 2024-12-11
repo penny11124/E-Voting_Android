@@ -36,14 +36,14 @@ public class ResourceCryptoTest {
     @Test
     public void serializationUtilTest() throws Exception {
         String test = "foobar";
-        assert (test.equals(SerializationUtil.byteBackToStr(SerializationUtil.strToByte(test))));
+        assert (test.equals(SerializationUtil.bytesToStr(SerializationUtil.strToBytes(test))));
 
-        byte[] test_byte = SerializationUtil.strToByte(test);
-        assert (Arrays.equals(test_byte, SerializationUtil.base64StrBackToByte(SerializationUtil.byteToBase64Str(test_byte))));
+        byte[] test_byte = SerializationUtil.strToBytes(test);
+        assert (Arrays.equals(test_byte, SerializationUtil.base64ToBytes(SerializationUtil.bytesToBase64(test_byte))));
 
         Map<String, String> map = new HashMap<>();
         map.put("foo", "bar");
-        assert (map.equals(SerializationUtil.jsonStrToDict(SerializationUtil.dictToJsonStr(map))));
+        assert (map.equals(SerializationUtil.jsonToMap(SerializationUtil.mapToJson(map))));
 
         KeyPair keyPair = ECC.generateKeyPair();
         byte[] publicKeyByte = SerializationUtil._keyToByte(keyPair.getPublic(), "eccPublicKey");
@@ -64,7 +64,7 @@ public class ResourceCryptoTest {
         assertNotNull(keyPair.getPrivate());
         assertNotNull(keyPair.getPublic());
 
-        byte[] test = SerializationUtil.strToByte("foobar");
+        byte[] test = SerializationUtil.strToBytes("foobar");
         byte[] test_byte = ECC.signSignature(test, (ECPrivateKey) keyPair.getPrivate());
         assertTrue(ECC.verifySignature(test_byte, test, (ECPublicKey) keyPair.getPublic()));
     }
@@ -97,7 +97,7 @@ public class ResourceCryptoTest {
         byte[] ecdh_key2 = ECDH.generateEcdhKey((ECPrivateKey) keyPair2.getPrivate(), salt, null, (ECPublicKey) keyPair1.getPublic());
         assert (Arrays.equals(ecdh_key1, ecdh_key2));
 
-        byte[] plaintext = SerializationUtil.base64StrBackToByte(foobar);
+        byte[] plaintext = SerializationUtil.base64ToBytes(foobar);
         byte[][] cbc_result = ECDH.cbcEncrypt(plaintext, ecdh_key1);
         byte[] cbc_ciphertext = cbc_result[0];
         byte[] cbc_iv = cbc_result[1];

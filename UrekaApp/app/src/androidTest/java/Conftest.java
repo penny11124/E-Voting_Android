@@ -185,7 +185,7 @@ public class Conftest {
 
         // WHEN: Issuer: DO's UA generate the self_access_u_ticket to herself
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = new HashMap<>();
         generatedRequest.put("device_id", targetDeviceId);
         generatedRequest.put("holder_id", userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr());
@@ -227,7 +227,7 @@ public class Conftest {
         // WHEN: Issuer: DO's UA generate & send the access_u_ticket to EP's CS
         // createSimulatedCommConnection(userAgentDO, cloudServerEP);
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = new HashMap<>();
         generatedRequest.put("device_id", targetDeviceId);
         generatedRequest.put("holder_id", cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr());
@@ -263,7 +263,7 @@ public class Conftest {
         // WHEN: Issuer: DO's UA generate & send the access_u_ticket to EP's CS
         // createSimulatedCommConnection(userAgentDO, cloudServerEP);
         String targetDeviceId = iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of(
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of(
                 "SAY-HELLO-1", "allow",
                 "SAY-HELLO-2", "allow",
                 "SAY-HELLO-3", "forbid"

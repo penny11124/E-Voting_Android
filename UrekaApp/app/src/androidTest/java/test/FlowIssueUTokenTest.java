@@ -52,7 +52,7 @@ public class FlowIssueUTokenTest {
         thisDevice.setDeviceName("deviceName");
         Map<String, String> task_scope = new HashMap<>();
         task_scope.put("ALL", "allow");
-        currentSession.setCurrentTaskScope(SerializationUtil.dictToJsonStr(task_scope));
+        currentSession.setCurrentTaskScope(SerializationUtil.mapToJson(task_scope));
 
         SharedData sharedData = new SharedData(thisDevice, currentSession, thisPerson);
         sharedData.setDeviceTable(new HashMap<>());
@@ -83,13 +83,13 @@ public class FlowIssueUTokenTest {
         KeyPair k1 = ECC.generateKeyPair(), k2 = ECC.generateKeyPair();
         byte[] salt = ECDH.generateRandomByte(32);
         byte[] ecdh_key = ECDH.generateEcdhKey((ECPrivateKey) k1.getPrivate(), salt, null, (ECPublicKey) k2.getPublic());
-        flowIssueUToken.getSharedData().getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.byteToBase64Str(ecdh_key));
+        flowIssueUToken.getSharedData().getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.bytesToBase64(ecdh_key));
         flowIssueUToken.getSharedData().getCurrentSession().setCurrentDeviceId(device_id);
-        flowIssueUToken.getSharedData().getCurrentSession().setIvData(SerializationUtil.byteToBase64Str(ECDH.gcmGenIv()));
+        flowIssueUToken.getSharedData().getCurrentSession().setIvData(SerializationUtil.bytesToBase64(ECDH.gcmGenIv()));
 
         flowIssueUToken.holderSendCmd(device_id, cmd, false);
         assert (Objects.equals(flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getPlaintextCmd(), cmd));
-        assert (Objects.equals(flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextCmd(), "additional unencrypted cmd"));
+        assert (Objects.equals(flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextCmd(), "AUC"));
         assert (flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getCiphertextCmd() != null);
         assert (flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getGcmAuthenticationTagCmd() != null);
         assert (flowIssueUToken.getExecutor().getSharedData().getCurrentSession().getIvData() != null);

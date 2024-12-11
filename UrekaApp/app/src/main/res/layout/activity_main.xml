@@ -36,17 +36,6 @@
         android:text="Voter 2"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="@+id/buttonVoterAgent1"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonVoterAgent3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <Button
-        android:id="@+id/buttonVoterAgent3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Voter 3"
-        tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonVoterAgent2"
         app:layout_constraintBottom_toBottomOf="@+id/buttonTest"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -57,7 +46,7 @@
         android:layout_height="wrap_content"
         android:text="Test"
         tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonVoterAgent3"
+        app:layout_constraintTop_toTopOf="@+id/buttonVoterAgent2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

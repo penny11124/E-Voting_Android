@@ -30,17 +30,9 @@ public class FlowIssueUToken {
     private MsgSender msgSender;
     private FlowApplyUTicket flowApplyUTicket;
 
-    public FlowIssueUToken(
-            SharedData shareData,
-            MeasureHelper measureHelper,
-            ReceivedMsgStorer receivedMsgStorer,
-            MsgVerifier msgVerifier,
-            Executor executor,
-            MsgGenerator msgGenerator,
-            GeneratedMsgStorer generatedMsgStorer,
-            MsgSender msgSender,
-            FlowApplyUTicket flowApplyUTicket
-    ) {
+    public FlowIssueUToken(SharedData shareData, MeasureHelper measureHelper, ReceivedMsgStorer receivedMsgStorer,
+            MsgVerifier msgVerifier, Executor executor, MsgGenerator msgGenerator,
+            GeneratedMsgStorer generatedMsgStorer, MsgSender msgSender, FlowApplyUTicket flowApplyUTicket) {
         this.sharedData = shareData;
         this.measureHelper = measureHelper;
         this.receivedMsgStorer = receivedMsgStorer;
@@ -144,6 +136,7 @@ public class FlowIssueUToken {
             if (this.sharedData.getDeviceTable().containsKey(device_id)) {
                 // Stage: (E)
                 this.executor.executePs("sendUToken", null, cmd, null);
+                SimpleLogger.simpleLog("info", "holderSendCmd: executePs success, cmd = " + cmd);
 
                 String u_ticket_type;
                 if (!accessEnd) {
@@ -344,8 +337,6 @@ public class FlowIssueUToken {
 
         if (Environment.COMMUNICATION_CHANNEL.equals("SIMULATED")) {
             this.msgSender.completeSimulatedComm();
-//        } else if (Environment.COMMUNICATION_CHANNEL.equals("BLUETOOTH")) {
-//            this.msgSender.completeBluetoothComm();
         }
     }
 }

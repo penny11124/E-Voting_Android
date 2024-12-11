@@ -50,7 +50,7 @@ public class Test04SuccessWhenAccessDeviceByOwner {
 
         // WHEN: Issuer: DO's UA generate the self_access_u_ticket to herself
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
                 "device_id", targetDeviceId,
                 "holder_id", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),

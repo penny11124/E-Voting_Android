@@ -1,5 +1,6 @@
 package ureka.framework.logic.stage_worker;
 
+import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
 import java.util.Map;
@@ -229,7 +230,7 @@ public class MsgVerifierUTicket {
         } else if (Objects.equals(uTicketIn.getUTicketType(), UTicket.TYPE_SELFACCESS_UTICKET)) {
             Map<String, String> map = new HashMap<>();
             map.put("ALL", "allow");
-            if (Objects.equals(uTicketIn.getTaskScope(), SerializationUtil.dictToJsonStr(map))) {
+            if (Objects.equals(uTicketIn.getTaskScope(), SerializationUtil.mapToJson(map))) {
                 SimpleLogger.simpleLog("info", successMsg);
                 return uTicketIn;
             } else {
@@ -306,16 +307,16 @@ public class MsgVerifierUTicket {
     //////////////////////////////////////////////////////
     // Verify ECC Signature on UTicket
     //////////////////////////////////////////////////////
-    private static boolean _verifyIssuerSignatureOnUTicket(UTicket signedUTicket, ECPublicKey publicKey) throws Exception {
+    private static boolean _verifyIssuerSignatureOnUTicket(UTicket signedUTicket, PublicKey publicKey) throws Exception {
         // Get signature on UTicket
-        byte[] signatureByte = SerializationUtil.base64StrToSignature(signedUTicket.getIssuerSignature());
+        byte[] signatureByte = SerializationUtil.base64ToSignature(signedUTicket.getIssuerSignature());
 
         // Verify Signature on Signed UTicket, but Prevent side effect on Signed UTicket
         UTicket unsignedUTicket = new UTicket(signedUTicket);
         unsignedUTicket.setIssuerSignature(null);
 
         String unsignedUTicketStr = UTicket.uTicketToJsonStr(unsignedUTicket);
-        byte[] unsignedUTicketByte = SerializationUtil.strToByte(unsignedUTicketStr);
+        byte[] unsignedUTicketByte = SerializationUtil.strToBytes(unsignedUTicketStr);
 
         // Verify signature
         return ECC.verifySignature(signatureByte, unsignedUTicketByte, publicKey);

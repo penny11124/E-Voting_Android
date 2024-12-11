@@ -57,7 +57,7 @@ public class Test05SuccessWhenAccessDeviceByOthers {
         // WHEN: Issuer: DO's UA generate & send the access_u_ticket to EP's CS
         // createSimulatedCommConnection(this.userAgentDO,this.cloudServerEP);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
                 "device_id", targetDeviceId,
                 "holder_id", this.cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr(),
