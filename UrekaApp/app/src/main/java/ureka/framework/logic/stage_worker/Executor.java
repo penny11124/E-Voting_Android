@@ -1,9 +1,13 @@
 package ureka.framework.logic.stage_worker;
 
+import com.example.urekaapp.AdminAgentActivity;
+
+import java.io.Serial;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -73,7 +77,6 @@ public class Executor {
         );
         return true;
     }
-
     public void _executeOneTimeInitializeAgentOrServer() {
         // Start Process Measurement
         this.measureHelper.measureProcessPerfStart();
@@ -109,8 +112,8 @@ public class Executor {
             throw new RuntimeException(e);
         }
         // RAM
-        this.sharedData.getThisDevice().setDevicePrivKey((ECPrivateKey) deviceKeyPair.getPrivate());
-        this.sharedData.getThisDevice().setDevicePubKey((ECPublicKey) deviceKeyPair.getPublic());
+        this.sharedData.getThisDevice().setDevicePrivKey(deviceKeyPair.getPrivate());
+        this.sharedData.getThisDevice().setDevicePubKey(deviceKeyPair.getPublic());
 
         // Initialize Personal Id
         // CRYPTO
@@ -196,11 +199,10 @@ public class Executor {
             } else { // pragma: no cover -> Shouldn't Reach Here
                 throw new RuntimeException("Shouldn't Reach Here");
             }
-        } catch (RuntimeException error) {
-            SimpleLogger.simpleLog("error", error.getMessage());
-            throw error;
+        } catch (Exception error) {
+            String failure_msg = "_executeXxxUTicket: " + error.getMessage() + ", ticketType = " + uTicketIn.getUTicketType();
+            throw new RuntimeException(failure_msg);
         }
-
     }
 
     // Execute RTicket (Update Session, & Ticket Order)
@@ -265,7 +267,7 @@ public class Executor {
     }
 
     // Ownership
-    public void _executeOneTimeInitializeIotDevice(UTicket uTicketIn) {
+    public void _executeOneTimeInitializeIotDevice(UTicket uTicketIn) throws Exception {
         SimpleLogger.simpleLog("info",sharedData.getThisDevice().getDeviceName() + " is initializing...");
 
         if (!this.sharedData.getThisDevice().getDeviceType().equals(ThisDevice.IOT_DEVICE)) {
@@ -283,12 +285,12 @@ public class Executor {
             throw new RuntimeException(e);
         }
         // RAM
-        this.sharedData.getThisDevice().setDevicePrivKey((ECPrivateKey) keyPair.getPrivate());
-        this.sharedData.getThisDevice().setDevicePubKey((ECPublicKey) keyPair.getPublic());
+        this.sharedData.getThisDevice().setDevicePrivKey(keyPair.getPrivate());
+        this.sharedData.getThisDevice().setDevicePubKey(keyPair.getPublic());
 
         // Initialize Device Owner
         // RAM
-        ECPublicKey ownerPubKey = (ECPublicKey) SerializationUtil.strToKey(uTicketIn.getHolderId(), "eccPublicKey");
+        PublicKey ownerPubKey = SerializationUtil.base64ToPublicKey(uTicketIn.getHolderId());
         this.sharedData.getThisDevice().setOwnerPubKey(ownerPubKey);
 
         // Storage
@@ -299,13 +301,12 @@ public class Executor {
                 this.sharedData.getCurrentSession()
         );
     }
-
-    public void _executeOwnershipTransfer(UTicket newUTicket) {
+    public void _executeOwnershipTransfer(UTicket newUTicket) throws Exception {
         SimpleLogger.simpleLog("info", this.sharedData.getThisDevice().getDeviceName() + " is transferring ownership...");
 
         // Update Device Owner
         // RAM
-        ECPublicKey ownerPubKey = (ECPublicKey) SerializationUtil.strToKey(newUTicket.getHolderId(), "eccPublicKey");
+        PublicKey ownerPubKey = SerializationUtil.base64ToPublicKey(newUTicket.getHolderId());
         this.sharedData.getThisDevice().setOwnerPubKey(ownerPubKey);
 
         // Storage
@@ -394,12 +395,12 @@ public class Executor {
                         this.sharedData.getCurrentSession().getKeyExchangeSalt1(),
                         this.sharedData.getCurrentSession().getKeyExchangeSalt2(),
                         this.sharedData.getThisPerson().getPersonPrivKey(),
-                    (ECPublicKey) SerializationUtil.strToKey(this.sharedData.getCurrentSession().getCurrentDeviceId(), "eccPublicKey")
+                        SerializationUtil.base64ToPublicKey(this.sharedData.getCurrentSession().getCurrentDeviceId())
                 );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.byteToBase64Str(currentSessionKeyByte));
+            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.bytesToBase64(currentSessionKeyByte));
 
             // Update Session: PS-Cmd
             this.executePs("recvCrke1AndSendCrke2", ticketIn, null, null);
@@ -416,12 +417,12 @@ public class Executor {
                         this.sharedData.getCurrentSession().getKeyExchangeSalt1(),
                         ticketIn.getKeyExchangeSalt2(),
                         this.sharedData.getThisDevice().getDevicePrivKey(),
-                    (ECPublicKey) SerializationUtil.strToKey(this.sharedData.getCurrentSession().getCurrentHolderId(), "eccPublicKey")
+                        SerializationUtil.base64ToPublicKey(this.sharedData.getCurrentSession().getCurrentHolderId())
                 );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.byteToBase64Str(currentSessionKeyByte));
+            this.sharedData.getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.bytesToBase64(currentSessionKeyByte));
 
             // Update Session: PS-Cmd
             this.executePs("recvCrke2", ticketIn, null, null);
@@ -447,10 +448,10 @@ public class Executor {
         // simpleStorage.storeStorage(sharedData.getThisDevice(), sharedData.getDeviceTable(), sharedData.getThisPerson(), sharedData.getCurrentSession());
     }
 
-    private byte[] _executeGenerateSessionKey(String keyExchangeSalt1, String keyExchangeSalt2, ECPrivateKey serverPrivKey, ECPublicKey peerPubKey) throws Exception {
+    private byte[] _executeGenerateSessionKey(String keyExchangeSalt1, String keyExchangeSalt2, PrivateKey serverPrivKey, PublicKey peerPubKey) throws Exception {
         // Convert Base64 encoded salts to byte arrays
-        byte[] salt1Bytes = SerializationUtil.base64StrBackToByte(keyExchangeSalt1);
-        byte[] salt2Bytes = SerializationUtil.base64StrBackToByte(keyExchangeSalt2);
+        byte[] salt1Bytes = SerializationUtil.base64ToBytes(keyExchangeSalt1);
+        byte[] salt2Bytes = SerializationUtil.base64ToBytes(keyExchangeSalt2);
 
         // Perform bitwise AND operation between salt1Bytes and salt2Bytes
         assert salt1Bytes != null && salt2Bytes != null;
@@ -483,7 +484,7 @@ public class Executor {
             case "sendUt" :
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintext);
-                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("additional unencrypted cmd");
+                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("AUC");
                 break;
             case "recvUtAndSendCrke1":
                 // Update Session: Next-IV
@@ -491,7 +492,7 @@ public class Executor {
                 break;
             case "recvCrke2" :
                 // Update Session: PS-Cmd (Input: Key)
-                byte[] currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                byte[] currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
 
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
@@ -515,7 +516,7 @@ public class Executor {
                 break;
             case "sendCrke3" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)
@@ -539,11 +540,11 @@ public class Executor {
             // PS
             case "sendUToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintext);
-                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("additional unencrypted cmd");
+                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("AUC");
 
                 // Update Session: PS-Cmd (Encryption)
                 Pair encResult2 = this._executeEncryptPlaintext(
@@ -561,7 +562,7 @@ public class Executor {
                 break;
             case "recvUToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
                 this.sharedData.getCurrentSession().setCiphertextCmd(ticketIn.getCiphertextCmd());
@@ -586,7 +587,7 @@ public class Executor {
                 break;
             case "sendRToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)
@@ -619,7 +620,7 @@ public class Executor {
             case "sendUt" :
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintext);
-                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("additional unencrypted cmd");
+                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("AUC");
                 break;
             case "recvUtAndSendCrke1":
                 // Update Session: Next-IV
@@ -627,7 +628,7 @@ public class Executor {
                 break;
             case "recvCrke1AndSendCrke2" :
                 // Update Session: PS-Cmd (Input: Key)
-                byte[] currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                byte[] currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvCmd(ticketIn.getIvCmd());
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
@@ -649,11 +650,11 @@ public class Executor {
                 break;
             case "recvCrke2" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
 
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
-                this.sharedData.getCurrentSession().setCiphertextCmd(ticketIn.getCiphertextCmd());
+                this.sharedData.getCurrentSession().setCiphertextCmd(ticketIn.getCiphertextData());
                 this.sharedData.getCurrentSession().setAssociatedPlaintextCmd(ticketIn.getAssociatedPlaintextCmd());
                 this.sharedData.getCurrentSession().setGcmAuthenticationTagCmd(ticketIn.getGcmAuthenticationTagCmd());
 
@@ -673,7 +674,7 @@ public class Executor {
                 break;
             case "sendCrke3" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)
@@ -697,7 +698,7 @@ public class Executor {
             case "recvCrke3":
             case "recvRToken":
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvCmd(ticketIn.getIvCmd());
                 // Update Session: PS-Data (Input: Ciphertext, Associated-Plaintext, GCM-Authentication-Tag)
@@ -721,11 +722,16 @@ public class Executor {
             // PS
             case "sendUToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintext);
-                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("additional unencrypted cmd");
+                this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("AUC");
+
+                SimpleLogger.simpleLog("info", "executePs: plaintextCmd = " + this.sharedData.getCurrentSession().getPlaintextCmd());
+                SimpleLogger.simpleLog("info", "executePs: associatedPlaintextCmd = " + this.sharedData.getCurrentSession().getAssociatedPlaintextCmd());
+                SimpleLogger.simpleLog("info", "executePs: currentSessionKeyStr = " + this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                SimpleLogger.simpleLog("info", "executePs: ivCmd = " + this.sharedData.getCurrentSession().getIvCmd());
 
                 // Update Session: PS-Cmd (Encryption)
                 Pair encResult3 = this._executeEncryptPlaintext(
@@ -743,7 +749,7 @@ public class Executor {
                 break;
             case "sendRToken" :
                 // Update Session: PS-Cmd (Input: Key)
-                currentSessionKeyBytes = SerializationUtil.base64StrBackToByte(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
+                currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
                 this.sharedData.getCurrentSession().setIvData(ticketIn.getIvData());
                 // Update Session: PS-Data (Input: Plaintext, Associated-Plaintext, Encryption)
@@ -771,45 +777,44 @@ public class Executor {
 
     private String _generateNextIv() {
         try {
-            return SerializationUtil.byteToBase64Str(ECDH.gcmGenIv());
+            return SerializationUtil.bytesToBase64(ECDH.gcmGenIv());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private Pair _executeEncryptPlaintext(String plaintext, String associatedPlaintext, byte[] sessionKey, String iv) {
-        byte[] plaintextBytes = SerializationUtil.strToByte(plaintext);
+        byte[] plaintextBytes = SerializationUtil.strToBytes(plaintext);
         plaintextBytes = (plaintextBytes == null) ? new byte[0] : plaintextBytes;
-        byte[] associatedPlaintextBytes = SerializationUtil.strToByte(associatedPlaintext);
+        byte[] associatedPlaintextBytes = SerializationUtil.strToBytes(associatedPlaintext);
         associatedPlaintextBytes = (associatedPlaintextBytes == null) ? new byte[0] : associatedPlaintextBytes;
-        byte[] ivBytes = SerializationUtil.base64StrBackToByte(iv);
+        byte[] ivBytes = SerializationUtil.base64ToBytes(iv);
 
         try {
             byte[][] bytePair = ECDH.gcmEncrypt(plaintextBytes, associatedPlaintextBytes, sessionKey, ivBytes);
             byte[] ciphertextBytes = bytePair[0];
             byte[] gcmAuthenticationTagBytes = bytePair[2];
 
-            String ciphertext = SerializationUtil.byteToBase64Str(ciphertextBytes);
-            String gcmAuthenticationTag = SerializationUtil.byteToBase64Str(gcmAuthenticationTagBytes);
+            String ciphertext = SerializationUtil.bytesToBase64(ciphertextBytes);
+            String gcmAuthenticationTag = SerializationUtil.bytesToBase64(gcmAuthenticationTagBytes);
 
             return new Pair(ciphertext, gcmAuthenticationTag);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
     private String _executeDecryptCiphertext(String ciphertext, String associatedPlaintext, String gcmAuthenticationTag, byte[] sessionKey, String iv) {
         // [STAGE: (VTK)] Verify HMAC before Execution
-        byte[] ciphertextBytes = SerializationUtil.base64StrBackToByte(ciphertext);
-        byte[] associatedPlaintextBytes = SerializationUtil.strToByte(associatedPlaintext);
-        byte[] gcmAuthenticationTagByte = SerializationUtil.base64StrBackToByte(gcmAuthenticationTag);
-        byte[] ivBytes = SerializationUtil.base64StrBackToByte(iv);
+        byte[] ciphertextBytes = SerializationUtil.base64ToBytes(ciphertext);
+        byte[] associatedPlaintextBytes = SerializationUtil.strToBytes(associatedPlaintext);
+        byte[] gcmAuthenticationTagByte = SerializationUtil.base64ToBytes(gcmAuthenticationTag);
+        byte[] ivBytes = SerializationUtil.hexToBytes(iv);
 
         try {
             // verify_token_through_hmac
             byte[] plaintextByte = ECDH.gcmDecrypt(ciphertextBytes,associatedPlaintextBytes,gcmAuthenticationTagByte,sessionKey,ivBytes);
 
-            String plaintext = SerializationUtil.byteBackToStr(plaintextByte);
+            String plaintext = SerializationUtil.bytesToStr(plaintextByte);
 
             this.sharedData.setResultMessage("-> SUCCESS: VERIFY_IV_AND_HMAC");
             SimpleLogger.simpleLog("info", this.sharedData.getResultMessage());

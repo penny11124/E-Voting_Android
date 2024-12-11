@@ -163,7 +163,7 @@ public class MsgVerifier {
         String successMsg = "-> SUCCESS: VERIFY_CMD_IN_TASK_SCOPE";
         String failureMsg = "-> FAILURE: VERIFY_CMD_IN_TASK_SCOPE";
 
-        Map<String, String> task_scope = SerializationUtil.jsonStrToDict(this.sharedData.getCurrentSession().getCurrentTaskScope());
+        Map<String, String> task_scope = SerializationUtil.jsonToMap(this.sharedData.getCurrentSession().getCurrentTaskScope());
         // SimpleLogger.simpleLog("debug", "currentTaskScope: " + task_scope);
 
         if (Objects.equals(task_scope.get("ALL"), "allow")) {

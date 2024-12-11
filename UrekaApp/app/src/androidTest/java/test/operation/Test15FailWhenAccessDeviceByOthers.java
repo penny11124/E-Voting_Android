@@ -63,7 +63,7 @@ public class Test15FailWhenAccessDeviceByOthers {
                 targetDeviceId, interceptedUTicketJson, interceptedRTicketJson, 2
         ));
         // WHEN: Forge Flow (issuerIssueUTicketToHolder)
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
                 "device_id", targetDeviceId,
                 "holder_id", this.cloudServerATK.getSharedData().getThisPerson().getPersonPubKeyStr(),
@@ -111,7 +111,7 @@ public class Test15FailWhenAccessDeviceByOthers {
         // Because TYPE_ACCESS_UTICKET has sent on BC, & maybe have been sent in WPAN (Reopen Session) the attacker can intercept & preempt it.
         // createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
                 "device_id", targetDeviceId,
                 "holder_id", this.cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr(),
@@ -165,7 +165,7 @@ public class Test15FailWhenAccessDeviceByOthers {
         // Because TYPE_ACCESS_UTICKET has sent on BC, & maybe have been sent in WPAN (Reopen Session) the attacker can intercept & preempt it.
         // createSimulatedCommConnection(this.userAgentDO, this.cloudServerEP);
         String targetDeviceId = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
                 "device_id", targetDeviceId,
                 "holder_id", this.cloudServerEP.getSharedData().getThisPerson().getPersonPubKeyStr(),

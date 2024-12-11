@@ -54,7 +54,7 @@ public class FlowOpenSessionTest {
         currentSession.setCurrentUTicketId("currentUTicketId");
         currentSession.setChallenge1(ECDH.generateRandomStr(32));
         currentSession.setKeyExchangeSalt1(ECDH.generateRandomStr(32));
-        currentSession.setIvCmd(SerializationUtil.byteToBase64Str(ECDH.gcmGenIv()));
+        currentSession.setIvCmd(SerializationUtil.bytesToBase64(ECDH.gcmGenIv()));
 
         SharedData sharedData = new SharedData(thisDevice, currentSession, thisPerson);
         sharedData.setDeviceTable(new HashMap<>());

@@ -1,5 +1,7 @@
 package ureka.framework.logic.stage_worker;
 
+import com.example.urekaapp.AdminAgentActivity;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
@@ -172,7 +174,7 @@ public class MsgReceiver implements Runnable {
         if (data.contains("REQUEST: ")) {
             String croppedData = data.substring(0, "REQUEST: ".length());
 
-            Map<String, String> arbitraryDict = SerializationUtil.jsonStrToDict(croppedData);
+            Map<String, String> arbitraryDict = SerializationUtil.jsonToMap(croppedData);
             this.getFlowIssueUTicket().issuerIssueUTicketToHolder(arbitraryDict);
         }
 
@@ -222,9 +224,13 @@ public class MsgReceiver implements Runnable {
                 this.flowOpenSession._holderRecvCrKe3((RTicket) receivedMessage);
                 SimpleLogger.simpleLog("cli", "plaintextData in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextData());
                 SimpleLogger.simpleLog("cli", "+++Session is Constructed+++");
+                AdminAgentActivity.sendNextTicket = true;
+                SimpleLogger.simpleLog("info", "Ready to send next ticket");
             } else if (state.equals(ThisDevice.STATE_AGENT_WAIT_FOR_DATA)) {
                 this.flowIssueUToken._holderRecvData((RTicket) receivedMessage);
                 SimpleLogger.simpleLog("cli", "plaintextData in " + this.sharedData.getThisDevice().getDeviceName() + " = " + this.sharedData.getCurrentSession().getPlaintextData());
+                AdminAgentActivity.sendNextTicket = true;
+                SimpleLogger.simpleLog("info", "Ready to send next ticket");
             } else { // pragma: no cover -> Shouldn't Reach Here
                 throw new RuntimeException("Shouldn't Reach Here");
             }

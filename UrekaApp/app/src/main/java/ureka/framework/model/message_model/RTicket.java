@@ -62,7 +62,7 @@ public class RTicket {
     private String gcm_authentication_tag_cmd;
     // PS-Data
     private String associated_plaintext_data;
-    private String ciphertextData;
+    private String ciphertext_data;
     private String iv_data;
     private String gcm_authentication_tag_data;
     // RT
@@ -262,11 +262,11 @@ public class RTicket {
     }
 
     public String getCiphertextData() {
-        return ciphertextData;
+        return ciphertext_data;
     }
 
     public void setCiphertextData(String ciphertextData) {
-        this.ciphertextData = ciphertextData;
+        this.ciphertext_data = ciphertextData;
     }
 
     public String getIvData() {
@@ -348,8 +348,8 @@ public class RTicket {
         if (rTicket.associated_plaintext_data != null) {
             jsonObject.addProperty("associated_plaintext_data", rTicket.associated_plaintext_data);
         }
-        if (rTicket.ciphertextData != null) {
-            jsonObject.addProperty("ciphertextData", rTicket.ciphertextData);
+        if (rTicket.ciphertext_data != null) {
+            jsonObject.addProperty("ciphertext_data", rTicket.ciphertext_data);
         }
         if (rTicket.iv_data != null) {
             jsonObject.addProperty("iv_data", rTicket.iv_data);

@@ -1,19 +1,27 @@
 package ureka.framework.resource.crypto;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.spongycastle.asn1.ASN1Integer;
 import org.spongycastle.asn1.ASN1Sequence;
 import org.spongycastle.asn1.DERSequence;
+import org.spongycastle.crypto.params.ECPrivateKeyParameters;
 import org.spongycastle.jce.ECNamedCurveTable;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.spongycastle.jce.spec.ECPrivateKeySpec;
 
+import java.io.IOException;
 import java.io.Serial;
+import java.lang.reflect.Type;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
@@ -22,6 +30,7 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
@@ -35,273 +44,270 @@ import ureka.framework.resource.logger.SimpleLogger;
 
 public class SerializationUtil {
 
-//    static {
-//        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-//            // Security.addProvider(new BouncyCastleProvider());
-//            Security.insertProviderAt(new BouncyCastleProvider(), 1);
-//        }
-//    }
+    //////////////////// Basic Serialization ////////////////////
+    ////////// Bytes reversion //////////
+    public static byte[] reverseBytes(byte[] byteArray) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("reverseBytes: ByteArray is null.");
+        }
+        byte[] reversed = new byte[byteArray.length];
+        for (int i = 0; i < byteArray.length; i++) {
+            reversed[i] = byteArray[byteArray.length - 1 - i];
+        }
+        return reversed;
+    }
 
     ////////// String <-> Bytes //////////
-    public static byte[] strToByte(String string) {
+    public static byte[] strToBytes(String string) {
         if (string == null) {
-            return null;
+            throw new IllegalArgumentException("strToBytes: String is null.");
         }
         return string.getBytes(StandardCharsets.UTF_8);
     }
-
-    public static String byteBackToStr(byte[] byteArray) {
-        try {
-            return new String(byteArray, java.nio.charset.StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("byteBackToStr: Decode failed.", e);
+    public static String bytesToStr(byte[] byteArray) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("bytesToStr: ByteArray is null.");
         }
+        return new String(byteArray, StandardCharsets.UTF_8);
     }
 
-    ////////// Bytes <-> Base64Str //////////
-    public static String byteToBase64Str(byte[] byteArray) {
-        return Base64.getEncoder().encodeToString(byteArray);
-    }
-
-    public static byte[] base64StrBackToByte(String base64String) {
-        try {
-            assert (base64String != null);
-            return Base64.getDecoder().decode(base64String);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("base64StrBackToByte: Decode failed.", e);
-        }
-    }
-
-    ////////// Dict <-> JSONStr //////////
-    private static final Gson gson = new Gson();
-
-    public static String dictToJsonStr(Map<String, String> dict) {
-        return gson.toJson(dict);
-    }
-
-    public static Map<String, String> jsonStrToDict(String jsonStr) {
-        try {
-            return gson.fromJson(jsonStr, Map.class);
-        } catch (Exception e) {
-            throw new RuntimeException("NOT VALID JSON", e);
-        }
-    }
-
-    ////////// ECPublicKey/ECPrivateKey <-> Byte //////////
-    public static byte[] _keyToByte(Object keyObj, String keyType) {
-        try {
-            if (keyType.equals("eccPublicKey") && keyObj instanceof ECPublicKey) {
-                return ((ECPublicKey) keyObj).getEncoded();
-            } else if (keyType.equals("eccPrivateKey") && keyObj instanceof ECPrivateKey) {
-                return SerializationUtil.hexToBytes(SerializationUtil.ecPrivateKeyToHex((ECPrivateKey) keyObj));
-            } else {
-                throw new RuntimeException("_keyToByte: Key type not supported.");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("_keyToByte: Conversion failed.", e);
-        }
-    }
-
-    public static Object _byteToKey(byte[] keyByte, String keyType) {
-        try {
-            KeyFactory keyFactory = KeyFactory.getInstance("EC");
-            if (keyType.equals("eccPublicKey")) {
-                X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyByte);
-                return keyFactory.generatePublic(keySpec);
-            } else if (keyType.equals("eccPrivateKey")) {
-                return SerializationUtil.hexToECPrivateKey(SerializationUtil.bytesToHex(keyByte));
-            } else {
-                throw new RuntimeException("_byteToKey: Key type not supported.");
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("_byteToKey: Conversion failed.", e);
-        }
-    }
-
-    ////////// ECPublicKey/ECPrivateKey <-> String //////////
-    public static String keyToStr(Object keyObj, String keyType) {
-        if (keyObj instanceof ECPrivateKey) {
-            return byteToBase64Str(_keyToByte(keyObj, keyType));
-        } else if (keyObj instanceof ECPublicKey) {
-            ECPublicKey publicKey = (ECPublicKey) keyObj;
-
-            // Extract the public key's elliptic curve point
-            BigInteger x = publicKey.getW().getAffineX();
-            BigInteger y = publicKey.getW().getAffineY();
-
-            byte[] xBytes = x.toByteArray();
-            byte[] yBytes = y.toByteArray();
-//            xBytes = SerializationUtil.reverseBytes(xBytes);
-//            yBytes = SerializationUtil.reverseBytes(yBytes);
-//            SimpleLogger.simpleLog("info", "xHex = " + SerializationUtil.bytesToHex(xBytes));
-//            SimpleLogger.simpleLog("info", "yHex = " + SerializationUtil.bytesToHex(yBytes));
-
-            // Encode the byte arrays to Base64 strings
-            String xBase64 = Base64.getEncoder().encodeToString(xBytes);
-            String yBase64 = Base64.getEncoder().encodeToString(yBytes);
-            return xBase64 + "-" + yBase64;
-        } else {
-            throw new IllegalArgumentException("keyToStr: Illegal argument.");
-        }
-    }
-
-    public static Object strToKey(String keyStr, String keyType) {
-        if (Objects.equals(keyType, "eccPrivateKey")) {
-            return _byteToKey(base64StrBackToByte(keyStr), keyType);
-        } else if (Objects.equals(keyType, "eccPublicKey")) {
-            try {
-                String[] base64Int = keyStr.split("-");
-
-                byte[] xBytes = Base64.getDecoder().decode(base64Int[0]);
-                byte[] yBytes = Base64.getDecoder().decode(base64Int[1]);
-//                xBytes = SerializationUtil.reverseBytes(xBytes);
-//                yBytes = SerializationUtil.reverseBytes(yBytes);
-
-                SimpleLogger.simpleLog("info", "strToKey: x = " + bytesToHex(xBytes));
-                SimpleLogger.simpleLog("info", "strToKey: y = " + bytesToHex(yBytes));
-
-                // Convert byte arrays to BigInteger
-                BigInteger x = new BigInteger(1, xBytes);
-                BigInteger y = new BigInteger(1, yBytes);
-
-                // Create an ECPoint from x and y
-                ECPoint ecPoint = new ECPoint(x, y);
-
-                // Get the ECParameterSpec for the curve (e.g., secp256k1)
-                // This example uses the standard named curve "secp256k1"
-                ECGenParameterSpec ecGenSpec = new java.security.spec.ECGenParameterSpec("secp256k1");
-                KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance("EC", "SC");
-                kpg.initialize(ecGenSpec);
-                ECParameterSpec ecSpec = ((ECPublicKey) kpg.generateKeyPair().getPublic()).getParams();
-
-                // Create the ECPublicKeySpec
-                ECPublicKeySpec ecPublicKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
-
-                // Generate the public key using KeyFactory
-                KeyFactory keyFactory = KeyFactory.getInstance("EC", "SC");
-                return keyFactory.generatePublic(ecPublicKeySpec);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            throw new RuntimeException("strToKey: Unknown key type.");
-        }
-    }
-
-    ////////// Signature <-> Base64Str //////////
-    public static String signatureToBase64Str(byte[] signature) {
-        try {
-            // Extract r and s from the ASN.1/DER-encoded signature
-            ASN1Sequence sequence = (ASN1Sequence) ASN1Sequence.fromByteArray(signature);
-            BigInteger r = ((ASN1Integer) sequence.getObjectAt(0)).getValue();
-            BigInteger s = ((ASN1Integer) sequence.getObjectAt(1)).getValue();
-
-            // Convert r and s to byte arrays (big-endian by default)
-            byte[] rBytes = r.toByteArray();
-            byte[] sBytes = s.toByteArray();
-//            rBytes = reverseBytes(rBytes); // Convert to small-endian
-//            sBytes = reverseBytes(sBytes); // Convert to small-endian
-
-            // Convert r and s to Base64
-            String rBase64 = Base64.getEncoder().encodeToString(rBytes);
-            String sBase64 = Base64.getEncoder().encodeToString(sBytes);
-
-            return rBase64 + "-" + sBase64;
-        } catch (Exception e) {
-            throw new RuntimeException("signatureToBase64Str: Decode failed.", e);
-        }
-    }
-
-    public static byte[] base64StrToSignature(String base64Str) {
-        try {
-            String[] base64Strs = base64Str.split("-");
-            // Decode Base64 strings to byte arrays
-            byte[] rBytes = Base64.getDecoder().decode(base64Strs[0]);
-            byte[] sBytes = Base64.getDecoder().decode(base64Strs[1]);
-//            rBytes = SerializationUtil.reverseBytes(rBytes);
-//            sBytes = SerializationUtil.reverseBytes(sBytes);
-            SimpleLogger.simpleLog("info", "base64StrToSignature: r = " + SerializationUtil.bytesToHex(rBytes));
-            SimpleLogger.simpleLog("info", "base64StrToSignature: s = " + SerializationUtil.bytesToHex(sBytes));
-
-            // Convert byte arrays to BigInteger
-            BigInteger r = new BigInteger(1, rBytes);
-            BigInteger s = new BigInteger(1, sBytes);
-
-            // Create ASN.1/DER-encoded sequence from r and s
-            ASN1Integer rAsn1 = new ASN1Integer(r);
-            ASN1Integer sAsn1 = new ASN1Integer(s);
-            ASN1Sequence sequence = new DERSequence(new ASN1Integer[]{rAsn1, sAsn1});
-            return sequence.getEncoded();
-        } catch (Exception e) {
-            throw new RuntimeException("base64StrToSignature: Decode failed.", e);
-        }
-    }
-
-    ////////// byte[] <-> hex string //////////
-    public static String bytesToHex(byte[] bytes) {
-        if (bytes == null) {
-            return null;
-        }
-
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = String.format("%02x", b);
-            hexString.append(hex);
-        }
-
-        return hexString.toString();
-    }
-
+    ////////// Hex <-> Bytes //////////
     public static byte[] hexToBytes(String hexString) {
-        if (hexString == null || hexString.length() % 2 != 0) {
-            throw new IllegalArgumentException("Invalid hexadecimal string");
+        if (hexString == null) {
+            throw new IllegalArgumentException("hexToBytes: String is null.");
+        } else if (hexString.length() % 2 != 0) {
+            throw new IllegalArgumentException("hexToBytes: Invalid hex string length.");
         }
-
         int length = hexString.length();
         byte[] byteArray = new byte[length / 2];
-
         for (int i = 0; i < length; i += 2) {
             String hexPair = hexString.substring(i, i + 2);
             byteArray[i / 2] = (byte) Integer.parseInt(hexPair, 16);
         }
-
         return byteArray;
     }
-
-    ////////// ECPrivateKey <-> hex string //////////
-    public static String ecPrivateKeyToHex(ECPrivateKey ecPrivateKey) {
-        BigInteger privateKeyValue = ecPrivateKey.getS();
-
-        byte[] privateKeyBytes = privateKeyValue.toByteArray();
-
-        if (privateKeyBytes[0] == 0) {
-            byte[] temp = new byte[privateKeyBytes.length - 1];
-            System.arraycopy(privateKeyBytes, 1, temp, 0, temp.length);
-            privateKeyBytes = temp;
+    public static String bytesToHex(byte[] byteArray) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("bytesToHex: ByteArray is null.");
         }
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : byteArray) {
+            String hex = String.format("%02x", b);
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    ////////// Base64Str <-> Bytes //////////
+    public static byte[] base64ToBytes(String base64String) {
+        if (base64String == null) {
+            throw new IllegalArgumentException("base64ToBytes: String is null.");
+        }
+        return Base64.getDecoder().decode(base64String);
+    }
+    public static String bytesToBase64(byte[] byteArray) {
+        if (byteArray == null) {
+            throw new IllegalArgumentException("bytesToBase64: ByteArray is null.");
+        }
+        return Base64.getEncoder().encodeToString(byteArray);
+    }
+
+    ////////// Map <-> JSON //////////
+    private static final Gson gson = new Gson();
+    public static String mapToJson(Map<String, String> map) {
+        if (map == null) {
+            throw new IllegalArgumentException("mapToJson: Map is null.");
+        }
+        return gson.toJson(map);
+    }
+    public static Map<String, String> jsonToMap(String jsonString) {
+        if (jsonString == null) {
+            throw new IllegalArgumentException("jsonToMap: String is null.");
+        }
+        Type mapType = new TypeToken<Map<String, String>>(){}.getType();
+        return gson.fromJson(jsonString, mapType);
+    }
+
+    //////////////////// Key Serialization ////////////////////
+    ////////// PublicKey <-> Base64 //////////
+    public static String publicKeyToBase64(PublicKey publicKey) {
+        if (publicKey == null) {
+            throw new IllegalArgumentException("publicKeyToBase64: PublicKey is null.");
+        }
+        ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
+        BigInteger x = ecPublicKey.getW().getAffineX();
+        BigInteger y = ecPublicKey.getW().getAffineY();
+        byte[] xBytes = x.toByteArray();
+        byte[] yBytes = y.toByteArray();
+        if (xBytes.length > 32) {
+            xBytes = Arrays.copyOfRange(xBytes, xBytes.length - 32, xBytes.length);
+        }
+        if (yBytes.length > 32) {
+            yBytes = Arrays.copyOfRange(yBytes, yBytes.length - 32, yBytes.length);
+        }
+        String xBase64 = SerializationUtil.bytesToBase64(xBytes);
+        String yBase64 = SerializationUtil.bytesToBase64(yBytes);
+        return xBase64 + "-" + yBase64;
+    }
+    public static PublicKey base64ToPublicKey(String base64String) throws Exception {
+        if (base64String == null) {
+            throw new IllegalArgumentException("base64ToPublicKey: String is null.");
+        } else if (!base64String.contains("-")) {
+            throw new IllegalArgumentException("base64ToPublicKey: Invalid Base64 string.");
+        }
+        String[] parts = base64String.split("-");
+        String xBase64 = parts[0];
+        String yBase64 = parts[1];
+        byte[] xBytes = SerializationUtil.base64ToBytes(xBase64);
+        byte[] yBytes = SerializationUtil.base64ToBytes(yBase64);
+        BigInteger x = new BigInteger(1, xBytes);
+        BigInteger y = new BigInteger(1, yBytes);
+
+        ECPoint ecPoint = new ECPoint(x, y);
+        ECGenParameterSpec ecGenSpec = new java.security.spec.ECGenParameterSpec("secp256k1");
+        KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance("EC", "SC");
+        kpg.initialize(ecGenSpec);
+        ECParameterSpec ecSpec = ((ECPublicKey) kpg.generateKeyPair().getPublic()).getParams();
+        ECPublicKeySpec ecPublicKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
+        KeyFactory keyFactory = KeyFactory.getInstance("EC", "SC");
+        return keyFactory.generatePublic(ecPublicKeySpec);
+    }
+
+    ////////// PrivateKey <-> Base64 //////////
+    public static String privateKeyToBase64(PrivateKey privateKey) {
+        if (privateKey == null) {
+            throw new IllegalArgumentException("privateKeyToBase64: PrivateKey is null.");
+        }
+        byte[] privateKeyBytes = privateKey.getEncoded();
+        return SerializationUtil.bytesToBase64(privateKeyBytes);
+    }
+    public static PrivateKey base64ToPrivateKey(String base64String) throws Exception {
+        if (base64String == null) {
+            throw new IllegalArgumentException("base64ToPrivateKey: String is null.");
+        }
+        byte[] privateKeyBytes = SerializationUtil.base64ToBytes(base64String);
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
+        return keyFactory.generatePrivate(keySpec);
+    }
+
+    ////////// PublicKey <-> Hex //////////
+    public static String[] publicKeyToHex(PublicKey publicKey) {
+        if (publicKey == null) {
+            throw new IllegalArgumentException("publicKeyToHex: PublicKey is null.");
+        }
+        ECPublicKey ecPublicKey = (ECPublicKey) publicKey;
+        BigInteger x = ecPublicKey.getW().getAffineX();
+        BigInteger y = ecPublicKey.getW().getAffineY();
+        byte[] xBytes = x.toByteArray();
+        byte[] yBytes = y.toByteArray();
+        String xHex = SerializationUtil.bytesToHex(xBytes);
+        String yHex = SerializationUtil.bytesToHex(yBytes);
+        return new String[]{xHex, yHex};
+    }
+    public static PublicKey hexToPublicKey(String xHex, String yHex) throws Exception {
+        if (xHex == null) {
+            throw new IllegalArgumentException("hexToPublicKey: xHex is null.");
+        } else if (yHex == null) {
+            throw new IllegalArgumentException("hexToPublicKey: yHex is null.");
+        }
+        byte[] xBytes = SerializationUtil.hexToBytes(xHex);
+        byte[] yBytes = SerializationUtil.hexToBytes(yHex);
+        BigInteger x = new BigInteger(1, xBytes);
+        BigInteger y = new BigInteger(1, yBytes);
+
+        ECPoint ecPoint = new ECPoint(x, y);
+        ECGenParameterSpec ecGenSpec = new java.security.spec.ECGenParameterSpec("secp256k1");
+        KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance("EC", "SC");
+        kpg.initialize(ecGenSpec);
+        ECParameterSpec ecSpec = ((ECPublicKey) kpg.generateKeyPair().getPublic()).getParams();
+        ECPublicKeySpec ecPublicKeySpec = new ECPublicKeySpec(ecPoint, ecSpec);
+        KeyFactory keyFactory = KeyFactory.getInstance("EC", "SC");
+        return keyFactory.generatePublic(ecPublicKeySpec);
+    }
+
+    ////////// PrivateKey <-> Hex //////////
+    public static String privateKeyToHex(PrivateKey privateKey) {
+        if (privateKey == null) {
+            throw new IllegalArgumentException("privateKeyToHex: PrivateKey is null.");
+        }
+        ECPrivateKey ecPrivateKey = (ECPrivateKey) privateKey;
+        byte[] privateKeyBytes = ecPrivateKey.getS().toByteArray();
         return SerializationUtil.bytesToHex(privateKeyBytes);
     }
-
-    public static ECPrivateKey hexToECPrivateKey(String hexString) throws Exception {
+    public static PrivateKey hexToPrivateKey(String hexString) throws Exception {
+        if (hexString == null) {
+            throw new IllegalArgumentException("hexToPrivateKey: String is null.");
+        }
         byte[] privateKeyBytes = SerializationUtil.hexToBytes(hexString);
-
-        // Create a BigInteger from the byte array (this is the 's' value of the private key)
-        BigInteger privateKeyValue = new BigInteger(1, privateKeyBytes); // Ensure positive
-
-        // Define the EC parameters for secp256k1
-        ECPrivateKeySpec privateKeySpec = new ECPrivateKeySpec(privateKeyValue, ECNamedCurveTable.getParameterSpec("secp256k1"));
-
-        // Use KeyFactory to generate the ECPrivateKey
-        KeyFactory keyFactory = KeyFactory.getInstance("EC", "SC");
-
-        return (ECPrivateKey) keyFactory.generatePrivate(privateKeySpec);
+        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec("secp256k1");
+        ECPrivateKeySpec privateKeySpec = new ECPrivateKeySpec(new BigInteger(1, privateKeyBytes), spec);
+        KeyFactory keyFactory = KeyFactory.getInstance("EC");
+        return keyFactory.generatePrivate(privateKeySpec);
     }
 
-    public static byte[] reverseBytes(byte[] bytes) {
-        byte[] reversed = new byte[bytes.length];
-        for (int i = 0; i < bytes.length; i++) {
-            reversed[i] = bytes[bytes.length - 1 - i];
+    //////////////////// Signature Serialization ////////////////////
+    ////////// Signature <-> Base64 //////////
+    public static String signatureToBase64(byte[] signature) throws Exception {
+        if (signature == null) {
+            throw new IllegalArgumentException("signatureToBase64: Signature is null.");
         }
-        return reversed;
+        ASN1Sequence sequence = (ASN1Sequence) ASN1Sequence.fromByteArray(signature);
+        BigInteger r = ((ASN1Integer) sequence.getObjectAt(0)).getValue();
+        BigInteger s = ((ASN1Integer) sequence.getObjectAt(1)).getValue();
+        byte[] rBytes = r.toByteArray();
+        byte[] sBytes = s.toByteArray();
+        if (rBytes.length > 32) {
+            rBytes = Arrays.copyOfRange(rBytes, rBytes.length - 32, rBytes.length);
+        }
+        if (sBytes.length > 32) {
+            sBytes = Arrays.copyOfRange(sBytes, sBytes.length - 32, sBytes.length);
+        }
+        String rBase64 = SerializationUtil.bytesToBase64(rBytes);
+        String sBase64 = SerializationUtil.bytesToBase64(sBytes);
+        return rBase64 + "-" + sBase64;
+    }
+    public static byte[] base64ToSignature(String base64Str) throws Exception {
+        if (base64Str == null) {
+            throw new IllegalArgumentException("base64ToSignature: String is null.");
+        } else if (!base64Str.contains("-")) {
+            throw new IllegalArgumentException("base64ToSignature: Invalid Base64 string.");
+        }
+        String[] parts = base64Str.split("-");
+        String rBase64 = parts[0];
+        String sBase64 = parts[1];
+        byte[] rBytes = SerializationUtil.base64ToBytes(rBase64);
+        byte[] sBytes = SerializationUtil.base64ToBytes(sBase64);
+        BigInteger r = new BigInteger(1, rBytes);
+        BigInteger s = new BigInteger(1, sBytes);
+        ASN1Integer rAsn1 = new ASN1Integer(r);
+        ASN1Integer sAsn1 = new ASN1Integer(s);
+        ASN1Sequence sequence = new DERSequence(new ASN1Integer[]{rAsn1, sAsn1});
+        return sequence.getEncoded();
+    }
+
+    ////////// Signature <-> Hex //////////
+    public static String[] signatureToHex(byte[] signature) throws IOException {
+        if (signature == null) {
+            throw new IllegalArgumentException("signatureToHex: Signature is null.");
+        }
+        ASN1Sequence sequence = (ASN1Sequence) ASN1Sequence.fromByteArray(signature);
+        BigInteger r = ((ASN1Integer) sequence.getObjectAt(0)).getValue();
+        BigInteger s = ((ASN1Integer) sequence.getObjectAt(1)).getValue();
+        byte[] rBytes = r.toByteArray();
+        byte[] sBytes = s.toByteArray();
+        String rHex = SerializationUtil.bytesToHex(rBytes);
+        String sHex = SerializationUtil.bytesToHex(sBytes);
+        return new String[]{rHex, sHex};
+    }
+    public static byte[] hexToSignature(String rHex, String sHex) throws Exception {
+        byte[] rBytes = SerializationUtil.hexToBytes(rHex);
+        byte[] sBytes = SerializationUtil.hexToBytes(sHex);
+        BigInteger r = new BigInteger(1, rBytes);
+        BigInteger s = new BigInteger(1, sBytes);
+        ASN1Integer rAsn1 = new ASN1Integer(r);
+        ASN1Integer sAsn1 = new ASN1Integer(s);
+        ASN1Sequence sequence = new DERSequence(new ASN1Integer[]{rAsn1, sAsn1});
+        return sequence.getEncoded();
     }
 }

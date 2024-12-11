@@ -5,9 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.interfaces.ECPrivateKey;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class MsgGeneratorRTicket {
     }
 
     // Message Generation Flow
-    public RTicket generateArbitraryRTicket(Map<String, String> arbitraryDict) {
+    public RTicket generateArbitraryRTicket(Map<String, String> arbitraryDict) throws Exception {
         String successMsg = "-> SUCCESS: GENERATE_RTICKET";
         String failureMsg = "-> FAILURE: GENERATE_RTICKET";
 
@@ -80,12 +82,12 @@ public class MsgGeneratorRTicket {
                 Objects.equals(newRTicket.getRTicketType(), RTicket.TYPE_CRKE1_RTICKET) ||
                 Objects.equals(newRTicket.getRTicketType(), RTicket.TYPE_CRKE3_RTICKET) ||
                 Objects.equals(newRTicket.getRTicketType(), UTicket.TYPE_ACCESS_END_UTOKEN)) {
-            newRTicket = this._addIssuerSignatureOnRTicket(newRTicket,this.thisDevice.getDevicePrivKey());
+            newRTicket = this._addIssuerSignatureOnRTicket(newRTicket, this.thisDevice.getDevicePrivKey());
             SimpleLogger.simpleLog("info", successMsg);
         }
         // "holder"
         else if (Objects.equals(newRTicket.getRTicketType(), RTicket.TYPE_CRKE2_RTICKET)) {
-            newRTicket = this._addIssuerSignatureOnRTicket(newRTicket,this.thisPerson.getPersonPrivKey());
+            newRTicket = this._addIssuerSignatureOnRTicket(newRTicket, this.thisPerson.getPersonPrivKey());
             SimpleLogger.simpleLog("info", successMsg);
         }
         // "device"
@@ -103,10 +105,10 @@ public class MsgGeneratorRTicket {
 
     // something to fixed
     // Add ECC Signature on RTicket
-    private RTicket _addIssuerSignatureOnRTicket(RTicket unsignedRTicket, ECPrivateKey privateKey) {
+    private RTicket _addIssuerSignatureOnRTicket(RTicket unsignedRTicket, PrivateKey privateKey) throws Exception {
         // Message
         String unsignedRTicketStr = RTicket.rTicketToJsonStr(unsignedRTicket);  // something to fixed
-        byte[] unsignedRTicketByte = SerializationUtil.strToByte(unsignedRTicketStr);
+        byte[] unsignedRTicketByte = SerializationUtil.strToBytes(unsignedRTicketStr);
 
         // Sign Signature
         byte[] signatureByte;
@@ -118,12 +120,7 @@ public class MsgGeneratorRTicket {
 
         // Add Signature on New Signed RTicket, but Prevent side effect on Unsigned RTicket
         RTicket signedRTicket = new RTicket(unsignedRTicket);
-//        try {
-//            signedRTicket = deepCopy(unsignedRTicket);
-//        } catch (IOException | ClassNotFoundException e) {
-//            throw new RuntimeException(e);
-//        }
-        signedRTicket.setDeviceSignature(SerializationUtil.signatureToBase64Str(signatureByte));
+        signedRTicket.setDeviceSignature(SerializationUtil.signatureToBase64(signatureByte));
 
         return signedRTicket;
     }

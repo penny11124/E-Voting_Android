@@ -142,8 +142,8 @@ public class FlowIssueUTicketTest {
         rTicket.setAuditStart(uTicket.getUTicketId());
         KeyPair keyPair = ECC.generateKeyPair();
         rTicket.setRTicketId(SerializationUtil.keyToStr(keyPair.getPublic()));
-        rTicket.setDeviceSignature(SerializationUtil.byteToBase64Str(
-            ECC.signSignature(SerializationUtil.strToByte(RTicket.rTicketToJsonStr(rTicket)), (ECPrivateKey) keyPair.getPrivate())));
+        rTicket.setDeviceSignature(SerializationUtil.bytesToBase64(
+            ECC.signSignature(SerializationUtil.strToBytes(RTicket.rTicketToJsonStr(rTicket)), (ECPrivateKey) keyPair.getPrivate())));
 
         flowIssueUTicket.getSharedData().getDeviceTable().put(device_id, new OtherDevice());
         flowIssueUTicket.getSharedData().getDeviceTable().get(device_id).setTicketOrder(114514);

@@ -133,7 +133,7 @@ public class MenuAgentOrServer {
 //        this.agentOrServer.getMsgSender().connectBluetoothComm();
 //
 //        // WHEN: Issuer: DM's CS generate the self_access_u_ticket to herself
-//        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+//        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
 //        Map<String, String> generatedRequest = new HashMap<>();
 //        generatedRequest.put("device_id", targetDeviceId);
 //        generatedRequest.put("holder_id", this.agentOrServer.getSharedData().getThisPerson().getPersonPubKeyStr());
@@ -159,7 +159,7 @@ public class MenuAgentOrServer {
         Environment.COMMUNICATION_CHANNEL = "SIMULATED";
         Conftest.createSimulatedCommConnection(this.agentOrServer, newAccessor);
 
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = new HashMap<>();
         generatedRequest.put("device_id", targetDeviceId);
         generatedRequest.put("holder_id", newAccessor.getSharedData().getThisPerson().getPersonPubKeyStr());
@@ -249,14 +249,14 @@ public class MenuAgentOrServer {
 //            insecureCmdDict.put("device_id", "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEuWt9xdWLXffJE-CydWYBTH05kv7xFmMGl-L3DT_7-YH2ocgHJWUUAPxQjjRBQGOeITMandJxLDye7jK8W26GmA==");
 //            insecureCmdDict.put("insecureCommand", "HELLO");
 //
-//            insecureCmdJson = SerializationUtil.dictToJsonStr(insecureCmdDict);
+//            insecureCmdJson = SerializationUtil.mapToJson(insecureCmdDict);
 //        } else if (option.equals("uTicketSize")) {
 //            Map<String, String> insecureCmdDict = new HashMap<>();
 //            insecureCmdDict.put("protocol_version", "UREKA-1.0");
 //            insecureCmdDict.put("device_id", "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEuWt9xdWLXffJE-CydWYBTH05kv7xFmMGl-L3DT_7-YH2ocgHJWUUAPxQjjRBQGOeITMandJxLDye7jK8W26GmA==");
 //            insecureCmdDict.put("insecureCommand", "HELLO".repeat(150));
 //
-//            insecureCmdJson = SerializationUtil.dictToJsonStr(insecureCmdDict);
+//            insecureCmdJson = SerializationUtil.mapToJson(insecureCmdDict);
 //        }
 //
 //        this.agentOrServer.getSharedData().getConnectionSocket().sendMessage(insecureCmdJson);

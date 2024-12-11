@@ -22,22 +22,8 @@ import java.security.interfaces.ECPublicKey;
 import ureka.framework.Environment;
 import ureka.framework.resource.crypto.ECC;
 import ureka.framework.resource.crypto.SerializationUtil;
-//import ureka.framework.test.operation.Test01SuccessWhenInitializeAgentOrServer;
-//import ureka.framework.test.operation.Test02SuccessWhenInitializeDevice;
-//import ureka.framework.test.operation.Test03SuccessWhenTransferDeviceOwnership;
-//import ureka.framework.test.operation.Test04SuccessWhenAccessDeviceByOwner;
-//import ureka.framework.test.operation.Test05SuccessWhenAccessDeviceByOthers;
-//import ureka.framework.test.operation.Test06SuccessWhenAccessDeviceByPrivateSession;
-//import ureka.framework.test.operation.Test11FailWhenInitializeAgentOrServer;
-//import ureka.framework.test.operation.Test12FailWhenInitializeDevice;
-//import ureka.framework.test.operation.Test13FailWhenTransferDeviceOwnership;
-//import ureka.framework.test.operation.Test14FailWhenAccessDeviceByOwner;
-//import ureka.framework.test.operation.Test15FailWhenAccessDeviceByOthers;
-//import ureka.framework.test.operation.Test16FailWhenAccessDeviceByPrivateSession;
 
 public class MainActivity extends AppCompatActivity {
-    private String mode = "RUN";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,11 +36,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        KeyPair keyPair1, keyPair2, keyPair3;
+        KeyPair keyPair1, keyPair2;
         try {
             keyPair1 = ECC.generateKeyPair();
             keyPair2 = ECC.generateKeyPair();
-            keyPair3 = ECC.generateKeyPair();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -64,10 +49,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AdminAgentActivity.class);
-                intent.putExtra("mode", mode);
-                intent.putExtra("key1", SerializationUtil.keyToStr(keyPair1.getPublic(), "eccPublicKey"));
-                intent.putExtra("key2", SerializationUtil.keyToStr(keyPair2.getPublic(), "eccPublicKey"));
-                intent.putExtra("key3", SerializationUtil.keyToStr(keyPair3.getPublic(), "eccPublicKey"));
+                intent.putExtra("key1", SerializationUtil.publicKeyToBase64(keyPair1.getPublic()));
+                intent.putExtra("key2", SerializationUtil.publicKeyToBase64(keyPair2.getPublic()));
                 startActivity(intent);
             }
         });
@@ -77,9 +60,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
-                intent.putExtra("mode", mode);
-                intent.putExtra("publicKey", SerializationUtil.keyToStr(keyPair1.getPublic(), "eccPublicKey"));
-                intent.putExtra("privateKey", SerializationUtil.keyToStr(keyPair1.getPrivate(), "eccPrivateKey"));
+                intent.putExtra("publicKey", SerializationUtil.publicKeyToBase64(keyPair1.getPublic()));
+                intent.putExtra("privateKey", SerializationUtil.privateKeyToBase64(keyPair1.getPrivate()));
                 startActivity(intent);
             }
         });
@@ -89,21 +71,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
-                intent.putExtra("mode", mode);
-                intent.putExtra("publicKey", SerializationUtil.keyToStr(keyPair2.getPublic(), "eccPublicKey"));
-                intent.putExtra("privateKey", SerializationUtil.keyToStr(keyPair2.getPrivate(), "eccPrivateKey"));
-                startActivity(intent);
-            }
-        });
-
-        Button buttonVoterAgent3 = findViewById(R.id.buttonVoterAgent3);
-        buttonVoterAgent3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
-                intent.putExtra("mode", mode);
-                intent.putExtra("publicKey", SerializationUtil.keyToStr(keyPair3.getPublic(), "eccPublicKey"));
-                intent.putExtra("privateKey", SerializationUtil.keyToStr(keyPair3.getPrivate(), "eccPrivateKey"));
+                intent.putExtra("publicKey", SerializationUtil.publicKeyToBase64(keyPair2.getPublic()));
+                intent.putExtra("privateKey", SerializationUtil.privateKeyToBase64(keyPair2.getPrivate()));
                 startActivity(intent);
             }
         });
@@ -112,18 +81,6 @@ public class MainActivity extends AppCompatActivity {
         buttonTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                mode = "TEST";
-//                Toast.makeText(MainActivity.this, "MODE is set to TEST.", Toast.LENGTH_SHORT).show();
-//
-//                try {
-//                    KeyPair keyPair = ECC.generateKeyPair();
-//
-//                    ECPublicKey ecPublicKey = (ECPublicKey) keyPair.getPublic();
-//                    textTest.setText(SerializationUtil.keyToStr(ecPublicKey));
-//
-//                } catch (Exception e) {
-//                    throw new RuntimeException(e);
-//                }
                 Intent intent = new Intent(MainActivity.this, TestActivity.class);
                 startActivity(intent);
             }

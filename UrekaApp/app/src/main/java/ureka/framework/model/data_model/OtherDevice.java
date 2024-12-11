@@ -12,7 +12,7 @@ import java.util.Map;
 
 
 public class OtherDevice {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private String device_id = null;
     private Integer ticket_order = null;
     // URequest, UTicket, UReject, etc.

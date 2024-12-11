@@ -3,6 +3,7 @@ package com.example.urekaapp;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.Telephony;
 import android.util.Log;
 import android.view.View;
@@ -26,6 +27,7 @@ import com.example.urekaapp.communication.NearbyManager;
 import com.example.urekaapp.communication.NearbyPermissionHelper;
 import com.example.urekaapp.communication.NearbyViewModel;
 
+import org.bouncycastle.mime.smime.SMimeMultipartContext;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.platform.commons.util.StringUtils;
 
@@ -50,7 +52,7 @@ public class AdminAgentActivity extends AppCompatActivity {
 
     // Data
     private ArrayList<String> candidates; // The names of the candidates
-    private ArrayList<Integer> candidateVotes; // The votes od the candidates
+    private ArrayList<Integer> candidateVotes; // The votes of the candidates
     private ArrayList<String> voters; // The public key of the voters
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
     public static String connectedDeviceId; // The device_id of the voting machine
@@ -68,6 +70,9 @@ public class AdminAgentActivity extends AppCompatActivity {
     // Bluetooth connection
     private BLEViewModel bleViewModel;
     private NearbyViewModel nearbyViewModel;
+
+    // Queuing ticket sending
+    public static boolean sendNextTicket = false; // Whether to send the next ticket: true when the previous ticket finished
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +170,13 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("no_id", arbitraryDict);
                 deviceController.getFlowApplyUTicket().holderApplyUTicket("no_id");
 
+//                while (!sendNextTicket) {
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
                 buttonApplyInitUTicket.setEnabled(true);
             }
         });
@@ -180,7 +192,6 @@ public class AdminAgentActivity extends AppCompatActivity {
                 voters = new ArrayList<>();
                 voters.add(getIntent().getStringExtra("key1"));
                 voters.add(getIntent().getStringExtra("key2"));
-                voters.add(getIntent().getStringExtra("key3"));
             }
         });
 
@@ -199,27 +210,61 @@ public class AdminAgentActivity extends AppCompatActivity {
 
                 // Apply UTicket + CRKE
                 String generatedCommand = "HELLO-1";
+                sendNextTicket = false;
+                SimpleLogger.simpleLog("info", "sendNextTicket = " + sendNextTicket);
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(connectedDeviceId, generatedCommand);
-                while (deviceController.getSharedData().getCurrentSession().getCurrentSessionKeyStr() == null) {
+
+                // Send UToken: CC
+                while (!sendNextTicket) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
+                sendNextTicket = false;
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending CC.");
+                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "CC", false);
 
                 // Send UToken: candidates and voters
-//                for (String candidate: candidates) {
-//                    String data = "C:" + candidate;
-//                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-//                }
-//                for (String voter: voters) {
-//                    String data = "C-" + voter;
-//                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-//                }
-//
-//                // Access End + receive RTicket
-//                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
+                for (String candidate: candidates) {
+                    while (!sendNextTicket) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    sendNextTicket = false;
+                    String data = "C:" + candidate;
+                    SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending candidate.");
+                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
+                }
+                for (String voter: voters) {
+                    while (!sendNextTicket) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    sendNextTicket = false;
+                    String data = "C-" + voter;
+                    SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending voter.");
+                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
+                }
+
+                // Access End + receive RTicket
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                sendNextTicket = false;
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending ACCESS_END.");
+                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
 
                 buttonApplyTallyUTicket.setEnabled(true);
             }
@@ -229,7 +274,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyTallyUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+                String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
                 Map<String, String> generatedRequest = Map.of(
                         "device_id", connectedDeviceId,
                         "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),

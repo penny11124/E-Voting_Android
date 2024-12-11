@@ -1,5 +1,7 @@
 package ureka.framework.logic.pipeline_flow;
 
+import com.example.urekaapp.AdminAgentActivity;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -240,10 +242,6 @@ public class FlowApplyUTicket {
                 // [STAGE: (G)(S)]
                 this.flowOpenSession._deviceSendCrKe1(this.sharedData.getResultMessage());
             }
-            // else {
-            //     // pragma: no cover -> Shouldn't Reach Here
-            //     throw new RuntimeException("FlowApplyUTicket-_deviceRecvUTicket: Unexpected error-2.");
-            // }
         }
     }
 
@@ -360,6 +358,8 @@ public class FlowApplyUTicket {
             // pragma: no cover -> Shouldn't Reach Here
             throw new RuntimeException("FlowApplyUTicket-_holderRecvRTicket: Unexpected error.");
         } finally {
+            AdminAgentActivity.sendNextTicket = true;
+            SimpleLogger.simpleLog("info", "Ready to send next ticket");
             //////////////////////////////////////////////////////
             // End Process Measurement
             //////////////////////////////////////////////////////
@@ -376,8 +376,6 @@ public class FlowApplyUTicket {
         // Manually Finish Simulated/Bluetooth Comm
         if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "SIMULATED")) {
             this.msgSender.completeSimulatedComm();
-//        } else if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "BLUETOOTH")) {
-//            this.msgSender.completeBluetoothComm();
         }
     }
 }

@@ -29,7 +29,12 @@ public class MsgGenerator {
                 this.sharedData.getThisPerson(),
                 this.sharedData.getDeviceTable()
         );
-        UTicket generatedUTicket = uTicketGenerator.generateArbitraryUTicket(arbitraryDict);
+        UTicket generatedUTicket;
+        try {
+            generatedUTicket = uTicketGenerator.generateArbitraryUTicket(arbitraryDict);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         return UTicket.uTicketToJsonStr(generatedUTicket);
     }
@@ -46,7 +51,12 @@ public class MsgGenerator {
                 this.sharedData.getDeviceTable()
         );
 
-        RTicket generatedRTicket = rTicketGenerator.generateArbitraryRTicket(arbitraryDict);
+        RTicket generatedRTicket;
+        try {
+            generatedRTicket = rTicketGenerator.generateArbitraryRTicket(arbitraryDict);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         return RTicket.rTicketToJsonStr(generatedRTicket);
     }
