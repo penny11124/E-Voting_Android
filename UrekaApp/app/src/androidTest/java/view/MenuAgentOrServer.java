@@ -76,9 +76,9 @@ public class MenuAgentOrServer {
 //        // WHEN: Issuer: DM's CS generate the intialization_u_ticket to herself
 //        String idForInitializationUTicket = "noId";
 //        Map<String, String> generatedRequest = new HashMap<>();
-//        generatedRequest.put("deviceId", idForInitializationUTicket);
-//        generatedRequest.put("holderId", this.agentOrServer.getSharedData().getThisPerson().getPersonPubKeyStr());
-//        generatedRequest.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
+//        generatedRequest.put("device_id", idForInitializationUTicket);
+//        generatedRequest.put("holder_id", this.agentOrServer.getSharedData().getThisPerson().getPersonPubKeyStr());
+//        generatedRequest.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
 //
 //        this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket, generatedRequest);
 //
@@ -104,9 +104,9 @@ public class MenuAgentOrServer {
         Conftest.createSimulatedCommConnection(this.agentOrServer, newOwner);
 
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", targetDeviceId);
-        generatedRequest.put("holderId", newOwner.getSharedData().getThisPerson().getPersonPubKeyStr());
-        generatedRequest.put("uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET);
+        generatedRequest.put("device_id", targetDeviceId);
+        generatedRequest.put("holder_id", newOwner.getSharedData().getThisPerson().getPersonPubKeyStr());
+        generatedRequest.put("u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET);
 
         this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         Conftest.waitSimulatedCommCompleted(newOwner, this.agentOrServer);
@@ -133,12 +133,12 @@ public class MenuAgentOrServer {
 //        this.agentOrServer.getMsgSender().connectBluetoothComm();
 //
 //        // WHEN: Issuer: DM's CS generate the self_access_u_ticket to herself
-//        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+//        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
 //        Map<String, String> generatedRequest = new HashMap<>();
-//        generatedRequest.put("deviceId", targetDeviceId);
-//        generatedRequest.put("holderId", this.agentOrServer.getSharedData().getThisPerson().getPersonPubKeyStr());
-//        generatedRequest.put("uTicketType", UTicket.TYPE_ACCESS_UTICKET);
-//        generatedRequest.put("taskScope", generatedTaskScope);
+//        generatedRequest.put("device_id", targetDeviceId);
+//        generatedRequest.put("holder_id", this.agentOrServer.getSharedData().getThisPerson().getPersonPubKeyStr());
+//        generatedRequest.put("u_ticket_type", UTicket.TYPE_ACCESS_UTICKET);
+//        generatedRequest.put("task_scope", generatedTaskScope);
 //
 //        this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 //
@@ -159,11 +159,11 @@ public class MenuAgentOrServer {
         Environment.COMMUNICATION_CHANNEL = "SIMULATED";
         Conftest.createSimulatedCommConnection(this.agentOrServer, newAccessor);
 
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = new HashMap<>();
-        generatedRequest.put("deviceId", targetDeviceId);
-        generatedRequest.put("holderId", newAccessor.getSharedData().getThisPerson().getPersonPubKeyStr());
-        generatedRequest.put("uTicketType", generatedTaskScope);
+        generatedRequest.put("device_id", targetDeviceId);
+        generatedRequest.put("holder_id", newAccessor.getSharedData().getThisPerson().getPersonPubKeyStr());
+        generatedRequest.put("u_ticket_type", generatedTaskScope);
 
         this.agentOrServer.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId, generatedRequest);
         Conftest.waitSimulatedCommCompleted(newAccessor, this.agentOrServer);
@@ -245,18 +245,18 @@ public class MenuAgentOrServer {
 //            insecureCmdJson = "HELLO";
 //        } else if (option.equals("withDeviceId")) {
 //            Map<String, String> insecureCmdDict = new HashMap<>();
-//            insecureCmdDict.put("protocolVersion", "UREKA-1.0");
-//            insecureCmdDict.put("deviceId", "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEuWt9xdWLXffJE-CydWYBTH05kv7xFmMGl-L3DT_7-YH2ocgHJWUUAPxQjjRBQGOeITMandJxLDye7jK8W26GmA==");
+//            insecureCmdDict.put("protocol_version", "UREKA-1.0");
+//            insecureCmdDict.put("device_id", "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEuWt9xdWLXffJE-CydWYBTH05kv7xFmMGl-L3DT_7-YH2ocgHJWUUAPxQjjRBQGOeITMandJxLDye7jK8W26GmA==");
 //            insecureCmdDict.put("insecureCommand", "HELLO");
 //
-//            insecureCmdJson = SerializationUtil.dictToJsonStr(insecureCmdDict);
+//            insecureCmdJson = SerializationUtil.mapToJson(insecureCmdDict);
 //        } else if (option.equals("uTicketSize")) {
 //            Map<String, String> insecureCmdDict = new HashMap<>();
-//            insecureCmdDict.put("protocolVersion", "UREKA-1.0");
-//            insecureCmdDict.put("deviceId", "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEuWt9xdWLXffJE-CydWYBTH05kv7xFmMGl-L3DT_7-YH2ocgHJWUUAPxQjjRBQGOeITMandJxLDye7jK8W26GmA==");
+//            insecureCmdDict.put("protocol_version", "UREKA-1.0");
+//            insecureCmdDict.put("device_id", "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEuWt9xdWLXffJE-CydWYBTH05kv7xFmMGl-L3DT_7-YH2ocgHJWUUAPxQjjRBQGOeITMandJxLDye7jK8W26GmA==");
 //            insecureCmdDict.put("insecureCommand", "HELLO".repeat(150));
 //
-//            insecureCmdJson = SerializationUtil.dictToJsonStr(insecureCmdDict);
+//            insecureCmdJson = SerializationUtil.mapToJson(insecureCmdDict);
 //        }
 //
 //        this.agentOrServer.getSharedData().getConnectionSocket().sendMessage(insecureCmdJson);

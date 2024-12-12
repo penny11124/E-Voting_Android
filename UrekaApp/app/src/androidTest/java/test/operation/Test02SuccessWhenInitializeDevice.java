@@ -59,9 +59,9 @@ public class Test02SuccessWhenInitializeDevice {
         // WHEN: Issuer: DM's CS generate the initializationUTicket to herself
         String idForInitializationUTicket = "noId";
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", idForInitializationUTicket,
-                "holderId", this.cloudServerDm.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET
+                "device_id", idForInitializationUTicket,
+                "holder_id", this.cloudServerDm.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET
         );
         this.cloudServerDm.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
         // WHEN: Holder: DM's CS forward the accessUTicket to Uninitialized IoTD

@@ -80,17 +80,17 @@ public class FlowApplyUTicketTest {
 
     @Test
     public void holderApplyUTicketTest() throws Exception {
-        String deviceId = "deviceId";
-        flowApplyUTicket.getSharedData().getDeviceTable().put(deviceId, new OtherDevice());
+        String device_id = "device_id";
+        flowApplyUTicket.getSharedData().getDeviceTable().put(device_id, new OtherDevice());
         UTicket uTicket = new UTicket();
         uTicket.setProtocolVersion(UTicket.PROTOCOL_VERSION);
 
         uTicket.setUTicketType(UTicket.TYPE_INITIALIZATION_UTICKET);
-        uTicket.setDeviceId(deviceId);
+        uTicket.setDeviceId(device_id);
         uTicket.setUTicketId(ECDH.generateSha256HashStr(UTicket.uTicketToJsonStr(uTicket)));
-        flowApplyUTicket.getSharedData().getDeviceTable().get(deviceId).setDeviceUTicketForOwner(UTicket.uTicketToJsonStr(uTicket));
+        flowApplyUTicket.getSharedData().getDeviceTable().get(device_id).setDeviceUTicketForOwner(UTicket.uTicketToJsonStr(uTicket));
 
-        flowApplyUTicket.holderApplyUTicket(deviceId, "");
+        flowApplyUTicket.holderApplyUTicket(device_id, "");
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getState(), ThisDevice.STATE_AGENT_WAIT_FOR_RT));
         String uTicketJson = flowApplyUTicket.getMsgSender().getSharedData().getSimulatedCommChannel().getSenderQueue().poll();
         Message message = Message.jsonstrToMessage(uTicketJson);
@@ -101,14 +101,14 @@ public class FlowApplyUTicketTest {
         uTicket = new UTicket();
         uTicket.setProtocolVersion(UTicket.PROTOCOL_VERSION);
         uTicket.setUTicketType(UTicket.TYPE_INITIALIZATION_UTICKET);
-        uTicket.setDeviceId(deviceId);
+        uTicket.setDeviceId(device_id);
         uTicket.setUTicketType(UTicket.TYPE_ACCESS_UTICKET);
-        uTicket.setHolderId("holderId");
-        uTicket.setTaskScope("taskScope");
+        uTicket.setHolderId("holder_id");
+        uTicket.setTaskScope("task_scope");
         uTicket.setUTicketId(ECDH.generateSha256HashStr(UTicket.uTicketToJsonStr(uTicket)));
-        flowApplyUTicket.getSharedData().getDeviceTable().get(deviceId).setDeviceUTicketForOwner(UTicket.uTicketToJsonStr(uTicket));
+        flowApplyUTicket.getSharedData().getDeviceTable().get(device_id).setDeviceUTicketForOwner(UTicket.uTicketToJsonStr(uTicket));
 
-        flowApplyUTicket.holderApplyUTicket(deviceId, "holder");
+        flowApplyUTicket.holderApplyUTicket(device_id, "holder");
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getState(), ThisDevice.STATE_AGENT_WAIT_FOR_CRKE1));
         uTicketJson = flowApplyUTicket.getMsgSender().getSharedData().getSimulatedCommChannel().getSenderQueue().poll();
         message = Message.jsonstrToMessage(uTicketJson);
@@ -120,7 +120,7 @@ public class FlowApplyUTicketTest {
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getCurrentHolderId(), uTicket.getHolderId()));
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getCurrentTaskScope(), uTicket.getTaskScope()));
         assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getPlaintextCmd(), "holder"));
-        assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextCmd(), "additional unencrypted cmd"));
+        assert (Objects.equals(flowApplyUTicket.getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextCmd(), "AUC"));
     }
 
     @Test
@@ -144,10 +144,10 @@ public class FlowApplyUTicketTest {
         uTicket.setUTicketType(UTicket.TYPE_ACCESS_UTICKET);
         uTicket.setDeviceId(flowApplyUTicket.getMsgVerifier().getSharedData().getThisDevice().getDevicePubKeyStr());
         uTicket.setTicketOrder(flowApplyUTicket.getMsgVerifier().getSharedData().getThisDevice().getTicketOrder());
-        uTicket.setTaskScope("taskScope");
+        uTicket.setTaskScope("task_scope");
         uTicket.setHolderId(SerializationUtil.keyToStr(ECC.generateKeyPair().getPublic()));
-        uTicket.setIssuerSignature(SerializationUtil.byteToBase64Str(ECC.signSignature
-            (SerializationUtil.strToByte(UTicket.uTicketToJsonStr(uTicket)),
+        uTicket.setIssuerSignature(SerializationUtil.bytesToBase64(ECC.signSignature
+            (SerializationUtil.strToBytes(UTicket.uTicketToJsonStr(uTicket)),
                 flowApplyUTicket.getMsgVerifier().getSharedData().getThisPerson().getPersonPrivKey())));
         flowApplyUTicket.getExecutor().getSharedData().getThisDevice().setDeviceType(ThisDevice.IOT_DEVICE);
         flowApplyUTicket._deviceRecvUTicket(uTicket);
@@ -177,7 +177,7 @@ public class FlowApplyUTicketTest {
         rTicket.setTicketOrder(1);
         rTicket.setAuditStart(uTicket.getUTicketId());
         rTicket.setRTicketId(flowApplyUTicket.getSharedData().getThisDevice().getDevicePubKeyStr());
-        rTicket.setDeviceSignature(SerializationUtil.byteToBase64Str(ECC.signSignature(SerializationUtil.strToByte(RTicket.rTicketToJsonStr(rTicket)),
+        rTicket.setDeviceSignature(SerializationUtil.bytesToBase64(ECC.signSignature(SerializationUtil.strToBytes(RTicket.rTicketToJsonStr(rTicket)),
             flowApplyUTicket.getSharedData().getThisDevice().getDevicePrivKey())));
 
         OtherDevice otherDevice = new OtherDevice();

@@ -1,9 +1,17 @@
 package ureka.framework.logic.stage_worker;
 
+import com.example.urekaapp.AdminAgentActivity;
+
+import org.junit.jupiter.api.DisplayNameGenerator;
+
+import java.util.Map;
+
+import ureka.framework.Environment;
 import ureka.framework.model.SharedData;
 import ureka.framework.model.data_model.OtherDevice;
 import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
+import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 import ureka.framework.resource.storage.SimpleStorage;
 
@@ -85,7 +93,7 @@ public class ReceivedMsgStorer {
         try {
             String receivedRTicketJson = RTicket.rTicketToJsonStr(receivedRTicket);
 
-            // We store this RTicket (but not verified) in deviceTable["deviceId"]
+            // We store this RTicket (but not verified) in deviceTable["device_id"]
             if (receivedRTicket.getRTicketType().equals(UTicket.TYPE_INITIALIZATION_UTICKET)) {
                 // Holder (for Owner)
                 String createdDeviceId = receivedRTicket.getDeviceId();
@@ -94,10 +102,14 @@ public class ReceivedMsgStorer {
                         createdDeviceId,
                         new OtherDevice(
                                 createdDeviceId,
-                                this.sharedData.getDeviceTable().get("noId").getDeviceUTicketForOwner(),
+                                this.sharedData.getDeviceTable().get("no_id").getDeviceUTicketForOwner(),
                                 receivedRTicketJson
                         )
                 );
+                AdminAgentActivity.connectedDeviceId = createdDeviceId;
+//                for (Map.Entry<String, OtherDevice> entry : this.sharedData.getDeviceTable().entrySet()) {
+//                    SimpleLogger.simpleLog("info", "device_id = " + entry.getKey());
+//                }
             } else if (receivedRTicket.getRTicketType().equals(UTicket.TYPE_OWNERSHIP_UTICKET)) {
                 // Holder (for Owner)
                 if (this.sharedData.getDeviceTable().get(receivedRTicket.getDeviceId()).getDeviceOwnershipUTicketForOthers() == null) {

@@ -14,17 +14,42 @@
         android:text="Admin Agent"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonVoterAgent"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonVoterAgent1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
-        android:id="@+id/buttonVoterAgent"
+        android:id="@+id/buttonVoterAgent1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Voter Agent"
+        android:text="Voter 1"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="@+id/buttonAdminAgent"
+<<<<<<< HEAD
+=======
+        app:layout_constraintBottom_toBottomOf="@+id/buttonVoterAgent2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/buttonVoterAgent2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Voter 2"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="@+id/buttonVoterAgent1"
+        app:layout_constraintBottom_toBottomOf="@+id/buttonTest"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/buttonTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Test"
+        tools:ignore="HardcodedText"
+        app:layout_constraintTop_toTopOf="@+id/buttonVoterAgent2"
+>>>>>>> 7b958e0b1db291c38d2b99b9d1da8a269256d099
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

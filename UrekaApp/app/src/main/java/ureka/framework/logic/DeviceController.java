@@ -18,6 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import ureka.framework.Environment;
 import ureka.framework.logic.pipeline_flow.FlowApplyUTicket;
@@ -252,41 +253,48 @@ public class DeviceController {
     }
 
     public void connectToDevice(String deviceName, Runnable onConnected, Runnable onDisconnected, TextView textView) {
-        this.bleManager.startScan(deviceName, new BLEManager.BLECallback() {
-            final StringBuilder jsonBuilder = new StringBuilder();
-            @Override
-            public void onConnected() {
-                SimpleLogger.simpleLog("info", "Device connected!");
-                new Handler(Looper.getMainLooper()).post(() ->
-                        textView.setText("Device connected!")
-                );
-                onConnected.run();
-            }
-
-            @Override
-            public void onDisconnected() {
-                SimpleLogger.simpleLog("info", "Device disconnected!");
-                new Handler(Looper.getMainLooper()).post(() ->
-                        textView.setText("Device disconnected!")
-                );
-                onDisconnected.run();
-            }
-
-            @Override
-            public void onDataReceived(String data) {
-                SimpleLogger.simpleLog("info", "Received data: " + data);
-                new Handler(Looper.getMainLooper()).post(() ->
-                        textView.setText("Data received.")
-                );
-                jsonBuilder.append(data);
-
-                if (data.contains("$")) {
-                    msgReceiver._recvXxxMessage(jsonBuilder.toString());
-                    jsonBuilder.setLength(0);
-                } else {
-                    Log.d("Bluetooth.onDataReceived", "Waiting for more data to complete JSON.");
+        new Thread(() -> {
+            this.bleManager.startScan(deviceName, new BLEManager.BLECallback() {
+                final StringBuilder jsonBuilder = new StringBuilder();
+                @Override
+                public void onConnected() {
+                    SimpleLogger.simpleLog("info", "Device connected!");
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            textView.setText("Device connected!")
+                    );
+                    onConnected.run();
                 }
-            }
-        });
+
+                @Override
+                public void onDisconnected() {
+                    SimpleLogger.simpleLog("info", "Device disconnected!");
+                    new Handler(Looper.getMainLooper()).post(() ->
+                            textView.setText("Device disconnected!")
+                    );
+                    onDisconnected.run();
+                }
+
+                @Override
+                public void onDataReceived(String data) {
+                    SimpleLogger.simpleLog("info", "Received data: " + data);
+//                    new Handler(Looper.getMainLooper()).post(() ->
+//                            textView.setText("Data received from voting machine.")
+//                    );
+                    jsonBuilder.append(data);
+
+                    if (data.contains("freed")) {
+                        SimpleLogger.simpleLog("info", "No hello thank you");
+                        jsonBuilder.setLength(0);
+                    } else if (data.contains("$")) {
+                        Log.d("Bluetooth.onDataReceived", "Received complete JSON: starting process.");
+                        jsonBuilder.deleteCharAt(jsonBuilder.length() - 1);
+                        msgReceiver._recvXxxMessage(jsonBuilder.toString());
+                        jsonBuilder.setLength(0);
+                    } else {
+                        Log.d("Bluetooth.onDataReceived", "Waiting for more data to complete JSON.");
+                    }
+                }
+            });
+        }).start();
     }
 }

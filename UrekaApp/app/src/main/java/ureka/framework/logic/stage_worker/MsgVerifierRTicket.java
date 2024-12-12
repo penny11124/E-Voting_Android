@@ -1,5 +1,6 @@
 package ureka.framework.logic.stage_worker;
 
+import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.Map;
@@ -76,6 +77,9 @@ public class MsgVerifierRTicket {
         RTicket ticketWithoutIdAndSig;
         try {
             ticketWithoutIdAndSig = new RTicket(rTicketIn);
+            ticketWithoutIdAndSig.setRTicketId(null);
+            ticketWithoutIdAndSig.setDeviceSignature(null);
+
             ticketWithoutIdAndSig.setRTicketId(null);
             ticketWithoutIdAndSig.setDeviceSignature(null);
             String generatedHash= ECDH.generateSha256HashStr(RTicket.rTicketToJsonStr(ticketWithoutIdAndSig));
@@ -396,7 +400,7 @@ public class MsgVerifierRTicket {
         }
     }
 
-    public RTicket verifyDeviceSignature(RTicket rTicketIn) {
+    public RTicket verifyDeviceSignature(RTicket rTicketIn) throws Exception {
         String successMsg = "-> SUCCESS: VERIFY_DEVICE_SIGNATURE on " + rTicketIn.getRTicketType() + " RTICKET";
         String failureMsg = "-> FAILURE: VERIFY_DEVICE_SIGNATURE on " + rTicketIn.getRTicketType() + " RTICKET";
 
@@ -407,16 +411,21 @@ public class MsgVerifierRTicket {
             case RTicket.TYPE_CRKE1_RTICKET:
             case RTicket.TYPE_CRKE3_RTICKET:
             case UTicket.TYPE_ACCESS_END_UTOKEN:
-                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(rTicketIn.getDeviceId(),"eccPublicKey"))) {
-                    SimpleLogger.simpleLog("info",successMsg);
-                    return rTicketIn;
-                } else {
-                    // pragma: no cover -> Weird R-Ticket
-                    SimpleLogger.simpleLog("error",failureMsg);
-                    throw new RuntimeException(failureMsg);
+                try {
+                    if(this._verifyDeviceSignatureOnRTicket(rTicketIn, SerializationUtil.base64ToPublicKey(rTicketIn.getDeviceId()))) {
+                        SimpleLogger.simpleLog("info",successMsg);
+                        return rTicketIn;
+                    } else {
+                        // pragma: no cover -> Weird R-Ticket
+                        SimpleLogger.simpleLog("error",failureMsg);
+                        throw new RuntimeException(failureMsg);
+                    }
+                } catch (Exception e) {
+                    SimpleLogger.simpleLog("error", "error = " + e.getMessage());
                 }
+
             case RTicket.TYPE_CRKE2_RTICKET:
-                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, (ECPublicKey) SerializationUtil.strToKey(this.currentSession.getCurrentHolderId(),"eccPublicKey"))) {
+                if(this._verifyDeviceSignatureOnRTicket(rTicketIn, SerializationUtil.base64ToPublicKey(this.currentSession.getCurrentHolderId()))) {
                     successMsg = "-> SUCCESS: VERIFY_HOLDER_SIGNATURE on " + rTicketIn.getRTicketType() + " RTICKET";
                     SimpleLogger.simpleLog("info",successMsg);
                     return rTicketIn;
@@ -438,21 +447,22 @@ public class MsgVerifierRTicket {
     }
 
     // Verify ECC Signature on RTicket
-    private boolean _verifyDeviceSignatureOnRTicket(RTicket signedRTicket, ECPublicKey eccPublicKey) {
+    private boolean _verifyDeviceSignatureOnRTicket(RTicket signedRTicket, PublicKey publicKey) throws Exception {
         // Get Signature on RTicket
-        byte[] signatureByte = SerializationUtil.base64StrToSignature(signedRTicket.getDeviceSignature());
+        byte[] signatureByte = SerializationUtil.base64ToSignature(signedRTicket.getDeviceSignature());
 
         // Verify Signature on Signed RTicket, but Prevent side effect on Signed RTicket
         RTicket unsignedRTicket;
         unsignedRTicket = new RTicket(signedRTicket);
         unsignedRTicket.setDeviceSignature(null);
+        unsignedRTicket.setRTicketId(null);
 
         String unsignedRTicketStr = RTicket.rTicketToJsonStr(unsignedRTicket);
-        byte[] unsignedRTicketByte = SerializationUtil.strToByte(unsignedRTicketStr);
+        byte[] unsignedRTicketByte = SerializationUtil.strToBytes(unsignedRTicketStr);
 
         // Verify Signature
         try {
-            return ECC.verifySignature(signatureByte, unsignedRTicketByte, eccPublicKey);
+            return ECC.verifySignature(signatureByte, unsignedRTicketByte, publicKey);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

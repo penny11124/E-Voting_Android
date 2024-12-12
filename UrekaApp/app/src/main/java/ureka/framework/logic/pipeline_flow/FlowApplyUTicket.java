@@ -1,5 +1,7 @@
 package ureka.framework.logic.pipeline_flow;
 
+import com.example.urekaapp.AdminAgentActivity;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -117,10 +119,10 @@ public class FlowApplyUTicket {
         this.flowOpenSession = flowOpenSession;
     }
 
-    public void holderApplyUTicket(String deviceId) {
-        holderApplyUTicket(deviceId, "");
+    public void holderApplyUTicket(String device_id) {
+        holderApplyUTicket(device_id, "");
     }
-    public void holderApplyUTicket(String deviceId, String cmd) {
+    public void holderApplyUTicket(String device_id, String cmd) {
         //////////////////////////////////////////////////////
         // Start Process Measurement
         //////////////////////////////////////////////////////
@@ -129,8 +131,8 @@ public class FlowApplyUTicket {
         try {
             // [STAGE: (VL)(L)]
             String storedUTicketJson;
-            if (this.sharedData.getDeviceTable().containsKey(deviceId)) {
-                storedUTicketJson = this.sharedData.getDeviceTable().get(deviceId).getDeviceUTicketForOwner();
+            if (this.sharedData.getDeviceTable().containsKey(device_id)) {
+                storedUTicketJson = this.sharedData.getDeviceTable().get(device_id).getDeviceUTicketForOwner();
             } else {
                 String error = "FAILURE: (VL)";
                 this.sharedData.setResultMessage(error);
@@ -240,42 +242,38 @@ public class FlowApplyUTicket {
                 // [STAGE: (G)(S)]
                 this.flowOpenSession._deviceSendCrKe1(this.sharedData.getResultMessage());
             }
-            // else {
-            //     // pragma: no cover -> Shouldn't Reach Here
-            //     throw new RuntimeException("FlowApplyUTicket-_deviceRecvUTicket: Unexpected error-2.");
-            // }
         }
     }
 
-    public void _deviceSendRTicket(String uTicketType, String uTicketId, String resultMessage) {
+    public void _deviceSendRTicket(String u_ticket_type, String u_ticket_id, String resultMessage) {
         try {
             Map<String, String> rTicketRequest = new HashMap<>();
             // [STAGE: (G)]
-            if (Objects.equals(uTicketType, UTicket.TYPE_INITIALIZATION_UTICKET)
-                || Objects.equals(uTicketType, UTicket.TYPE_OWNERSHIP_UTICKET)) {
+            if (Objects.equals(u_ticket_type, UTicket.TYPE_INITIALIZATION_UTICKET)
+                || Objects.equals(u_ticket_type, UTicket.TYPE_OWNERSHIP_UTICKET)) {
                 if (resultMessage.contains("SUCCESS")) {
-                    rTicketRequest.put("rTicketType", uTicketType);
-                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    rTicketRequest.put("r_ticket_type", u_ticket_type);
+                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
-                    rTicketRequest.put("auditStart", uTicketId);
+                    rTicketRequest.put("audit_start", u_ticket_id);
                 } else {
-                    rTicketRequest.put("rTicketType", uTicketType);
-                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    rTicketRequest.put("r_ticket_type", u_ticket_type);
+                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
                 }
 
-            } else if (Objects.equals(uTicketType, UTicket.TYPE_ACCESS_END_UTOKEN)) {
+            } else if (Objects.equals(u_ticket_type, UTicket.TYPE_ACCESS_END_UTOKEN)) {
                 if (resultMessage.contains("SUCCESS")) {
-                    // auditStart has already stored when receiving Access UTicket
-                    rTicketRequest.put("rTicketType", uTicketType);
-                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    // audit_start has already stored when receiving Access UTicket
+                    rTicketRequest.put("r_ticket_type", u_ticket_type);
+                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
-                    rTicketRequest.put("auditStart", this.sharedData.getCurrentSession().getCurrentUTicketId());
-                    rTicketRequest.put("auditEnd", "ACCESS_END");
+                    rTicketRequest.put("audit_start", this.sharedData.getCurrentSession().getCurrentUTicketId());
+                    rTicketRequest.put("audit_end", "ACCESS_END");
                 } else {
                     // pragma: no cover -> Weird U-Token
-                    rTicketRequest.put("rTicketType", uTicketType);
-                    rTicketRequest.put("deviceId", this.sharedData.getThisDevice().getDevicePubKeyStr());
+                    rTicketRequest.put("r_ticket_type", u_ticket_type);
+                    rTicketRequest.put("device_id", this.sharedData.getThisDevice().getDevicePubKeyStr());
                     rTicketRequest.put("result", resultMessage);
                 }
             } else {
@@ -326,7 +324,7 @@ public class FlowApplyUTicket {
                 || Objects.equals(receivedRTicket.getRTicketType(), UTicket.TYPE_OWNERSHIP_UTICKET)
                 || Objects.equals(receivedRTicket.getRTicketType(), UTicket.TYPE_ACCESS_END_UTOKEN)) {
                 // Query Corresponding UTicket(s)
-                //   Notice that even Initialization UTicket is copied in the device_table["deviceId"]
+                //   Notice that even Initialization UTicket is copied in the device_table["device_id"]
                 // [STAGE: (VL)(L)]
                 String storedUTicketJson;
                 if (this.sharedData.getDeviceTable().containsKey(receivedRTicket.getDeviceId())) {
@@ -360,6 +358,8 @@ public class FlowApplyUTicket {
             // pragma: no cover -> Shouldn't Reach Here
             throw new RuntimeException("FlowApplyUTicket-_holderRecvRTicket: Unexpected error.");
         } finally {
+            AdminAgentActivity.sendNextTicket = true;
+            SimpleLogger.simpleLog("info", "Ready to send next ticket");
             //////////////////////////////////////////////////////
             // End Process Measurement
             //////////////////////////////////////////////////////
@@ -376,8 +376,6 @@ public class FlowApplyUTicket {
         // Manually Finish Simulated/Bluetooth Comm
         if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "SIMULATED")) {
             this.msgSender.completeSimulatedComm();
-//        } else if (Objects.equals(Environment.COMMUNICATION_CHANNEL, "BLUETOOTH")) {
-//            this.msgSender.completeBluetoothComm();
         }
     }
 }

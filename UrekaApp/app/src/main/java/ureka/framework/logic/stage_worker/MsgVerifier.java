@@ -163,16 +163,16 @@ public class MsgVerifier {
         String successMsg = "-> SUCCESS: VERIFY_CMD_IN_TASK_SCOPE";
         String failureMsg = "-> FAILURE: VERIFY_CMD_IN_TASK_SCOPE";
 
-        Map<String, String> taskScope = SerializationUtil.jsonStrToDict(this.sharedData.getCurrentSession().getCurrentTaskScope());
-        // SimpleLogger.simpleLog("debug", "currentTaskScope: " + taskScope);
+        Map<String, String> task_scope = SerializationUtil.jsonToMap(this.sharedData.getCurrentSession().getCurrentTaskScope());
+        // SimpleLogger.simpleLog("debug", "currentTaskScope: " + task_scope);
 
-        if (Objects.equals(taskScope.get("ALL"), "allow")) {
+        if (Objects.equals(task_scope.get("ALL"), "allow")) {
             SimpleLogger.simpleLog("info", successMsg);
-        } else if (Objects.equals(cmd, "HELLO-1") && Objects.equals(taskScope.get("SAY-HELLO-1"), "allow")) {
+        } else if (Objects.equals(cmd, "HELLO-1") && Objects.equals(task_scope.get("SAY-HELLO-1"), "allow")) {
             SimpleLogger.simpleLog("info", successMsg);
-        } else if (Objects.equals(cmd, "HELLO-2") && Objects.equals(taskScope.get("SAY-HELLO-2"), "allow")) {
+        } else if (Objects.equals(cmd, "HELLO-2") && Objects.equals(task_scope.get("SAY-HELLO-2"), "allow")) {
             SimpleLogger.simpleLog("info", successMsg);
-        } else if (Objects.equals(cmd, "HELLO-3") && Objects.equals(taskScope.get("SAY-HELLO-3"), "allow")) {
+        } else if (Objects.equals(cmd, "HELLO-3") && Objects.equals(task_scope.get("SAY-HELLO-3"), "allow")) {
             // pragma: no cover -> FAILURE: (VTS)
             SimpleLogger.simpleLog("info", successMsg);
         } else {

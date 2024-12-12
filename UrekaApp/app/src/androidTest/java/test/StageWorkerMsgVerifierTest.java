@@ -154,9 +154,9 @@ public class StageWorkerMsgVerifierTest {
         validRTicket.setAuditStart(auditStartTicket.getUTicketId());
         validRTicket.setRTicketId(SerializationUtil.keyToStr(keyPair.getPublic()));
         String validRTicketStr = RTicket.rTicketToJsonStr(validRTicket);
-        byte[] validRTicketByte = SerializationUtil.strToByte(validRTicketStr);
+        byte[] validRTicketByte = SerializationUtil.strToBytes(validRTicketStr);
         byte[] validRTicketSignature = ECC.signSignature(validRTicketByte, (ECPrivateKey) keyPair.getPrivate());
-        validRTicket.setDeviceSignature(SerializationUtil.byteToBase64Str(validRTicketSignature));
+        validRTicket.setDeviceSignature(SerializationUtil.bytesToBase64(validRTicketSignature));
         msgVerifier.verifyUTicketHasExecutedThroughRTicket(validRTicket, auditStartTicket, auditEndTicket);
 
         RTicket invalidRTicket = new RTicket();
@@ -172,14 +172,14 @@ public class StageWorkerMsgVerifierTest {
 
     @Test
     public void verifyCmdIsInTaskScopeTest() {
-        Map<String, String> taskScope = new HashMap<>();
-        taskScope.put("ALL", "allow");
-        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(taskScope));
+        Map<String, String> task_scope = new HashMap<>();
+        task_scope.put("ALL", "allow");
+        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.mapToJson(task_scope));
         msgVerifier.verifyCmdIsInTaskScope("foo");
 
-        taskScope.clear();
-        taskScope.put("SAY-HELLO-3", "allow");
-        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(taskScope));
+        task_scope.clear();
+        task_scope.put("SAY-HELLO-3", "allow");
+        msgVerifier.getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.mapToJson(task_scope));
         msgVerifier.verifyCmdIsInTaskScope("HELLO-3");
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {

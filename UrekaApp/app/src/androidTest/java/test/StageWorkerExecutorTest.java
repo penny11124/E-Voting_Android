@@ -45,7 +45,7 @@ public class StageWorkerExecutorTest {
         SharedData sharedData = new SharedData(thisDevice, currentSession, thisPerson);
         sharedData.setMeasureRec(new HashMap<>());
         sharedData.setDeviceTable(new HashMap<>());
-        sharedData.getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(new HashMap<>()));
+        sharedData.getCurrentSession().setCurrentTaskScope(SerializationUtil.mapToJson(new HashMap<>()));
         MeasureHelper measureHelper = new MeasureHelper(sharedData);
         SimpleStorage simpleStorage = new SimpleStorage("foo");
         MsgVerifier msgVerifier = new MsgVerifier(sharedData, measureHelper);
@@ -112,10 +112,10 @@ public class StageWorkerExecutorTest {
 
         uTicket = new UTicket();
         uTicket.setUTicketType(UTicket.TYPE_ACCESS_UTICKET);
-        uTicket.setUTicketId("uTicketId");
-        uTicket.setDeviceId("deviceId");
-        uTicket.setHolderId("holderId");
-        uTicket.setTaskScope("taskScope");
+        uTicket.setUTicketId("u_ticket_id");
+        uTicket.setDeviceId("device_id");
+        uTicket.setHolderId("holder_id");
+        uTicket.setTaskScope("task_scope");
         executor.getSharedData().setCurrentSession(new CurrentSession());
         executor.executeXxxUTicket(uTicket);
         assertEquals(uTicket.getUTicketId(), executor.getSharedData().getCurrentSession().getCurrentUTicketId());
@@ -134,11 +134,11 @@ public class StageWorkerExecutorTest {
         executor.getSharedData().setCurrentSession(new CurrentSession());
 
         uTicket.setUTicketType(UTicket.TYPE_ACCESS_END_UTOKEN);
-        uTicket.setCiphertextCmd(SerializationUtil.byteToBase64Str(gcm_result[0]));
+        uTicket.setCiphertextCmd(SerializationUtil.bytesToBase64(gcm_result[0]));
         uTicket.setAssociatedPlaintextCmd(associatedPlaintext);
-        uTicket.setGcmAuthenticationTagCmd(SerializationUtil.byteToBase64Str(gcm_result[2]));
-        executor.getSharedData().getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.byteToBase64Str(ecdh_key));
-        executor.getSharedData().getCurrentSession().setIvCmd(SerializationUtil.byteToBase64Str(gcm_result[1]));
+        uTicket.setGcmAuthenticationTagCmd(SerializationUtil.bytesToBase64(gcm_result[2]));
+        executor.getSharedData().getCurrentSession().setCurrentSessionKeyStr(SerializationUtil.bytesToBase64(ecdh_key));
+        executor.getSharedData().getCurrentSession().setIvCmd(SerializationUtil.bytesToBase64(gcm_result[1]));
 
         executor.executeXxxUTicket(uTicket);
 
@@ -153,9 +153,9 @@ public class StageWorkerExecutorTest {
         executor.getSharedData().getThisDevice().setDevicePrivKey((ECPrivateKey) deviceKey.getPrivate());
         executor.getSharedData().getCurrentSession().setCurrentDeviceId(SerializationUtil.keyToStr(deviceKey.getPublic()));
         executor.getSharedData().getCurrentSession().setCurrentHolderId(SerializationUtil.keyToStr(personKey.getPublic()));
-        Map<String, String> taskScope = SerializationUtil.jsonStrToDict(executor.getMsgVerifier().getSharedData().getCurrentSession().getCurrentTaskScope());
-        taskScope.put("ALL", "allow");
-        executor.getMsgVerifier().getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.dictToJsonStr(taskScope));
+        Map<String, String> task_scope = SerializationUtil.jsonToMap(executor.getMsgVerifier().getSharedData().getCurrentSession().getCurrentTaskScope());
+        task_scope.put("ALL", "allow");
+        executor.getMsgVerifier().getSharedData().getCurrentSession().setCurrentTaskScope(SerializationUtil.mapToJson(task_scope));
 
         rTicket = new RTicket();
         rTicket.setRTicketType(UTicket.TYPE_INITIALIZATION_UTICKET);
@@ -168,18 +168,18 @@ public class StageWorkerExecutorTest {
         rTicket.setRTicketType(RTicket.TYPE_CRKE1_RTICKET);
         rTicket.setChallenge1(ECDH.generateRandomStr(32));
         rTicket.setKeyExchangeSalt1(ECDH.generateRandomStr(32));
-        rTicket.setIvCmd(SerializationUtil.byteToBase64Str(ECDH.gcmGenIv()));
+        rTicket.setIvCmd(SerializationUtil.bytesToBase64(ECDH.gcmGenIv()));
         executor.getSharedData().getCurrentSession().setPlaintextCmd("foo");
         executor.getSharedData().getCurrentSession().setAssociatedPlaintextCmd("test");
         executor.executeXxxRTicket(rTicket, "holderOrDevice");
         byte[][] resultCrke1 = ECDH.gcmEncrypt(
-            SerializationUtil.strToByte(executor.getSharedData().getCurrentSession().getPlaintextCmd()),
-            SerializationUtil.strToByte(executor.getSharedData().getCurrentSession().getAssociatedPlaintextCmd()),
-            SerializationUtil.base64StrBackToByte(executor.getSharedData().getCurrentSession().getCurrentSessionKeyStr()),
-            SerializationUtil.base64StrBackToByte(executor.getSharedData().getCurrentSession().getIvCmd())
+            SerializationUtil.strToBytes(executor.getSharedData().getCurrentSession().getPlaintextCmd()),
+            SerializationUtil.strToBytes(executor.getSharedData().getCurrentSession().getAssociatedPlaintextCmd()),
+            SerializationUtil.base64ToBytes(executor.getSharedData().getCurrentSession().getCurrentSessionKeyStr()),
+            SerializationUtil.base64ToBytes(executor.getSharedData().getCurrentSession().getIvCmd())
         );
-        assertEquals(executor.getSharedData().getCurrentSession().getCiphertextCmd(), SerializationUtil.byteToBase64Str(resultCrke1[0]));
-        assertEquals(executor.getSharedData().getCurrentSession().getGcmAuthenticationTagCmd(), SerializationUtil.byteToBase64Str(resultCrke1[2]));
+        assertEquals(executor.getSharedData().getCurrentSession().getCiphertextCmd(), SerializationUtil.bytesToBase64(resultCrke1[0]));
+        assertEquals(executor.getSharedData().getCurrentSession().getGcmAuthenticationTagCmd(), SerializationUtil.bytesToBase64(resultCrke1[2]));
 
         rTicket = new RTicket();
         rTicket.setRTicketType(RTicket.TYPE_CRKE2_RTICKET);

@@ -43,7 +43,7 @@ import ureka.framework.resource.crypto.SerializationUtil;
 
 public class VoterAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
-    private String connectedDeviceId; // The deviceId of the voting machine
+    private String connectedDeviceId; // The device_id of the voting machine
     private int votedCandidate;
 
     private Button buttonScan;
@@ -54,25 +54,25 @@ public class VoterAgentActivity extends AppCompatActivity {
     private TextView textViewConnectingStatus;
 
     private final ActivityResultLauncher<Intent> activityResultLauncher =
-            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null) {
-                        votedCandidate = data.getIntExtra("VOTED_CANDIDATE", -1);
-                        buttonApplyUTicket.setEnabled(false);
-                        buttonShowRTicket.setEnabled(true);
-                    }
+        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {
+                    votedCandidate = data.getIntExtra("VOTED_CANDIDATE", -1);
+                    buttonApplyUTicket.setEnabled(false);
+                    buttonShowRTicket.setEnabled(true);
+                }
 
-                    if (votedCandidate != -1) {
-                        String cmd = "V:" + votedCandidate;
-                        deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, cmd, false);
+                if (votedCandidate != -1) {
+                    String cmd = "V:" + votedCandidate;
+                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, cmd, false);
 //                        this.iotDevice.getMsgReceiver()._recvXxxMessage();
 //                        this.userAgentDO.getMsgReceiver()._recvXxxMessage();
-                    } else {
-                        throw new RuntimeException("Invalid vote.");
-                    }
+                } else {
+                    throw new RuntimeException("Invalid vote.");
                 }
-            });
+            }
+        });
 
     private BLEViewModel bleViewModel;
     private NearbyViewModel nearbyViewModel;
@@ -146,22 +146,21 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonRequestUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+                String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
                 Map<String, String> generatedRequest = Map.of(
-                        "holderId", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                        "uTicketType", UTicket.TYPE_ACCESS_UTICKET,
-                        "taskScope", generatedTaskScope
+                        "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                        "u_ticket_type", UTicket.TYPE_ACCESS_UTICKET,
+                        "task_scope", generatedTaskScope
                 );
                 try {
                     deviceController.getMsgSender().sendXxxMessageByNearby(
                             Message.MESSAGE_REQUEST,
                             Message.MESSAGE_REQUEST,
-                            SerializationUtil.dictToJsonStr(generatedRequest)
+                            SerializationUtil.mapToJson(generatedRequest)
                     );
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-//                deviceController.getMsgReceiver()._recvXxxMessage();
             }
         });
 
@@ -183,19 +182,12 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonApplyUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO
-                String targetDeviceId = connectedDeviceId; // = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
+                String targetDeviceId = connectedDeviceId;
                 String generatedCommand = "HELLO-1";
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId,generatedCommand);
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.cloudServerEP.getMsgReceiver()._recvXxxMessage();
 
                 String data = "A";
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-//                this.iotDevice.getMsgReceiver()._recvXxxMessage();
-//                this.userAgentDO.getMsgReceiver()._recvXxxMessage();
                 data = deviceController.getFlowIssueUToken().getExecutor().getSharedData().getCurrentSession().getPlaintextData();
                 data = data.replaceAll("[0-9]", "");
                 String[] result = data.split("\\.");

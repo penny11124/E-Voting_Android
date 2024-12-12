@@ -72,29 +72,29 @@ public class FlowIssueUTicketTest {
 
     @Test
     public void issuerIssueUTicketToHerselfTest() {
-        String deviceId = "noId";
+        String device_id = "noId";
         Map<String, String> uTicketMap = new HashMap<>();
-        uTicketMap.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
-        uTicketMap.put("deviceId", deviceId);
-        flowIssueUTicket.issuerIssueUTicketToHerself(deviceId, uTicketMap);
-        assert (flowIssueUTicket.getGeneratedMsgStorer().getSharedData().getDeviceTable().containsKey(deviceId));
-        assert (flowIssueUTicket.getExecutor().getSharedData().getDeviceTable().get(deviceId).getTicketOrder() == 0);
+        uTicketMap.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
+        uTicketMap.put("device_id", device_id);
+        flowIssueUTicket.issuerIssueUTicketToHerself(device_id, uTicketMap);
+        assert (flowIssueUTicket.getGeneratedMsgStorer().getSharedData().getDeviceTable().containsKey(device_id));
+        assert (flowIssueUTicket.getExecutor().getSharedData().getDeviceTable().get(device_id).getTicketOrder() == 0);
     }
 
     @Test
     public void issuerIssueUTicketToHolderTest() throws Exception {
-        String deviceId = "noId";
+        String device_id = "noId";
         Map<String, String> uTicketMap = new HashMap<>();
-        uTicketMap.put("uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET);
-        uTicketMap.put("deviceId", deviceId);
-        flowIssueUTicket.getSharedData().getDeviceTable().put(deviceId, new OtherDevice());
-        flowIssueUTicket.issuerIssueUTicketToHolder(deviceId, uTicketMap);
-        assert (flowIssueUTicket.getGeneratedMsgStorer().getSharedData().getDeviceTable().containsKey(deviceId));
+        uTicketMap.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
+        uTicketMap.put("device_id", device_id);
+        flowIssueUTicket.getSharedData().getDeviceTable().put(device_id, new OtherDevice());
+        flowIssueUTicket.issuerIssueUTicketToHolder(device_id, uTicketMap);
+        assert (flowIssueUTicket.getGeneratedMsgStorer().getSharedData().getDeviceTable().containsKey(device_id));
         String messageJson = flowIssueUTicket.getMsgSender().getSharedData().getSimulatedCommChannel().getSenderQueue().peek();
         Message message = Message.jsonstrToMessage(messageJson);
         assert (Objects.equals(message.getMessageOperation(), Message.MESSAGE_RECV_AND_STORE));
         assert (Objects.equals(message.getMessageType(), UTicket.MESSAGE_TYPE));
-        uTicketMap.put("ticketOrder", String.valueOf(0));
+        uTicketMap.put("ticket_order", String.valueOf(0));
         UTicket uTicket = new UTicket(uTicketMap);
         uTicket.setUTicketId(ECDH.generateSha256HashStr(UTicket.uTicketToJsonStr(uTicket)));
         assert (Objects.equals(message.getMessageStr(), UTicket.uTicketToJsonStr(uTicket)));
@@ -104,7 +104,7 @@ public class FlowIssueUTicketTest {
     public void _holderRecvUTicketTest() {
         UTicket uTicket = new UTicket();
         uTicket.setUTicketType(UTicket.TYPE_OWNERSHIP_UTICKET);
-        uTicket.setDeviceId("deviceId");
+        uTicket.setDeviceId("device_id");
         uTicket.setTicketOrder(1234);
         flowIssueUTicket._holderRecvUTicket(uTicket);
         assert (flowIssueUTicket.getReceivedMsgStorer().getSharedData().getDeviceTable().containsKey(uTicket.getDeviceId()));
@@ -113,10 +113,10 @@ public class FlowIssueUTicketTest {
 
     @Test
     public void holderSendRTicketToIssuerTest() {
-        String deviceId = "deviceId";
-        flowIssueUTicket.getSharedData().getDeviceTable().put(deviceId, new OtherDevice());
-        flowIssueUTicket.getSharedData().getDeviceTable().get(deviceId).setDeviceRTicketForOwner(RTicket.rTicketToJsonStr(new RTicket()));
-        flowIssueUTicket.holderSendRTicketToIssuer(deviceId);
+        String device_id = "device_id";
+        flowIssueUTicket.getSharedData().getDeviceTable().put(device_id, new OtherDevice());
+        flowIssueUTicket.getSharedData().getDeviceTable().get(device_id).setDeviceRTicketForOwner(RTicket.rTicketToJsonStr(new RTicket()));
+        flowIssueUTicket.holderSendRTicketToIssuer(device_id);
         String messageJson = flowIssueUTicket.getExecutor().getSharedData().getSimulatedCommChannel().getSenderQueue().peek();
         Message message = Message.jsonstrToMessage(messageJson);
         assert (Objects.equals(message.getMessageOperation(), Message.MESSAGE_RECV_AND_STORE));
@@ -126,28 +126,28 @@ public class FlowIssueUTicketTest {
 
     @Test
     public void _issuerRecvRTicketTest() throws Exception {
-        String deviceId = "deviceId";
+        String device_id = "device_id";
         UTicket uTicket = new UTicket();
         uTicket.setProtocolVersion(UTicket.PROTOCOL_VERSION);
         uTicket.setUTicketType(UTicket.TYPE_OWNERSHIP_UTICKET);
-        uTicket.setDeviceId(deviceId);
+        uTicket.setDeviceId(device_id);
         uTicket.setTicketOrder(114514);
         uTicket.setUTicketId(ECDH.generateSha256HashStr(UTicket.uTicketToJsonStr(uTicket)));
 
         RTicket rTicket = new RTicket();
         rTicket.setRTicketType(UTicket.TYPE_OWNERSHIP_UTICKET);
-        rTicket.setDeviceId(deviceId);
+        rTicket.setDeviceId(device_id);
         rTicket.setResult("SUCCESS");
         rTicket.setTicketOrder(114515);
         rTicket.setAuditStart(uTicket.getUTicketId());
         KeyPair keyPair = ECC.generateKeyPair();
         rTicket.setRTicketId(SerializationUtil.keyToStr(keyPair.getPublic()));
-        rTicket.setDeviceSignature(SerializationUtil.byteToBase64Str(
-            ECC.signSignature(SerializationUtil.strToByte(RTicket.rTicketToJsonStr(rTicket)), (ECPrivateKey) keyPair.getPrivate())));
+        rTicket.setDeviceSignature(SerializationUtil.bytesToBase64(
+            ECC.signSignature(SerializationUtil.strToBytes(RTicket.rTicketToJsonStr(rTicket)), (ECPrivateKey) keyPair.getPrivate())));
 
-        flowIssueUTicket.getSharedData().getDeviceTable().put(deviceId, new OtherDevice());
-        flowIssueUTicket.getSharedData().getDeviceTable().get(deviceId).setTicketOrder(114514);
-        flowIssueUTicket.getSharedData().getDeviceTable().get(deviceId).setDeviceOwnershipUTicketForOthers(UTicket.uTicketToJsonStr(uTicket));
+        flowIssueUTicket.getSharedData().getDeviceTable().put(device_id, new OtherDevice());
+        flowIssueUTicket.getSharedData().getDeviceTable().get(device_id).setTicketOrder(114514);
+        flowIssueUTicket.getSharedData().getDeviceTable().get(device_id).setDeviceOwnershipUTicketForOthers(UTicket.uTicketToJsonStr(uTicket));
 
         flowIssueUTicket._issuerRecvRTicket(rTicket);
         assert (Objects.equals(flowIssueUTicket.getSharedData().getResultMessage(), "-> SUCCESS: VERIFY_UT_HAS_EXECUTED"));

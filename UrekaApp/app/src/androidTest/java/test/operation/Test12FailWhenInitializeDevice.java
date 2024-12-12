@@ -50,9 +50,9 @@ public class Test12FailWhenInitializeDevice {
         // createSimulatedCommConnection(this.cloudServerDM,this.iotDevice);
         String idForInitializationUTicket = "noId";
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", idForInitializationUTicket,
-                "holderId", this.cloudServerDM.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_INITIALIZATION_UTICKET
+                "device_id", idForInitializationUTicket,
+                "holder_id", this.cloudServerDM.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET
         );
         this.cloudServerDM.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(idForInitializationUTicket,generatedRequest);
 

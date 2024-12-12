@@ -2,13 +2,14 @@ package ureka.framework.model.message_model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 
 public class Message {
-    private static final Gson gson = new Gson();
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     //////////////////////////////////////////////////////
     // Message Operation
     //////////////////////////////////////////////////////
@@ -16,15 +17,15 @@ public class Message {
     public static final String MESSAGE_RECV_AND_STORE = "MESSAGE_RECV_AND_STORE";
     public static final String MESSAGE_VERIFY_AND_EXECUTE = "MESSAGE_VERIFY_AND_EXECUTE";
 
-    private String messageOperation;
-    private String messageType;
-    private String messageStr;
+    private String message_operation;
+    private String message_type;
+    private String message_str;
 
     public Message() {}
     public Message(Map<String, String> values) {
-        this.messageOperation = values.getOrDefault("messageOperation", null);
-        this.messageType = values.getOrDefault("messageType", null);
-        this.messageStr = values.getOrDefault("messageStr", null);
+        this.message_operation = values.getOrDefault("message_operation", null);
+        this.message_type = values.getOrDefault("message_type", null);
+        this.message_str = values.getOrDefault("message_str", null);
     }
 
     @Override
@@ -52,31 +53,36 @@ public class Message {
     }
 
     public String getMessageOperation() {
-        return messageOperation;
+        return message_operation;
     }
 
     public void setMessageOperation(String messageOperation) {
-        this.messageOperation = messageOperation;
+        this.message_operation = messageOperation;
     }
 
     public String getMessageType() {
-        return messageType;
+        return message_type;
     }
 
     public void setMessageType(String messageType) {
-        this.messageType = messageType;
+        this.message_type = messageType;
     }
 
     public String getMessageStr() {
-        return messageStr;
+        return message_str;
     }
 
     public void setMessageStr(String messageStr) {
-        this.messageStr = messageStr;
+        this.message_str = messageStr;
     }
 
     public static String messageToJsonstr(Message messageObj) {
-        return gson.toJson(messageObj);
+//        return gson.toJson(messageObj);
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("message_operation", messageObj.message_operation);
+        jsonObject.addProperty("message_type", messageObj.message_type);
+        jsonObject.addProperty("message_str", messageObj.message_str);
+        return jsonObject.toString();
     }
 
     public static Message jsonstrToMessage(String json) {

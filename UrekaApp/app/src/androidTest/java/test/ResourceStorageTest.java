@@ -85,11 +85,11 @@ public class ResourceStorageTest {
         this.cloudServerDM.getSharedData().getThisDevice().setDeviceName("anotherNewDeviceName");
 
         // Modify the device table in the RAM
-        OtherDevice device1 = new OtherDevice("deviceId1", "uTicketJson1");
-        OtherDevice device2 = new OtherDevice("deviceId2", "uTicketJson2");
+        OtherDevice device1 = new OtherDevice("device_id1", "uTicketJson1");
+        OtherDevice device2 = new OtherDevice("device_id2", "uTicketJson2");
         Map<String, OtherDevice> deviceTable = new HashMap<>();
-        deviceTable.put("deviceId1", device1);
-        deviceTable.put("deviceId2", device2);
+        deviceTable.put("device_id1", device1);
+        deviceTable.put("device_id2", device2);
         this.cloudServerDM.getSharedData().setDeviceTable(deviceTable);
         SimpleLogger.simpleLog("debug","Modified Other Devices in RAM: " + OtherDevice.deviceTableToJsonStr(this.cloudServerDM.getSharedData().getDeviceTable()));
 
@@ -109,10 +109,10 @@ public class ResourceStorageTest {
 
         // THEN: Check SimpleStorage/testStorage/deviceTable.json to ensure the variables are stored correctly
         // THEN: The variables loaded from the Storage should be the same with the variables modified in the RAM
-        assertEquals("deviceId1", updatedDeviceTable.get("deviceId1").getDeviceId());
-        assertEquals("uTicketJson1", updatedDeviceTable.get("deviceId1").getDeviceUTicketForOwner());
-        assertEquals("deviceId2", updatedDeviceTable.get("deviceId2").getDeviceId());
-        assertEquals("uTicketJson2", updatedDeviceTable.get("deviceId2").getDeviceUTicketForOwner());
+        assertEquals("device_id1", updatedDeviceTable.get("device_id1").getDeviceId());
+        assertEquals("uTicketJson1", updatedDeviceTable.get("device_id1").getDeviceUTicketForOwner());
+        assertEquals("device_id2", updatedDeviceTable.get("device_id2").getDeviceId());
+        assertEquals("uTicketJson2", updatedDeviceTable.get("device_id2").getDeviceUTicketForOwner());
     }
 
     @Test

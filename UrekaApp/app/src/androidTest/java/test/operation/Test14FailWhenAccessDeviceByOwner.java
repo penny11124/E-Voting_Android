@@ -63,12 +63,12 @@ public class Test14FailWhenAccessDeviceByOwner {
                 targetDeviceId, interceptedUTicketJson, interceptedRTicketJson, 2
         ));
         // WHEN: Forge Flow (issuerIssueUTicketToHerself)
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId,
-                "holderId", this.cloudServerATK.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                "taskScope", generatedTaskScope
+                "device_id", targetDeviceId,
+                "holder_id", this.cloudServerATK.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                "task_scope", generatedTaskScope
         );
         this.cloudServerATK.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
@@ -112,12 +112,12 @@ public class Test14FailWhenAccessDeviceByOwner {
         // WHEN: Interception (TYPE_SELFACCESS_UTICKET)
         // Enough TYPE_SELFACCESS_UTICKET has NOT on BC, it maybe has been sent in WPAN (Reopen Session) the attacker can intercept & preempt it.
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId2,
-                "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                "taskScope", generatedTaskScope
+                "device_id", targetDeviceId2,
+                "holder_id", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                "task_scope", generatedTaskScope
         );
         this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 
@@ -170,12 +170,12 @@ public class Test14FailWhenAccessDeviceByOwner {
         // WHEN: Interception (TYPE_SELFACCESS_UTICKET)
         // Enough TYPE_SELFACCESS_UTICKET has NOT on BC, it maybe has been sent in WPAN (Reopen Session) the attacker can intercept & preempt it.
         String targetDeviceId2 = this.iotDevice.getSharedData().getThisDevice().getDevicePubKeyStr();
-        String generatedTaskScope = SerializationUtil.dictToJsonStr(Map.of("ALL", "allow"));
+        String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId2,
-                "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_SELFACCESS_UTICKET,
-                "taskScope", generatedTaskScope
+                "device_id", targetDeviceId2,
+                "holder_id", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_SELFACCESS_UTICKET,
+                "task_scope", generatedTaskScope
         );
         this.userAgentDO.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(targetDeviceId,generatedRequest);
 

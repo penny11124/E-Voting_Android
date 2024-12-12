@@ -5,16 +5,20 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -26,6 +30,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 public class ECDH {
@@ -54,7 +59,7 @@ public class ECDH {
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[bytesNum];
         random.nextBytes(bytes);
-        return SerializationUtil.byteToBase64Str(bytes);
+        return SerializationUtil.bytesToBase64(bytes);
     }
 
     //////////////////////////////////////////////////////
@@ -63,30 +68,18 @@ public class ECDH {
     public static byte[] generateSha256HashBytes(byte[] message) throws Exception {
         return SimpleMeasurer.measureResourceFunc(ECDH::_generateSha256HashBytes, message);
     }
-    private static byte[] _generateSha256HashBytes(byte[] message)
-        throws NoSuchAlgorithmException, NoSuchProviderException {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256", "SC");
-            return digest.digest(message);
-        } catch (NoSuchAlgorithmException e) {
-            String failureMsg = "generateSha256HashBytes: NoSuchAlgorithmException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchProviderException e) {
-            String failureMsg = "generateSha256HashBytes: NoSuchProviderException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        }
+    private static byte[] _generateSha256HashBytes(byte[] message) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256", "SC");
+        return digest.digest(message);
     }
 
     public static String generateSha256HashStr(String messageStr) throws Exception {
         return SimpleMeasurer.measureResourceFunc(ECDH::_generateSha256HashStr, messageStr);
     }
-    private static String _generateSha256HashStr(String messageStr)
-        throws NoSuchAlgorithmException, NoSuchProviderException {
-        byte[] messageBytes = SerializationUtil.strToByte(messageStr);
+    private static String _generateSha256HashStr(String messageStr) throws Exception {
+        byte[] messageBytes = SerializationUtil.strToBytes(messageStr);
         byte[] hashBytes = _generateSha256HashBytes(messageBytes);
-        return SerializationUtil.byteToBase64Str(hashBytes);
+        return SerializationUtil.bytesToBase64(hashBytes);
     }
 
     //////////////////////////////////////////////////////
@@ -100,8 +93,8 @@ public class ECDH {
     //       -> A practical solution for ephemeral maybe periodically re-exchange a HKDF-derived session key.
     //       -> How to set the period depends on the trade-off between security and overhead.
     //////////////////////////////////////////////////////
-    public static byte[] generateEcdhKey(ECPrivateKey serverPrivateKey, byte[] salt, byte[] info, ECPublicKey peerPublicKey) throws Exception {
-        return SimpleMeasurer.measureResourceFunc(ECDH::_generateEcdhKey, serverPrivateKey, salt, info, peerPublicKey);
+    public static byte[] generateEcdhKey(PrivateKey serverPrivateKey, byte[] salt, byte[] info, PublicKey peerPublicKey) throws Exception {
+        return SimpleMeasurer.measureResourceFunc(ECDH::_generateEcdhKey, (ECPrivateKey) serverPrivateKey, salt, info, (ECPublicKey) peerPublicKey);
     }
     private static byte[] _generateEcdhKey(ECPrivateKey serverPrivateKey, byte[] salt, byte[] info, ECPublicKey peerPublicKey)
         throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException {
@@ -111,15 +104,8 @@ public class ECDH {
             keyAgreement.init(serverPrivateKey);
             keyAgreement.doPhase(peerPublicKey, true);
             byte[] sharedSecret = keyAgreement.generateSecret();
-
-            // Perform Key Derivation [HKDF, HMAC-based Extract-and-Expand KDF]
-            HKDFBytesGenerator hkdf = new HKDFBytesGenerator(new SHA256Digest());
-            HKDFParameters hkdfParams = new HKDFParameters(sharedSecret, salt, info);
-            hkdf.init(hkdfParams);
-            byte[] derivedKey = new byte[32]; // Length of the derived key in bytes
-            hkdf.generateBytes(derivedKey, 0, derivedKey.length);
-
-            return derivedKey;
+            SimpleLogger.simpleLog("info", "Shared Key = " + SerializationUtil.bytesToHex(sharedSecret));
+            return sharedSecret;
         } catch (NoSuchAlgorithmException e) {
             String failureMsg = "generateEcdhKey: NoSuchAlgorithmException occurs.";
             // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
@@ -279,7 +265,6 @@ public class ECDH {
             if (iv == null) {
                 iv = _generateRandomByte(12); // GCM standard recommends a 12-byte IV
             }
-
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding", "SC");
             SecretKeySpec keySpec = new SecretKeySpec(key, "AES");
             GCMParameterSpec gcmSpec = new GCMParameterSpec(128, iv); // 128-bit authentication tag length
@@ -294,33 +279,8 @@ public class ECDH {
             System.arraycopy(ciphertext, 0, finalCiphertext, 0, ciphertext.length - 16);
 
             return new byte[][] { finalCiphertext, iv, tag };
-        } catch (IllegalBlockSizeException e) {
-            String failureMsg = "gcmEncrypt: IllegalBlockSizeException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (InvalidAlgorithmParameterException e) {
-            String failureMsg = "gcmEncrypt: InvalidAlgorithmParameterException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (InvalidKeyException e) {
-            String failureMsg = "gcmEncrypt: InvalidKeyException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (BadPaddingException e) {
-            String failureMsg = "gcmEncrypt: BadPaddingException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchAlgorithmException e) {
-            String failureMsg = "gcmEncrypt: NoSuchAlgorithmException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchPaddingException e) {
-            String failureMsg = "gcmEncrypt: NoSuchPaddingException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-            throw e;
-        } catch (NoSuchProviderException e) {
-            String failureMsg = "gcmEncrypt: NoSuchProviderException occurs.";
-            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
+        } catch (Exception e) {
+            SimpleLogger.simpleLog("error", e.getMessage());
             throw e;
         }
     }

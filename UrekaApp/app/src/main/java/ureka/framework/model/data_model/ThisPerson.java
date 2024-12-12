@@ -6,7 +6,10 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.util.HashMap;
@@ -17,8 +20,8 @@ import ureka.framework.resource.logger.SimpleLogger;
 
 public class ThisPerson {
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
-    private ECPrivateKey personPrivKey = null;
-    private ECPublicKey personPubKey = null;
+    private PrivateKey personPrivKey = null;
+    private PublicKey personPubKey = null;
 
     public ThisPerson() {}
 
@@ -46,39 +49,28 @@ public class ThisPerson {
         return true;
     }
 
-    public ECPrivateKey getPersonPrivKey() {
+    public PrivateKey getPersonPrivKey() {
         return personPrivKey;
     }
 
-    // Adapted from @property in Python
-    public String getPersonPrivKeyStr() {
-        if (this.personPrivKey == null) {
-            return null;
-        }
-        return SerializationUtil.keyToStr(this.personPrivKey, "eccPrivateKey");
-    }
-
-    public void setPersonPrivKey(ECPrivateKey personPrivKey) {
+    public void setPersonPrivKey(PrivateKey personPrivKey) {
         this.personPrivKey = personPrivKey;
     }
 
-    public ECPublicKey getPersonPubKey() {
+    public PublicKey getPersonPubKey() {
         return personPubKey;
     }
 
     // Adapted from @property in Python
     public String getPersonPubKeyStr() {
-        if (this.personPubKey == null) {
-            return null;
-        }
-        return SerializationUtil.keyToStr(this.personPubKey, "eccPublicKey");
+        return SerializationUtil.publicKeyToBase64(this.personPubKey);
     }
 
-    public void setPersonPubKey(ECPublicKey personPubKey) {
+    public void setPersonPubKey(PublicKey personPubKey) {
         this.personPubKey = personPubKey;
     }
 
-    public static Map<String, String> _thisPersonToMap(ThisPerson thisPerson) throws IllegalAccessException {
+    public static Map<String, String> _thisPersonToMap(ThisPerson thisPerson) {
         Map<String, String> thisPersonMap = new HashMap<>();
         Class<?> thisPersonClass = thisPerson.getClass();
 
@@ -92,26 +84,24 @@ public class ThisPerson {
                         thisPersonMap.put(field.getName(), value.toString());
                     } else if (field.getType().equals(String.class)) {
                         thisPersonMap.put(field.getName(), (String) value);
-                    } else if (field.getType().equals(ECPrivateKey.class)) {
-                        thisPersonMap.put(field.getName(), SerializationUtil.keyToStr(value));
-                    } else if (field.getType().equals(ECPublicKey.class)) {
-                        thisPersonMap.put(field.getName(), SerializationUtil.keyToStr(value));
+                    } else if (field.getType().equals(PrivateKey.class)) {
+                        thisPersonMap.put(field.getName(), SerializationUtil.privateKeyToBase64((PrivateKey) value));
+                    } else if (field.getType().equals(PublicKey.class)) {
+                        thisPersonMap.put(field.getName(), SerializationUtil.publicKeyToBase64((PublicKey) value));
                     }
                 } else {
                     thisPersonMap.put(field.getName(), null);
                 }
-            } catch (IllegalAccessException e) {
-                String failureMsg = "ThisPerson._thisPersonToMap: IllegalAccessException occurs.";
-                // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-                throw e;
+            } catch (Exception e) {
+                String failureMsg = "ThisPerson._thisPersonToMap: " + e.getMessage();
+                throw new RuntimeException(failureMsg);
             }
         }
 
         return thisPersonMap;
     }
 
-    public static ThisPerson _mapToThisPerson(Map<String, String> thisPersonMap)
-        throws NoSuchFieldException, IllegalAccessException {
+    public static ThisPerson _mapToThisPerson(Map<String, String> thisPersonMap) {
         ThisPerson thisPerson = new ThisPerson();
         Class<?> thisPersonClass = thisPerson.getClass();
 
@@ -127,19 +117,14 @@ public class ThisPerson {
                     field.set(thisPerson, value);
                 } else if (field.getType().equals(Integer.class)) {
                     field.set(thisPerson, Integer.valueOf(value));
-                } else if (field.getType().equals(ECPrivateKey.class)) {
-                    field.set(thisPerson, SerializationUtil.strToKey(value, "eccPrivateKey"));
-                } else if (field.getType().equals(ECPublicKey.class)) {
-                    field.set(thisPerson, SerializationUtil.strToKey(value, "eccPublicKey"));
+                } else if (field.getType().equals(PrivateKey.class)) {
+                    field.set(thisPerson, SerializationUtil.base64ToPrivateKey(value));
+                } else if (field.getType().equals(PublicKey.class)) {
+                    field.set(thisPerson, SerializationUtil.base64ToPublicKey(value));
                 }
-            } catch (NoSuchFieldException e) {
-                String failureMsg = "thisPerson._mapToThisPerson: NoSuchFieldException occurs.";
-                SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-                throw e;
-            } catch (IllegalAccessException e) {
-                String failureMsg = "thisPerson._mapToThisPerson: IllegalAccessException occurs.";
-                SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-                throw e;
+            } catch (Exception e) {
+                String failureMsg = "ThisPerson._mapToThisPerson: " + e.getMessage();
+                throw new RuntimeException(failureMsg);
             }
         }
 
@@ -147,31 +132,12 @@ public class ThisPerson {
     }
 
     public static String thisPersonToJsonStr(ThisPerson thisPerson) {
-        // We don't need to apply _otherDeviceToMap since GSON will automatically handle it.
-        Map<String, String> thisPersonMap = null;
-        try {
-            thisPersonMap = _thisPersonToMap(thisPerson);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        // Convert the map to JSON using GSON
+        Map<String, String> thisPersonMap = _thisPersonToMap(thisPerson);
         return gson.toJson(thisPersonMap);
     }
 
     public static ThisPerson jsonStrToThisPerson(String jsonStr) {
-//        try {
-//            return gson.fromJson(jsonStr, ThisPerson.class);
-//        } catch (Exception e) {
-//            String failureMsg = "NOT VALID JSON or VALID RTICKET SCHEMA";
-//            // SimpleLogger.simpleLog("error", "{" + failureMsg + "}: {" + e + "}");
-//            throw new RuntimeException(failureMsg);
-//        }
         Map<String, String> thisPersonMap = gson.fromJson(jsonStr, new TypeToken<Map<String, String>>() {}.getType());
-        // Map the fields from the map back to the ThisPerson object
-        try {
-            return _mapToThisPerson(thisPersonMap);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return _mapToThisPerson(thisPersonMap);
     }
 }

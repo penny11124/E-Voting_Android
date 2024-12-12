@@ -60,9 +60,9 @@ public class Test03SuccessWhenTransferDeviceOwnership {
         Integer originalAgentOrder = this.cloudServerDm.getSharedData().getDeviceTable().get(targetDeviceId).getTicketOrder();
 
         Map<String, String> generatedRequest = Map.of(
-                "deviceId", targetDeviceId,
-                "holderId", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
-                "uTicketType", UTicket.TYPE_OWNERSHIP_UTICKET
+                "device_id", targetDeviceId,
+                "holder_id", this.userAgentDO.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                "u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET
         );
         this.cloudServerDm.getFlowIssuerIssueUTicket().issuerIssueUTicketToHolder(targetDeviceId,generatedRequest);
         this.userAgentDO.getMsgReceiver()._recvXxxMessage();

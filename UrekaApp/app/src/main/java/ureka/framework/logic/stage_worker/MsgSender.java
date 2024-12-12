@@ -12,6 +12,7 @@ import ureka.framework.resource.logger.SimpleLogger;
 import ureka.framework.resource.logger.SimpleMeasurer;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class MsgSender {
@@ -99,17 +100,19 @@ public class MsgSender {
         if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) || messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
                 (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
 
-            Map<String, String> messageRequest = new HashMap<>();
-            messageRequest.put("messageOperation", messageOperation);
-            messageRequest.put("messageType", messageType);
-            messageRequest.put("messageStr", sentMessageJson);
+            Map<String, String> messageRequest = new LinkedHashMap<>();
+            messageRequest.put("message_operation", messageOperation);
+            messageRequest.put("message_type", messageType);
+            messageRequest.put("message_str", sentMessageJson);
 
             try {
                 Message newMessage = new Message(messageRequest);
                 String newMessageJson = Message.messageToJsonstr(newMessage);
+                newMessageJson += "$";
 //                if (!bleManager.isConnected()) {
 //                    throw new IllegalStateException("BLE is not connected.");
 //                }
+
                 bleManager.sendData(newMessageJson);
 //                Environment.transmittedMessage = newMessageJson;
                 // SimpleLogger.log("debug", "sentMessageJson: " + sentMessageJson);
@@ -126,14 +129,14 @@ public class MsgSender {
 //                    this.sharedData.getSimulatedCommChannel().getEnd().getSharedData().getThisDevice().getDeviceName() + "...");
 
             // Simulate Network Delay
-            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
-                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
-                }
-            }
+//            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
+//                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
+//                }
+//            }
 //            Map<String, String> messageRequest = new HashMap<>();
 //            messageRequest.put("messageOperation", messageOperation);
 //            messageRequest.put("messageType", messageType);
@@ -193,14 +196,14 @@ public class MsgSender {
 //                    this.sharedData.getSimulatedCommChannel().getEnd().getSharedData().getThisDevice().getDeviceName() + "...");
 
             // Simulate Network Delay
-            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                SimpleLogger.simpleLog("info", "network delay");
-                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
-                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
-                }
-            }
+//            for (int i = 0; i < Environment.SIMULATED_COMM_DELAY_COUNT; i++) {
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                SimpleLogger.simpleLog("info", "network delay");
+//                if (Environment.DEPLOYMENT_ENV.equals("PRODUCTION")) { // pragma: no cover -> PRODUCTION
+//                    Thread.sleep((long) Environment.SIMULATED_COMM_DELAY_DURATION);
+//                }
+//            }
 //            Map<String, String> messageRequest = new HashMap<>();
 //            messageRequest.put("messageOperation", messageOperation);
 //            messageRequest.put("messageType", messageType);

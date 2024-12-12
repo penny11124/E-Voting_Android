@@ -14,21 +14,26 @@ import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.urekaapp.communication.NearbyViewModel;
-
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ureka.framework.Environment;
 import ureka.framework.resource.logger.SimpleLogger;
 
 public class BLEManager {
+    private boolean isWriteInProgress = false;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothGatt bluetoothGatt;
@@ -38,7 +43,6 @@ public class BLEManager {
     private final MutableLiveData<Boolean> connectionState = new MutableLiveData<>(false);
     private final MutableLiveData<String> receivedData = new MutableLiveData<>();
     private Context context;
-    private NearbyViewModel nearbyViewModel = null;
 
     public BLEManager(Context context) {
         this.context = context.getApplicationContext();
@@ -74,103 +78,114 @@ public class BLEManager {
     }
 
     public void connectToDevice(BluetoothDevice device, BLECallback callback) {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            callback.onDisconnected();
-            return;
-        }
-
-        bluetoothGatt = device.connectGatt(context, false, new BluetoothGattCallback() {
-            @Override
-            public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    connectionState.postValue(true);
-                    if (ActivityCompat.checkSelfPermission(BLEManager.this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    gatt.discoverServices();
-                } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                    connectionState.postValue(false);
-                    if (bluetoothGatt != null) {
-                        bluetoothGatt.close();
-                        bluetoothGatt = null;
-                    }
-                    callback.onDisconnected();
-                }
+        new Thread(() -> {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                callback.onDisconnected();
+                return;
             }
 
-            @Override
-            public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-                if (status != BluetoothGatt.GATT_SUCCESS) {
-                    callback.onDisconnected();
-                    return;
-                }
-
-                BluetoothGattService service = gatt.getService(UUID.fromString(Environment.SERVICE_UUID));
-                if (service != null) {
-                    writeCharacteristic = service.getCharacteristic(UUID.fromString(Environment.WRITE_CHARACTERISTIC_UUID));
-                    notifyCharacteristic = service.getCharacteristic(UUID.fromString(Environment.NOTIFY_CHARACTERISTIC_UUID));
-
-                    if (ActivityCompat.checkSelfPermission(BLEManager.this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    gatt.setCharacteristicNotification(notifyCharacteristic, true);
-                    BluetoothGattDescriptor descriptor = notifyCharacteristic.getDescriptor(UUID.fromString(Environment.CLIENT_CHARACTERISTIC_CONFIG));
-                    if (descriptor != null) {
-                        descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                        boolean success = gatt.writeDescriptor(descriptor);
-                        if (!success) {
-                            callback.onDisconnected();
+            bluetoothGatt = device.connectGatt(context, false, new BluetoothGattCallback() {
+                @Override
+                public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+                    if (newState == BluetoothProfile.STATE_CONNECTED) {
+                        connectionState.postValue(true);
+                        if (ActivityCompat.checkSelfPermission(BLEManager.this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                            return;
                         }
+                        gatt.discoverServices();
+                    } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                        connectionState.postValue(false);
+                        callback.onDisconnected();
                     }
-                    callback.onConnected();
-                } else {
-                    callback.onDisconnected();
                 }
-            }
 
-            @Override
-            public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-                try {
-                    String data = new String(characteristic.getValue(), StandardCharsets.UTF_8);
-                    receivedData.postValue(data);
-                    callback.onDataReceived(data);
-                } catch (Exception e) {
-                    callback.onDataReceived("Invalid Data Received");
-                }
-            }
+                @Override
+                public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+                    if (status != BluetoothGatt.GATT_SUCCESS) {
+                        callback.onDisconnected();
+                        return;
+                    }
 
-            @Override
-            public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-                if (status != BluetoothGatt.GATT_SUCCESS) {
+                    BluetoothGattService service = gatt.getService(UUID.fromString(Environment.SERVICE_UUID));
+                    if (service != null) {
+                        writeCharacteristic = service.getCharacteristic(UUID.fromString(Environment.WRITE_CHARACTERISTIC_UUID));
+                        notifyCharacteristic = service.getCharacteristic(UUID.fromString(Environment.NOTIFY_CHARACTERISTIC_UUID));
+
+                        if (ActivityCompat.checkSelfPermission(BLEManager.this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                            return;
+                        }
+                        gatt.setCharacteristicNotification(notifyCharacteristic, true);
+                        BluetoothGattDescriptor descriptor = notifyCharacteristic.getDescriptor(UUID.fromString(Environment.CLIENT_CHARACTERISTIC_CONFIG));
+                        if (descriptor != null) {
+                            descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                            boolean success = gatt.writeDescriptor(descriptor);
+                            if (!success) {
+                                callback.onDisconnected();
+                            }
+                        }
+                        callback.onConnected();
+                    } else {
+                        callback.onDisconnected();
+                    }
                 }
-            }
-        });
+
+                @Override
+                public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+                    try {
+                        String data = new String(characteristic.getValue(), StandardCharsets.UTF_8);
+                        receivedData.postValue(data);
+                        callback.onDataReceived(data);
+                    } catch (Exception e) {
+                        callback.onDataReceived("Invalid Data Received");
+                    }
+                }
+
+                @Override
+                public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+                    if (status == BluetoothGatt.GATT_SUCCESS) {
+                        SimpleLogger.simpleLog("info", "Chunk written successfully");
+                    } else {
+                        SimpleLogger.simpleLog("error", "Write failed with status: " + status);
+                    }
+                    isWriteInProgress = false; // Allow the next chunk to be written
+                }
+            });
+        }).start();
     }
 
     public void sendData(String json) {
         if (writeCharacteristic != null && isConnected()) {
-            int chunkSize = 20;
-            for (int i = 0; i < json.length(); i += chunkSize) {
-                int end = Math.min(i + chunkSize, json.length());
-                String chunk = json.substring(i, end);
-                writeCharacteristic.setValue(chunk.getBytes(StandardCharsets.UTF_8));
+            executorService.submit(() -> {
+                int chunkSize = 41;
+                for (int i = 0; i < json.length(); i += chunkSize) {
+                    int end = Math.min(i + chunkSize, json.length());
+                    String chunk = json.substring(i, end);
 
-                if (ActivityCompat.checkSelfPermission(Environment.applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    return;
-                }
-                boolean success = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+                    writeCharacteristic.setValue(chunk.getBytes(StandardCharsets.UTF_8));
 
-                if (!success) {
-                    Toast.makeText(Environment.applicationContext, "Failed to send data, i = " + i, Toast.LENGTH_SHORT).show();
-                    break;
-                }
+                    if (ActivityCompat.checkSelfPermission(Environment.applicationContext, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        SimpleLogger.simpleLog("Error", "Permission denied");
+                        return;
+                    }
 
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    isWriteInProgress = true;
+                    boolean success = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+                    if (!success) {
+                        SimpleLogger.simpleLog("error", "Failed to initiate send data: " + chunk);
+                        break;
+                    }
+
+                    // Wait for the write to complete
+                    while (isWriteInProgress) {
+                        try {
+                            Thread.sleep(10); // Small delay to avoid CPU spinning
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    }
                 }
-            }
+            });
 //        }
 //        if (writeCharacteristic != null && isConnected()) {
 //            writeCharacteristic.setValue(json.getBytes(StandardCharsets.UTF_8));
@@ -192,10 +207,8 @@ public class BLEManager {
             bluetoothGatt.close();
             bluetoothGatt = null;
             connectionState.postValue(false);
-
         }
     }
-
 
     public boolean isConnected() {
         return connectionState.getValue() != null && connectionState.getValue();
