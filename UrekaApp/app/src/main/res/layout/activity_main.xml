@@ -25,8 +25,6 @@
         android:text="Voter 1"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="@+id/buttonAdminAgent"
-<<<<<<< HEAD
-=======
         app:layout_constraintBottom_toBottomOf="@+id/buttonVoterAgent2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -49,7 +47,6 @@
         android:text="Test"
         tools:ignore="HardcodedText"
         app:layout_constraintTop_toTopOf="@+id/buttonVoterAgent2"
->>>>>>> 7b958e0b1db291c38d2b99b9d1da8a269256d099
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

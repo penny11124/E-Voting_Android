@@ -136,7 +136,6 @@ public class FlowIssueUToken {
             if (this.sharedData.getDeviceTable().containsKey(device_id)) {
                 // Stage: (E)
                 this.executor.executePs("sendUToken", null, cmd, null);
-                SimpleLogger.simpleLog("info", "holderSendCmd: executePs success, cmd = " + cmd);
 
                 String u_ticket_type;
                 if (!accessEnd) {

@@ -23,11 +23,17 @@ import java.util.Objects;
 
 import ureka.framework.Environment;
 import ureka.framework.logic.stage_worker.MsgReceiver;
+import ureka.framework.resource.crypto.SerializationUtil;
 
 public class NearbyManager {
     private static final String TAG = "NearbyManager";
     private static final String SERVICE_ID = "com.example.urekaapp.communication";
     private ConnectionsClient connectionsClient;
+
+    public void setMsgReceiver(MsgReceiver msgReceiver) {
+        this.msgReceiver = msgReceiver;
+    }
+
     private MsgReceiver msgReceiver;
     private NearbyViewModel nearbyViewModel = null;
 
@@ -65,7 +71,7 @@ public class NearbyManager {
     }
 
     public void sendMessage(String endpointId, String message) {
-        Payload payload = Payload.fromBytes(message.getBytes());
+        Payload payload = Payload.fromBytes(SerializationUtil.strToBytes(message));
         connectionsClient.sendPayload(endpointId, payload)
                 .addOnSuccessListener(unused -> Log.d(TAG, "Payload sent successfully"))
                 .addOnFailureListener(e -> Log.e(TAG, "Payload sending failed", e));
@@ -144,4 +150,13 @@ public class NearbyManager {
             Log.d(TAG, "Payload transfer update from " + endpointId);
         }
     };
+
+    public void disconnectFromAllEndpoints() {
+        if (Environment.connectedEndpointId != null) {
+            connectionsClient.disconnectFromEndpoint(Environment.connectedEndpointId);
+        } else {
+            Log.d(TAG, "No active connections to disconnect");
+        }
+    }
+
 }

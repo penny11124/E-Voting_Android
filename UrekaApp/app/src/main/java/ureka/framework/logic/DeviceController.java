@@ -53,6 +53,8 @@ public class DeviceController {
     private MsgSender msgSender;
     private MsgReceiver msgReceiver;
     private BLEManager bleManager;
+
+    private NearbyViewModel nearbyViewModel;
     private NearbyManager nearbyManager;
     // Flow
     private FlowIssueUTicket flowIssuerIssueUTicket;
@@ -63,9 +65,10 @@ public class DeviceController {
     public DeviceController(String deviceType, String deviceName) {
         this._initialize(deviceType, deviceName, Environment.applicationContext);
     }
+
     private void _initialize(String deviceType, String deviceName, Context context) {
         BLEViewModel bleViewModel = new ViewModelProvider((AppCompatActivity) context).get(BLEViewModel.class);
-        NearbyViewModel nearbyViewModel = new ViewModelProvider((AppCompatActivity) context).get(NearbyViewModel.class);
+        this.nearbyViewModel = new ViewModelProvider((AppCompatActivity) context).get(NearbyViewModel.class);
 
         this.sharedData = new SharedData(new ThisDevice(), new CurrentSession(), new ThisPerson());
         this.simpleStorage = new SimpleStorage(deviceName);
@@ -84,7 +87,8 @@ public class DeviceController {
         this.msgGenerator = new MsgGenerator(this.sharedData, this.measureHelper);
         this.generatedMsgStorer = new GeneratedMsgStorer(this.sharedData, this.measureHelper, this.simpleStorage);
         this.bleManager = bleViewModel.getBLEManager(context);
-        this.nearbyManager = nearbyViewModel.getNearbyManager(context, this.msgReceiver);
+        this.nearbyManager = this.nearbyViewModel.getNearbyManager(context, this.msgReceiver);
+        this.nearbyManager.setViewModel(this.nearbyViewModel);
         this.msgSender = new MsgSender(this.sharedData, this.measureHelper, this.bleManager, this.nearbyManager);
 
         // Flow
@@ -250,6 +254,30 @@ public class DeviceController {
 
     public void setFlowIssueUToken(FlowIssueUToken flowIssueUToken) {
         this.flowIssueUToken = flowIssueUToken;
+    }
+
+    public BLEManager getBleManager() {
+        return bleManager;
+    }
+
+    public void setBleManager(BLEManager bleManager) {
+        this.bleManager = bleManager;
+    }
+
+    public NearbyManager getNearbyManager() {
+        return nearbyManager;
+    }
+
+    public void setNearbyManager(NearbyManager nearbyManager) {
+        this.nearbyManager = nearbyManager;
+    }
+
+    public NearbyViewModel getNearbyViewModel() {
+        return nearbyViewModel;
+    }
+
+    public void setNearbyViewModel(NearbyViewModel nearbyViewModel) {
+        this.nearbyViewModel = nearbyViewModel;
     }
 
     public void connectToDevice(String deviceName, Runnable onConnected, Runnable onDisconnected, TextView textView) {

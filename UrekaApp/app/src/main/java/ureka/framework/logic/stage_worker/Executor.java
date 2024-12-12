@@ -123,8 +123,8 @@ public class Executor {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        this.sharedData.getThisPerson().setPersonPrivKey((ECPrivateKey) personKeyPair.getPrivate());
-        this.sharedData.getThisPerson().setPersonPubKey((ECPublicKey) personKeyPair.getPublic());
+        this.sharedData.getThisPerson().setPersonPrivKey(personKeyPair.getPrivate());
+        this.sharedData.getThisPerson().setPersonPubKey(personKeyPair.getPublic());
 
         // Initialize Device Owner
         // RAM
@@ -697,6 +697,7 @@ public class Executor {
                 break;
             case "recvCrke3":
             case "recvRToken":
+                SimpleLogger.simpleLog("info", "Start receiving RToken");
                 // Update Session: PS-Cmd (Input: Key)
                 currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
@@ -708,6 +709,7 @@ public class Executor {
 
                 // [STAGE: (VTK)]
                 // Update Session: PS-Data (Decryption)
+                SimpleLogger.simpleLog("info", "Start decrypting");
                 String plaintextData = this._executeDecryptCiphertext(
                         this.sharedData.getCurrentSession().getCiphertextData(),
                         this.sharedData.getCurrentSession().getAssociatedPlaintextData(),
@@ -717,6 +719,7 @@ public class Executor {
                 );
 
                 // Update Session: PS-Data (Output: Plaintext)
+                SimpleLogger.simpleLog("info", "Executor: plaintextData = " + plaintextData);
                 this.sharedData.getCurrentSession().setPlaintextData(plaintextData);
                 break;
             // PS
@@ -727,11 +730,6 @@ public class Executor {
                 // Update Session: PS-Cmd (Input: Plaintext, Associated-Plaintext)
                 this.sharedData.getCurrentSession().setPlaintextCmd(plaintext);
                 this.sharedData.getCurrentSession().setAssociatedPlaintextCmd("AUC");
-
-                SimpleLogger.simpleLog("info", "executePs: plaintextCmd = " + this.sharedData.getCurrentSession().getPlaintextCmd());
-                SimpleLogger.simpleLog("info", "executePs: associatedPlaintextCmd = " + this.sharedData.getCurrentSession().getAssociatedPlaintextCmd());
-                SimpleLogger.simpleLog("info", "executePs: currentSessionKeyStr = " + this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
-                SimpleLogger.simpleLog("info", "executePs: ivCmd = " + this.sharedData.getCurrentSession().getIvCmd());
 
                 // Update Session: PS-Cmd (Encryption)
                 Pair encResult3 = this._executeEncryptPlaintext(
@@ -805,20 +803,29 @@ public class Executor {
     }
     private String _executeDecryptCiphertext(String ciphertext, String associatedPlaintext, String gcmAuthenticationTag, byte[] sessionKey, String iv) {
         // [STAGE: (VTK)] Verify HMAC before Execution
+        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 0");
+        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: ciphertext = " + ciphertext);
+        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: associatedPlaintext = " + associatedPlaintext);
+        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: gcmAuthenticationTag = " + gcmAuthenticationTag);
+        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: sessionKey = " + SerializationUtil.bytesToBase64(sessionKey));
+        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: iv = " + iv);
         byte[] ciphertextBytes = SerializationUtil.base64ToBytes(ciphertext);
         byte[] associatedPlaintextBytes = SerializationUtil.strToBytes(associatedPlaintext);
         byte[] gcmAuthenticationTagByte = SerializationUtil.base64ToBytes(gcmAuthenticationTag);
-        byte[] ivBytes = SerializationUtil.hexToBytes(iv);
+        byte[] ivBytes = SerializationUtil.base64ToBytes(iv);
 
+        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 1");
         try {
             // verify_token_through_hmac
             byte[] plaintextByte = ECDH.gcmDecrypt(ciphertextBytes,associatedPlaintextBytes,gcmAuthenticationTagByte,sessionKey,ivBytes);
 
+            SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 2");
             String plaintext = SerializationUtil.bytesToStr(plaintextByte);
 
             this.sharedData.setResultMessage("-> SUCCESS: VERIFY_IV_AND_HMAC");
             SimpleLogger.simpleLog("info", this.sharedData.getResultMessage());
 
+            SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 3");
             return plaintext;
         } catch (AEADBadTagException error) {
             this.sharedData.setResultMessage("-> FAILURE: VERIFY_IV_AND_HMAC");

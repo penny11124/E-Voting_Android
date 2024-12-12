@@ -32,7 +32,8 @@ public class MsgVerifierMessage {
         String failure_msg = "-> FAILURE: VERIFY_MESSAGE_OPERATION";
 
         if (Objects.equals(messageIn.getMessageOperation(), Message.MESSAGE_RECV_AND_STORE)
-            || Objects.equals(messageIn.getMessageOperation(), Message.MESSAGE_VERIFY_AND_EXECUTE)) {
+            || Objects.equals(messageIn.getMessageOperation(), Message.MESSAGE_VERIFY_AND_EXECUTE)
+            || Objects.equals(messageIn.getMessageOperation(), Message.MESSAGE_REQUEST)) {
             SimpleLogger.simpleLog("info", success_msg);
             return messageIn;
         } else {
@@ -47,7 +48,8 @@ public class MsgVerifierMessage {
         String failure_msg = "-> FAILURE: VERIFY_MESSAGE_TYPE";
 
         if (Objects.equals(messageIn.getMessageType(), UTicket.MESSAGE_TYPE)
-            || Objects.equals(messageIn.getMessageType(), RTicket.MESSAGE_TYPE)) {
+            || Objects.equals(messageIn.getMessageType(), RTicket.MESSAGE_TYPE)
+            || Objects.equals(messageIn.getMessageType(), Message.MESSAGE_REQUEST)) {
             SimpleLogger.simpleLog("info", success_msg);
             return messageIn;
         } else {

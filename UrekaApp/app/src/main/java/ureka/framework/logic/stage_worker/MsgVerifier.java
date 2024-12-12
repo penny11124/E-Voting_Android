@@ -66,8 +66,11 @@ public class MsgVerifier {
 
         if (Objects.equals(messageIn.getMessageType(), UTicket.MESSAGE_TYPE)) {
             return this._classifyUTicketIsDefinedType(messageIn.getMessageStr());
-        } else {
+        } else if (Objects.equals(messageIn.getMessageType(), RTicket.MESSAGE_TYPE)) {
             return this._classifyRTicketIsDefinedType(messageIn.getMessageStr());
+        } else {
+            // Handle Request UTicket
+            return messageIn.getMessageStr();
         }
     }
 

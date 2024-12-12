@@ -1,6 +1,7 @@
 package ureka.framework.logic.pipeline_flow;
 
 import com.example.urekaapp.AdminAgentActivity;
+import com.example.urekaapp.VoterAgentActivity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -135,6 +136,7 @@ public class FlowApplyUTicket {
                 storedUTicketJson = this.sharedData.getDeviceTable().get(device_id).getDeviceUTicketForOwner();
             } else {
                 String error = "FAILURE: (VL)";
+                SimpleLogger.simpleLog("info", "no you");
                 this.sharedData.setResultMessage(error);
                 throw new RuntimeException(error);
             }
@@ -359,6 +361,7 @@ public class FlowApplyUTicket {
             throw new RuntimeException("FlowApplyUTicket-_holderRecvRTicket: Unexpected error.");
         } finally {
             AdminAgentActivity.sendNextTicket = true;
+            VoterAgentActivity.sendNextTicket = true;
             SimpleLogger.simpleLog("info", "Ready to send next ticket");
             //////////////////////////////////////////////////////
             // End Process Measurement
