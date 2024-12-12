@@ -129,8 +129,18 @@ public class VoterAgentActivity extends AppCompatActivity {
         });
 
         buttonConnect.setOnClickListener(view -> {
-            bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
-            nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
+            if (bleViewModel.getBLEManager(Environment.applicationContext) != null && bleViewModel.getBLEManager(Environment.applicationContext).isConnected()) {
+                bleViewModel.getBLEManager(Environment.applicationContext).getConnectionState().observe(VoterAgentActivity.this, isConnected -> {
+                    if (isConnected != null && !isConnected) {
+                        nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
+                        bleViewModel.getBLEManager(Environment.applicationContext).getConnectionState().removeObservers(VoterAgentActivity.this);
+                    }
+                });
+
+                bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
+            } else {
+                nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
+            }
         });
 
         buttonRequestUTicket.setOnClickListener(new View.OnClickListener() {

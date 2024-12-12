@@ -135,8 +135,18 @@ public class AdminAgentActivity extends AppCompatActivity {
 
         // buttonAdvertising: Start advertising for the voter agent
         buttonAdvertising.setOnClickListener(view -> {
-            bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
-            nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startAdvertising();
+            if (bleViewModel.getBLEManager(Environment.applicationContext) != null && bleViewModel.getBLEManager(Environment.applicationContext).isConnected()) {
+                bleViewModel.getBLEManager(Environment.applicationContext).getConnectionState().observe(AdminAgentActivity.this, isConnected -> {
+                    if (isConnected != null && !isConnected) {
+                        nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
+                        bleViewModel.getBLEManager(Environment.applicationContext).getConnectionState().removeObservers(AdminAgentActivity.this);
+                    }
+                });
+
+                bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
+            } else {
+                nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
+            }
         });
 
         // buttonInit: Assign the admin agent with the voting machine

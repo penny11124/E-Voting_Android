@@ -20,6 +20,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.urekaapp.communication.NearbyViewModel;
+
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -36,6 +38,7 @@ public class BLEManager {
     private final MutableLiveData<Boolean> connectionState = new MutableLiveData<>(false);
     private final MutableLiveData<String> receivedData = new MutableLiveData<>();
     private Context context;
+    private NearbyViewModel nearbyViewModel = null;
 
     public BLEManager(Context context) {
         this.context = context.getApplicationContext();
@@ -87,6 +90,10 @@ public class BLEManager {
                     gatt.discoverServices();
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     connectionState.postValue(false);
+                    if (bluetoothGatt != null) {
+                        bluetoothGatt.close();
+                        bluetoothGatt = null;
+                    }
                     callback.onDisconnected();
                 }
             }
@@ -185,8 +192,10 @@ public class BLEManager {
             bluetoothGatt.close();
             bluetoothGatt = null;
             connectionState.postValue(false);
+
         }
     }
+
 
     public boolean isConnected() {
         return connectionState.getValue() != null && connectionState.getValue();
