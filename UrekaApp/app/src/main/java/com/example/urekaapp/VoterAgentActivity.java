@@ -52,6 +52,7 @@ public class VoterAgentActivity extends AppCompatActivity {
     private Button buttonRequestUTicket;
     private Button buttonApplyUTicket;
     private Button buttonShowRTicket;
+    private Button buttonPermissionlessVoter;
     private TextView textViewConnectingStatus;
     private Button buttonDisconnect;
 
@@ -114,6 +115,8 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
         buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
         buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
+        buttonPermissionlessVoter = findViewById(R.id.buttonOwnershipTransfer);
+
         textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         buttonDisconnect = findViewById(R.id.buttonDisconnect2);
         String mode = getIntent().getStringExtra("mode");
@@ -238,6 +241,13 @@ public class VoterAgentActivity extends AppCompatActivity {
                 deviceController.getBleManager().disconnect();
                 deviceController.getNearbyManager().stopAllActions();
                 deviceController.getNearbyManager().disconnectFromAllEndpoints();
+            }
+        });
+      
+        buttonPermissionlessVoter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            
             }
         });
 

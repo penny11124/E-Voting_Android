@@ -65,6 +65,8 @@ public class AdminAgentActivity extends AppCompatActivity {
     private Button buttonApplyInitUTicket;
     private Button buttonApplyTallyUTicket;
     private Button buttonShowRTickets;
+    private Button buttonPermissionlessAdmin;
+    private Button buttonOwnershipTransfer;
     private TextView textViewConnectingStatus;
     private Button buttonDisconnect;
 
@@ -103,6 +105,8 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
         buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
         buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
+        buttonPermissionlessAdmin = findViewById(R.id.buttonPermissionlessAdmin);
+        buttonOwnershipTransfer = findViewById(R.id.buttonOwnershipTransfer);
         textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         buttonDisconnect = findViewById(R.id.buttonDisconnect);
         String mode = getIntent().getStringExtra("mode");
@@ -406,6 +410,20 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getBleManager().disconnect();
                 deviceController.getNearbyManager().stopAllActions();
                 deviceController.getNearbyManager().disconnectFromAllEndpoints();
+            }
+        });
+      
+        buttonPermissionlessAdmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonOwnershipTransfer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+            
             }
         });
 
