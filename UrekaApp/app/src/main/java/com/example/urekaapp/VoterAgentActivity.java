@@ -51,6 +51,7 @@ public class VoterAgentActivity extends AppCompatActivity {
     private Button buttonRequestUTicket;
     private Button buttonApplyUTicket;
     private Button buttonShowRTicket;
+    private Button buttonPermissionlessVoter;
     private TextView textViewConnectingStatus;
 
     private final ActivityResultLauncher<Intent> activityResultLauncher =
@@ -111,6 +112,8 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
         buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
         buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
+        buttonPermissionlessVoter = findViewById(R.id.buttonOwnershipTransfer);
+
         textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         String mode = getIntent().getStringExtra("mode");
         if (!Objects.equals(mode, "TEST")) {
@@ -207,6 +210,13 @@ public class VoterAgentActivity extends AppCompatActivity {
 
                 intent.putExtra("PUBLIC_KEY", deviceController.getExecutor().getSharedData().getThisDevice().getDevicePubKeyStr());
                 startActivity(intent);
+            }
+        });
+
+        buttonPermissionlessVoter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

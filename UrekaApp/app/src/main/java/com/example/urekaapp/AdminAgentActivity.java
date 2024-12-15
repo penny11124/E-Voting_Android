@@ -65,6 +65,8 @@ public class AdminAgentActivity extends AppCompatActivity {
     private Button buttonApplyInitUTicket;
     private Button buttonApplyTallyUTicket;
     private Button buttonShowRTickets;
+    private Button buttonPermissionlessAdmin;
+    private Button buttonOwnershipTransfer;
     private TextView textViewConnectingStatus;
 
     // Bluetooth connection
@@ -109,6 +111,8 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
         buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
         buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
+        buttonPermissionlessAdmin = findViewById(R.id.buttonPermissionlessAdmin);
+        buttonOwnershipTransfer = findViewById(R.id.buttonOwnershipTransfer);
         textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         String mode = getIntent().getStringExtra("mode");
         if (!Objects.equals(mode, "TEST")) {
@@ -369,6 +373,20 @@ public class AdminAgentActivity extends AppCompatActivity {
                 intent.putExtra("mapSerializable", (Serializable) candidateVotesMap);
                 intent.putStringArrayListExtra("RTICKET_LIST", rticketList);
                 startActivity(intent);
+            }
+        });
+
+        buttonPermissionlessAdmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonOwnershipTransfer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

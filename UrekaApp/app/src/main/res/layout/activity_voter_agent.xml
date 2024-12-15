@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -7,83 +7,102 @@
     android:layout_height="match_parent"
     tools:context=".VoterAgentActivity">
 
-    <TextView
-        android:id="@+id/textViewDeviceType"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Device type: Voter Agent"
-        tools:ignore="HardcodedText"
-        android:textSize="20sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/textViewConnectingStatus"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textViewConnectingStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Not connected"
-        tools:ignore="HardcodedText"
-        android:textSize="20sp"
-        app:layout_constraintTop_toTopOf="@+id/textViewDeviceType"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonConnect"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/textViewDeviceType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device type: Voter Agent"
+            tools:ignore="HardcodedText"
+            android:textSize="20sp"
+            android:layout_marginTop="64dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
-        android:id="@+id/buttonConnect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Connect To Admin Agent"
-        tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/textViewConnectingStatus"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonRequestUTicket"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/textViewConnectingStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not connected"
+            tools:ignore="HardcodedText"
+            android:textSize="20sp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
-        android:id="@+id/buttonRequestUTicket"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Request UTicket"
-        tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonConnect"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonScanDevice"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <Button
+            android:id="@+id/buttonConnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connect To Admin Agent"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
-        android:id="@+id/buttonScanDevice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Connect To Voting Machine"
-        tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonRequestUTicket"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonApplyUTicket"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <Button
+            android:id="@+id/buttonRequestUTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Request UTicket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
-        android:id="@+id/buttonApplyUTicket"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Apply UTicket"
-        tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@+id/buttonScanDevice"
-        app:layout_constraintBottom_toBottomOf="@+id/buttonShowRTicket"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <Button
+            android:id="@+id/buttonScanDevice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Connect To Voting Machine"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-    <Button
-        android:id="@+id/buttonShowRTicket"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Show RTicket"
-        tools:ignore="HardcodedText"
-        app:layout_constraintTop_toTopOf="@id/buttonApplyUTicket"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <Button
+            android:id="@+id/buttonApplyUTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply UTicket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/buttonShowRTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show RTicket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/buttonPermissionlessVoter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Permissionless Ticket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="64dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </LinearLayout>
+
+</ScrollView>
