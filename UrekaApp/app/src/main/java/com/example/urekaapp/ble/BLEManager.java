@@ -150,7 +150,10 @@ public class BLEManager {
                     isWriteInProgress = false; // Allow the next chunk to be written
                 }
             });
+            SimpleLogger.simpleLog("info","bluetoothGatt" + (bluetoothGatt == null));
         }).start();
+
+
     }
 
     public void sendData(String json) {
@@ -199,16 +202,27 @@ public class BLEManager {
     }
 
     public void disconnect() {
+        SimpleLogger.simpleLog("info","bluetoothGatt" + (bluetoothGatt == null));
         if (bluetoothGatt != null) {
-            if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                return;
+            SimpleLogger.simpleLog("info", "Disconnecting...");
+            try {
+                if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    SimpleLogger.simpleLog("error", "Bluetooth permission not granted");
+                    return;
+                }
+                bluetoothGatt.disconnect();
+                bluetoothGatt.close();
+                bluetoothGatt = null;
+                connectionState.postValue(false);
+                SimpleLogger.simpleLog("info", "Bluetooth disconnected successfully");
+            } catch (Exception e) {
+                SimpleLogger.simpleLog("error", "Error while disconnecting: " + e.getMessage());
             }
-            bluetoothGatt.disconnect();
-            bluetoothGatt.close();
-            bluetoothGatt = null;
-            connectionState.postValue(false);
+        } else {
+            SimpleLogger.simpleLog("error", "Cannot disconnect, bluetoothGatt is null");
         }
     }
+
 
     public boolean isConnected() {
         return connectionState.getValue() != null && connectionState.getValue();

@@ -15,6 +15,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.io.Serial;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
@@ -22,6 +23,7 @@ import java.security.interfaces.ECPublicKey;
 import ureka.framework.Environment;
 import ureka.framework.resource.crypto.ECC;
 import ureka.framework.resource.crypto.SerializationUtil;
+import ureka.framework.resource.logger.SimpleLogger;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         KeyPair keyPair1, keyPair2;
         try {
             keyPair1 = ECC.generateKeyPair();
+            SimpleLogger.simpleLog("info", "PublicKey = " + SerializationUtil.publicKeyToBase64(keyPair1.getPublic()));
+            SimpleLogger.simpleLog("info", "PrivateKey = " + SerializationUtil.privateKeyToBase64(keyPair1.getPrivate()));
             keyPair2 = ECC.generateKeyPair();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AdminAgentActivity.class);
-                intent.putExtra("key1", SerializationUtil.publicKeyToBase64(keyPair1.getPublic()));
+                intent.putExtra("key1", "BAtN4eq30YAWTJ1R3oBbanD5ITCBIwisOCiKqM1FU54=-Yk1AFTjtExKup90cO7T06vw/GL7iWxDP29WJmOgoYyc=");
                 intent.putExtra("key2", SerializationUtil.publicKeyToBase64(keyPair2.getPublic()));
                 startActivity(intent);
             }
@@ -60,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
-                intent.putExtra("publicKey", SerializationUtil.publicKeyToBase64(keyPair1.getPublic()));
-                intent.putExtra("privateKey", SerializationUtil.privateKeyToBase64(keyPair1.getPrivate()));
+                intent.putExtra("publicKey", "BAtN4eq30YAWTJ1R3oBbanD5ITCBIwisOCiKqM1FU54=-Yk1AFTjtExKup90cO7T06vw/GL7iWxDP29WJmOgoYyc=");
+                intent.putExtra("privateKey", "MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQgS+3HzKTY80Bk0GiwVdkMh0iqd2EJW6cHwTapqfnbu4ygBwYFK4EEAAqhRANCAAQEC03h6rfRgBZMnVHegFtqcPkhMIEjCKw4KIqozUVTnmJNQBU47RMSrqfdHDu09Or8Pxi+4lsQz9vViZjoKGMn");
                 startActivity(intent);
             }
         });

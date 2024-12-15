@@ -68,10 +68,9 @@ public class AdminAgentActivity extends AppCompatActivity {
     private Button buttonPermissionlessAdmin;
     private Button buttonOwnershipTransfer;
     private TextView textViewConnectingStatus;
+    private Button buttonDisconnect;
 
     // Bluetooth connection
-    private BLEViewModel bleViewModel;
-    private NearbyViewModel nearbyViewModel;
 
     // Queuing ticket sending
     public static boolean sendNextTicket = false; // Whether to send the next ticket: true when the previous ticket finished
@@ -94,15 +93,10 @@ public class AdminAgentActivity extends AppCompatActivity {
             NearbyPermissionHelper.requestPermissions(this);
         }
 
-        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
-        nearbyViewModel = new ViewModelProvider(this).get(NearbyViewModel.class);
-
         // private fields initialization
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
-
-        bleViewModel = new ViewModelProvider(this).get(BLEViewModel.class);
-        nearbyViewModel.getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).setViewModel(nearbyViewModel);
+        deviceController.getNearbyManager().setMsgReceiver(deviceController.getMsgReceiver());
 
         buttonScan = findViewById(R.id.buttonScan);
         buttonAdvertising = findViewById(R.id.buttonAdvertising);
@@ -114,6 +108,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonPermissionlessAdmin = findViewById(R.id.buttonPermissionlessAdmin);
         buttonOwnershipTransfer = findViewById(R.id.buttonOwnershipTransfer);
         textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
+        buttonDisconnect = findViewById(R.id.buttonDisconnect);
         String mode = getIntent().getStringExtra("mode");
         if (!Objects.equals(mode, "TEST")) {
             buttonInit.setEnabled(false);
@@ -122,7 +117,8 @@ public class AdminAgentActivity extends AppCompatActivity {
             buttonApplyTallyUTicket.setEnabled(false);
             buttonShowRTickets.setEnabled(false);
         };
-        nearbyViewModel.getIsConnected().observe(this, isConnected -> {
+        deviceController.getNearbyViewModel().getIsConnected().observe(this, isConnected -> {
+            SimpleLogger.simpleLog("info", "AdminAgentActivity: isConnected = " + isConnected);
             if (isConnected != null && isConnected) {
                 textViewConnectingStatus.setText("Connected to Voter Agent");
             } else {
@@ -132,7 +128,7 @@ public class AdminAgentActivity extends AppCompatActivity {
 
         // buttonScan: Connect to the voting machine
         buttonScan.setOnClickListener(view -> {
-            nearbyViewModel.getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).stopAllActions();
+            deviceController.getNearbyViewModel().getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).stopAllActions();
             deviceController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
                         Toast.makeText(AdminAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
@@ -152,18 +148,8 @@ public class AdminAgentActivity extends AppCompatActivity {
 
         // buttonAdvertising: Start advertising for the voter agent
         buttonAdvertising.setOnClickListener(view -> {
-            if (bleViewModel.getBLEManager(Environment.applicationContext) != null && bleViewModel.getBLEManager(Environment.applicationContext).isConnected()) {
-                bleViewModel.getBLEManager(Environment.applicationContext).getConnectionState().observe(AdminAgentActivity.this, isConnected -> {
-                    if (isConnected != null && !isConnected) {
-                        nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
-                        bleViewModel.getBLEManager(Environment.applicationContext).getConnectionState().removeObservers(AdminAgentActivity.this);
-                    }
-                });
-
-                bleViewModel.getBLEManager(Environment.applicationContext).disconnect();
-            } else {
-                nearbyViewModel.getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startDiscovery();
-            }
+            deviceController.getBleManager().disconnect();
+            deviceController.getNearbyViewModel().getNearbyManager(Environment.applicationContext, deviceController.getMsgReceiver()).startAdvertising();
         });
 
         // buttonInit: Assign the admin agent with the voting machine
@@ -184,13 +170,13 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("no_id", arbitraryDict);
                 deviceController.getFlowApplyUTicket().holderApplyUTicket("no_id");
 
-//                while (!sendNextTicket) {
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 buttonApplyInitUTicket.setEnabled(true);
             }
         });
@@ -205,7 +191,7 @@ public class AdminAgentActivity extends AppCompatActivity {
 
                 voters = new ArrayList<>();
                 voters.add(getIntent().getStringExtra("key1"));
-                voters.add(getIntent().getStringExtra("key2"));
+//                voters.add(getIntent().getStringExtra("key2"));
             }
         });
 
@@ -223,9 +209,8 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(connectedDeviceId, generatedRequest);
 
                 // Apply UTicket + CRKE
-                String generatedCommand = "HELLO-1";
                 sendNextTicket = false;
-                SimpleLogger.simpleLog("info", "sendNextTicket = " + sendNextTicket);
+                String generatedCommand = "HELLO-1";
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(connectedDeviceId, generatedCommand);
 
                 // Send UToken: CC
@@ -237,7 +222,6 @@ public class AdminAgentActivity extends AppCompatActivity {
                     }
                 }
                 sendNextTicket = false;
-                SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending CC.");
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "CC", false);
 
                 // Send UToken: candidates and voters
@@ -251,7 +235,6 @@ public class AdminAgentActivity extends AppCompatActivity {
                     }
                     sendNextTicket = false;
                     String data = "C:" + candidate;
-                    SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending candidate.");
                     deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
                 }
                 for (String voter: voters) {
@@ -264,7 +247,6 @@ public class AdminAgentActivity extends AppCompatActivity {
                     }
                     sendNextTicket = false;
                     String data = "C-" + voter;
-                    SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending voter.");
                     deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
                 }
 
@@ -277,9 +259,15 @@ public class AdminAgentActivity extends AppCompatActivity {
                     }
                 }
                 sendNextTicket = false;
-                SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending ACCESS_END.");
-                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
+                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END_C", true);
 
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 buttonApplyTallyUTicket.setEnabled(true);
             }
         });
@@ -288,7 +276,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyTallyUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String generatedTaskScope = SerializationUtil.mapToJson(Map.of("ALL", "allow"));
+                String generatedTaskScope = "{\"ALL\": \"allow\"}";
                 Map<String, String> generatedRequest = Map.of(
                         "device_id", connectedDeviceId,
                         "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
@@ -298,13 +286,32 @@ public class AdminAgentActivity extends AppCompatActivity {
                 deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself(connectedDeviceId,generatedRequest);
 
                 // Apply UTicket + CRKE
+                sendNextTicket = false;
                 String generatedCommand = "HELLO-1";
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending HELLO-1");
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(connectedDeviceId,generatedCommand);
 
                 // Send UToken: the votes of candidates
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                sendNextTicket = false;
                 String data = "TC";
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending TC");
                 deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-                data = deviceController.getFlowIssueUToken().getExecutor().getSharedData().getCurrentSession().getPlaintextData();
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                data = deviceController.getFlowIssueUToken().getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextData();
+                data = data.substring("DATA: ".length());
 
                 candidateVotes = new ArrayList<>();
                 String[] result = data.split(":");
@@ -327,15 +334,26 @@ public class AdminAgentActivity extends AppCompatActivity {
                 voterVoted = new ArrayList<>();
                 for (int i = 0;; i++) {
                     data = "TV" + i;
+                    sendNextTicket = false;
+                    SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending " + data);
                     deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, data, false);
-                    data = deviceController.getFlowIssueUToken().getExecutor().getSharedData().getCurrentSession().getPlaintextData();
 
-                    if (Objects.equals(data, "---")) {
+                    while (!sendNextTicket) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    data = deviceController.getFlowIssueUToken().getExecutor().getSharedData().getCurrentSession().getAssociatedPlaintextData();
+                    data = data.substring("DATA: ".length());
+                    SimpleLogger.simpleLog("info", "Voter " + i + " DATA = " + data);
+                    if (Objects.equals(data, "-----")) {
                         break;
                     }
 
                     result = data.split(":");
-                    if (!Objects.equals(voters.get(i), result[0])) {
+                    if (!Objects.equals(String.valueOf(i), result[0])) {
                         // if the public key of the voter doesn't match
                         throw new RuntimeException("The public key of the voter doesn't match");
                     } else {
@@ -348,7 +366,17 @@ public class AdminAgentActivity extends AppCompatActivity {
                 }
 
                 // Access End + receive RTicket
-                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
+                sendNextTicket = false;
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: Sending ACCESS_END");
+                deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END_T", true);
+
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 buttonShowRTickets.setEnabled(true);
             }
         });
@@ -376,6 +404,15 @@ public class AdminAgentActivity extends AppCompatActivity {
             }
         });
 
+        buttonDisconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deviceController.getBleManager().disconnect();
+                deviceController.getNearbyManager().stopAllActions();
+                deviceController.getNearbyManager().disconnectFromAllEndpoints();
+            }
+        });
+      
         buttonPermissionlessAdmin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -386,7 +423,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonOwnershipTransfer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+            
             }
         });
 
@@ -413,11 +450,9 @@ public class AdminAgentActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (bleViewModel != null) {
-            BLEManager bleManager = bleViewModel.getBLEManager(this);
+            BLEManager bleManager = deviceController.getBleManager();
             if (bleManager != null) {
                 bleManager.disconnect();
-            }
         }
     }
 }

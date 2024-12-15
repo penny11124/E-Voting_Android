@@ -1,6 +1,7 @@
 package ureka.framework.logic.pipeline_flow;
 
 import com.example.urekaapp.AdminAgentActivity;
+import com.example.urekaapp.VoterAgentActivity;
 
 import java.security.KeyException;
 import java.util.Map;
@@ -127,6 +128,7 @@ public class FlowIssueUTicket {
         this.measureHelper.measureProcessPerfStart();
         try {
             // [STAGE: (VL)]
+            SimpleLogger.simpleLog("info", "deviceId = " + device_id + ", containing = " + (this.sharedData.getDeviceTable().containsKey(device_id) || "no_id".equals(device_id)));
             if (this.sharedData.getDeviceTable().containsKey(device_id) || "no_id".equals(device_id)) {
                 // [STAGE: (G)]
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(arbitraryDict);
@@ -159,10 +161,11 @@ public class FlowIssueUTicket {
             // [STAGE: (VL)]
             if (this.sharedData.getDeviceTable().containsKey(AdminAgentActivity.connectedDeviceId)) {
                 // [STAGE: (G)]
+                arbitraryDict.put("device_id", AdminAgentActivity.connectedDeviceId);
                 String generatedUTicketJson = this.msgGenerator.generateXxxUTicket(arbitraryDict);
-                UTicket generatedUTicket = UTicket.jsonStrToUTicket(generatedUTicketJson);
-                generatedUTicket.setDeviceId(AdminAgentActivity.connectedDeviceId);
-                generatedUTicketJson = UTicket.uTicketToJsonStr(generatedUTicket);
+//                UTicket generatedUTicket = UTicket.jsonStrToUTicket(generatedUTicketJson);
+//                generatedUTicket.setDeviceId(AdminAgentActivity.connectedDeviceId);
+//                generatedUTicketJson = UTicket.uTicketToJsonStr(generatedUTicket);
 
                 // [STAGE: (SG)]
                 this.generatedMsgStorer.storeGeneratedXxxUTicket(generatedUTicketJson);
@@ -181,6 +184,8 @@ public class FlowIssueUTicket {
                         UTicket.MESSAGE_TYPE,
                         generatedUTicketJson
                 );
+            } else {
+                SimpleLogger.simpleLog("info", "FlowIssueUTicket.issuerIssueUTicketToHolder: Device not in device table");
             }
         } catch (RuntimeException e) { // pragma: no cover -> Weird Ticket-Request (ValidationError)
             SimpleLogger.simpleLog("error", "FAILURE: (VUREQ)");
@@ -203,6 +208,7 @@ public class FlowIssueUTicket {
             */
 
             // [STAGE: (SR)]
+            VoterAgentActivity.connectedDeviceId = receivedUTicket.getDeviceId();
             this.receivedMsgStorer.storeReceivedXxxUTicket(receivedUTicket);
 
             // [STAGE: (O)]

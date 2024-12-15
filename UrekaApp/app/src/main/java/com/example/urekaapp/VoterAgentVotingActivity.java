@@ -15,6 +15,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
+
 public class VoterAgentVotingActivity extends AppCompatActivity {
 
     @Override
@@ -31,12 +33,14 @@ public class VoterAgentVotingActivity extends AppCompatActivity {
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
         Button buttonConfirm = findViewById(R.id.buttonConfirm);
 
-        String[] candidates = getIntent().getStringArrayExtra("CANDIDATES");
+        ArrayList<String> candidates = getIntent().getStringArrayListExtra("CANDIDATES");
         assert candidates != null;
+        int buttonId = 1;
         for (String candidate : candidates) {
             RadioButton radioButton = new RadioButton(this);
             radioButton.setText(candidate);
             radioButton.setTextSize(20);
+            radioButton.setId(buttonId++);
             radioGroup.addView(radioButton);
         }
 
