@@ -278,9 +278,7 @@ public class VoterAgentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendNextTicket = false;
-                SimpleLogger.simpleLog("info", "checkpoint 1");
                 deviceController.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(connectedDeviceId);
-                SimpleLogger.simpleLog("info", "checkpoint 2");
                 while (!sendNextTicket) {
                     try {
                         Thread.sleep(1000);
