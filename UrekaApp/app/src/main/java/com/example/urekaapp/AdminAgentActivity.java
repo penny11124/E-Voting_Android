@@ -138,6 +138,23 @@ public class AdminAgentActivity extends AppCompatActivity {
             }
         });
 
+        deviceController.getBleViewModel().getIsConnected().observe(this, isConnected -> {
+            SimpleLogger.simpleLog("info", "AdminAgentActivity: Admin Agent isConnected = " + isConnected);
+            if (isConnected != null && isConnected) {
+                textViewConnectingStatus.setText("Admin Agent connected to VM");
+                buttonInit.setEnabled(true);
+            } else {
+                textViewConnectingStatus.setText("Not connected");
+                buttonInit.setEnabled(false);
+                buttonIssueOwnershipUTicket.setEnabled(false);
+                buttonApplyOwnershipUTicket.setEnabled(false);
+                buttonGetData.setEnabled(false);
+                buttonApplyConfigUTicket.setEnabled(false);
+                buttonApplyTallyUTicket.setEnabled(false);
+                buttonPermissionlessAdmin.setEnabled(false);
+            }
+        });
+
         buttonScanManufacturer.setOnClickListener(view -> {
             manufacturerController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">UrekaApp</string>
+    <string name="title_activity_permissionless">PermissionlessActivity</string>
 </resources>
