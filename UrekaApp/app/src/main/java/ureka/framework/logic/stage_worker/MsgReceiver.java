@@ -192,6 +192,11 @@ public class MsgReceiver {
             String messageStr = (String) receivedMessage;
             if (messageStr.isEmpty()) {
                 // Handle Permissionless
+                AdminAgentActivity.sendNextTicket = true;
+                VoterAgentActivity.sendNextTicket = true;
+                AdminAgentActivity.permissionlessData = messageStr;
+                VoterAgentActivity.permissionlessData = messageStr;
+                return;
             } else {
                 // Handle Request UTicket
                 String receivedMessageStr = (String) receivedMessage;
