@@ -38,6 +38,7 @@ import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.ThisDevice;
 import ureka.framework.model.message_model.Message;
+import ureka.framework.model.message_model.RTicket;
 import ureka.framework.model.message_model.UTicket;
 import ureka.framework.resource.crypto.SerializationUtil;
 import ureka.framework.resource.logger.SimpleLogger;
@@ -47,13 +48,14 @@ public class VoterAgentActivity extends AppCompatActivity {
     public static String connectedDeviceId; // The device_id of the voting machine
     private int votedCandidate;
 
-    private Button buttonScan;
+    private TextView textViewConnectingStatus;
     private Button buttonConnect;
     private Button buttonRequestUTicket;
+    private Button buttonScan;
     private Button buttonApplyUTicket;
-    private Button buttonShowRTicket;
     private Button buttonPermissionlessVoter;
-    private TextView textViewConnectingStatus;
+    private Button buttonShowRTicket;
+    private Button buttonSendRTicket;
     private Button buttonDisconnect;
 
     public static boolean sendNextTicket = false;
@@ -64,13 +66,33 @@ public class VoterAgentActivity extends AppCompatActivity {
                 Intent data = result.getData();
                 if (data != null) {
                     votedCandidate = data.getIntExtra("VOTED_CANDIDATE", -1);
-                    buttonApplyUTicket.setEnabled(false);
-                    buttonShowRTicket.setEnabled(true);
                 }
 
                 if (votedCandidate != -1) {
+                    sendNextTicket = false;
                     String cmd = "V:" + votedCandidate;
                     deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, cmd, false);
+                    while (!sendNextTicket) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    sendNextTicket = false;
+                    deviceController.getFlowIssueUToken().holderSendCmd(connectedDeviceId, "ACCESS_END", true);
+                    while (!sendNextTicket) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    buttonApplyUTicket.setEnabled(false);
+                    buttonShowRTicket.setEnabled(true);
+                    buttonSendRTicket.setEnabled(true);
                 } else {
                     throw new RuntimeException("Invalid vote.");
                 }
@@ -110,21 +132,21 @@ public class VoterAgentActivity extends AppCompatActivity {
         deviceController.getNearbyManager().setMsgReceiver(deviceController.getMsgReceiver());
         SimpleLogger.simpleLog("info","MsgReceiver: "+(deviceController.getMsgReceiver()==null));
 
-        buttonScan = findViewById(R.id.buttonScanDevice);
+        textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         buttonConnect = findViewById(R.id.buttonConnect);
         buttonRequestUTicket = findViewById(R.id.buttonRequestUTicket);
+        buttonScan = findViewById(R.id.buttonScanDevice);
         buttonApplyUTicket = findViewById(R.id.buttonApplyUTicket);
+        buttonPermissionlessVoter = findViewById(R.id.buttonPermissionlessVoter);
         buttonShowRTicket = findViewById(R.id.buttonShowRTicket);
-        buttonPermissionlessVoter = findViewById(R.id.buttonOwnershipTransfer);
-
-        textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
+        buttonSendRTicket = findViewById(R.id.buttonSendRTicket);
         buttonDisconnect = findViewById(R.id.buttonDisconnect2);
-        String mode = getIntent().getStringExtra("mode");
-        if (!Objects.equals(mode, "TEST")) {
-            buttonRequestUTicket.setEnabled(false);
-            buttonApplyUTicket.setEnabled(false);
-            buttonShowRTicket.setEnabled(false);
-        }
+
+        buttonRequestUTicket.setEnabled(false);
+        buttonApplyUTicket.setEnabled(false);
+        buttonPermissionlessVoter.setEnabled(false);
+        buttonShowRTicket.setEnabled(false);
+
         deviceController.getNearbyViewModel().getIsConnected().observe(this, isConnected -> {
             if (isConnected != null && isConnected) {
                 buttonRequestUTicket.setEnabled(true);
@@ -225,6 +247,13 @@ public class VoterAgentActivity extends AppCompatActivity {
             }
         });
 
+        buttonPermissionlessVoter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
         buttonShowRTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -235,19 +264,27 @@ public class VoterAgentActivity extends AppCompatActivity {
             }
         });
 
+        buttonSendRTicket.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendNextTicket = false;
+                deviceController.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(connectedDeviceId);
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deviceController.getBleManager().disconnect();
                 deviceController.getNearbyManager().stopAllActions();
                 deviceController.getNearbyManager().disconnectFromAllEndpoints();
-            }
-        });
-      
-        buttonPermissionlessVoter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            
             }
         });
 

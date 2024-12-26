@@ -33,6 +33,7 @@ import org.junit.platform.commons.util.StringUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.security.KeyPair;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,12 +44,15 @@ import ureka.framework.Environment;
 import ureka.framework.logic.DeviceController;
 import ureka.framework.model.data_model.OtherDevice;
 import ureka.framework.model.data_model.ThisDevice;
+import ureka.framework.model.message_model.Message;
 import ureka.framework.model.message_model.UTicket;
+import ureka.framework.resource.crypto.ECC;
 import ureka.framework.resource.crypto.SerializationUtil;
 import ureka.framework.resource.logger.SimpleLogger;
 
 public class AdminAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
+    private DeviceController manufacturerController;
 
     // Data
     private ArrayList<String> candidates; // The names of the candidates
@@ -58,19 +62,19 @@ public class AdminAgentActivity extends AppCompatActivity {
     public static String connectedDeviceId; // The device_id of the voting machine
 
     // Components
+    private TextView textViewConnectingStatus;
+    private Button buttonScanManufacturer;
     private Button buttonScan;
     private Button buttonAdvertising;
     private Button buttonInit;
+    private Button buttonIssueOwnershipUTicket;
+    private Button buttonApplyOwnershipUTicket;
     private Button buttonGetData;
-    private Button buttonApplyInitUTicket;
+    private Button buttonApplyConfigUTicket;
     private Button buttonApplyTallyUTicket;
-    private Button buttonShowRTickets;
     private Button buttonPermissionlessAdmin;
-    private Button buttonOwnershipTransfer;
-    private TextView textViewConnectingStatus;
+    private Button buttonShowRTickets;
     private Button buttonDisconnect;
-
-    // Bluetooth connection
 
     // Queuing ticket sending
     public static boolean sendNextTicket = false; // Whether to send the next ticket: true when the previous ticket finished
@@ -97,50 +101,79 @@ public class AdminAgentActivity extends AppCompatActivity {
         deviceController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Admin Agent");
         deviceController.getExecutor()._executeOneTimeInitializeAgentOrServer();
         deviceController.getNearbyManager().setMsgReceiver(deviceController.getMsgReceiver());
+        manufacturerController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Manufacturer");
+        manufacturerController.getExecutor()._executeOneTimeInitializeAgentOrServer();
+//        manufacturerController.getNearbyManager().setMsgReceiver(manufacturerController.getMsgReceiver());
 
+        textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
+        buttonScanManufacturer = findViewById(R.id.buttonScanManufacturer);
         buttonScan = findViewById(R.id.buttonScan);
         buttonAdvertising = findViewById(R.id.buttonAdvertising);
         buttonInit = findViewById(R.id.buttonInit);
+        buttonIssueOwnershipUTicket = findViewById(R.id.buttonIssueOwnershipUTicket);
+        buttonApplyOwnershipUTicket = findViewById(R.id.buttonApplyOwnershipUTicket);
         buttonGetData = findViewById(R.id.buttonGetData);
-        buttonApplyInitUTicket = findViewById(R.id.buttonApplyInitUTicket);
+        buttonApplyConfigUTicket = findViewById(R.id.buttonApplyConfigUTicket);
         buttonApplyTallyUTicket = findViewById(R.id.buttonApplyTallyUTicket);
-        buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
         buttonPermissionlessAdmin = findViewById(R.id.buttonPermissionlessAdmin);
-        buttonOwnershipTransfer = findViewById(R.id.buttonOwnershipTransfer);
-        textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
+        buttonShowRTickets = findViewById(R.id.buttonShowRTickets);
         buttonDisconnect = findViewById(R.id.buttonDisconnect);
-        String mode = getIntent().getStringExtra("mode");
-        if (!Objects.equals(mode, "TEST")) {
-            buttonInit.setEnabled(false);
-            buttonGetData.setEnabled(false);
-            buttonApplyInitUTicket.setEnabled(false);
-            buttonApplyTallyUTicket.setEnabled(false);
-            buttonShowRTickets.setEnabled(false);
-        };
+
+        buttonInit.setEnabled(false);
+        buttonIssueOwnershipUTicket.setEnabled(false);
+        buttonApplyOwnershipUTicket.setEnabled(false);
+        buttonGetData.setEnabled(false);
+        buttonApplyConfigUTicket.setEnabled(false);
+        buttonApplyTallyUTicket.setEnabled(false);
+        buttonPermissionlessAdmin.setEnabled(false);
+        buttonShowRTickets.setEnabled(false);
+
         deviceController.getNearbyViewModel().getIsConnected().observe(this, isConnected -> {
-            SimpleLogger.simpleLog("info", "AdminAgentActivity: isConnected = " + isConnected);
+            SimpleLogger.simpleLog("info", "AdminAgentActivity: Admin Agent isConnected = " + isConnected);
             if (isConnected != null && isConnected) {
-                textViewConnectingStatus.setText("Connected to Voter Agent");
+                textViewConnectingStatus.setText("Admin Agent connected to Voter Agent");
             } else {
                 textViewConnectingStatus.setText("Not connected");
             }
         });
 
-        // buttonScan: Connect to the voting machine
+        buttonScanManufacturer.setOnClickListener(view -> {
+            manufacturerController.connectToDevice("HC-04BLE",
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Manufacturer connected to VM", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(true);
+                    }),
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(AdminAgentActivity.this, "Manufacturer disconnected", Toast.LENGTH_SHORT).show();
+                        buttonInit.setEnabled(false);
+                        buttonIssueOwnershipUTicket.setEnabled(false);
+                        buttonApplyOwnershipUTicket.setEnabled(false);
+                        buttonGetData.setEnabled(false);
+                        buttonApplyConfigUTicket.setEnabled(false);
+                        buttonApplyTallyUTicket.setEnabled(false);
+                        buttonPermissionlessAdmin.setEnabled(false);
+                    }),
+                    textViewConnectingStatus
+            );
+        });
+
+        // buttonScan: Admin agent connect to the voting machine
         buttonScan.setOnClickListener(view -> {
             deviceController.getNearbyViewModel().getNearbyManager(Environment.applicationContext,deviceController.getMsgReceiver()).stopAllActions();
             deviceController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
-                        Toast.makeText(AdminAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AdminAgentActivity.this, "Admin Agent connected to VM", Toast.LENGTH_SHORT).show();
                         buttonInit.setEnabled(true);
-                        buttonGetData.setEnabled(true);
                     }),
                     () -> runOnUiThread(() -> {
-                        Toast.makeText(AdminAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AdminAgentActivity.this, "Admin Agent disconnected", Toast.LENGTH_SHORT).show();
                         buttonInit.setEnabled(false);
+                        buttonIssueOwnershipUTicket.setEnabled(false);
+                        buttonApplyOwnershipUTicket.setEnabled(false);
                         buttonGetData.setEnabled(false);
-                        buttonApplyInitUTicket.setEnabled(false);
+                        buttonApplyConfigUTicket.setEnabled(false);
                         buttonApplyTallyUTicket.setEnabled(false);
+                        buttonPermissionlessAdmin.setEnabled(false);
                     }),
                     textViewConnectingStatus
             );
@@ -163,12 +196,18 @@ public class AdminAgentActivity extends AppCompatActivity {
                     return;
                 }
 
+//                Map<String, String> arbitraryDict = new HashMap<>();
+//                arbitraryDict.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
+//                arbitraryDict.put("device_id", "no_id");
+//                arbitraryDict.put("holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr());
+//                deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("no_id", arbitraryDict);
+//                deviceController.getFlowApplyUTicket().holderApplyUTicket("no_id");
                 Map<String, String> arbitraryDict = new HashMap<>();
                 arbitraryDict.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
                 arbitraryDict.put("device_id", "no_id");
-                arbitraryDict.put("holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr());
-                deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("no_id", arbitraryDict);
-                deviceController.getFlowApplyUTicket().holderApplyUTicket("no_id");
+                arbitraryDict.put("holder_id", manufacturerController.getSharedData().getThisPerson().getPersonPubKeyStr());
+                manufacturerController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("no_id", arbitraryDict);
+                manufacturerController.getFlowApplyUTicket().holderApplyUTicket("no_id");
 
                 while (!sendNextTicket) {
                     try {
@@ -177,7 +216,52 @@ public class AdminAgentActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 }
-                buttonApplyInitUTicket.setEnabled(true);
+                buttonIssueOwnershipUTicket.setEnabled(true);
+            }
+        });
+
+        buttonIssueOwnershipUTicket.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Map<String, String> generatedRequest = Map.of(
+                        "device_id", connectedDeviceId,
+                        "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
+                        "u_ticket_type", UTicket.TYPE_OWNERSHIP_UTICKET
+                );
+                try {
+                    // [STAGE: (VL)]
+                    if (manufacturerController.getFlowIssuerIssueUTicket().getSharedData().getDeviceTable().containsKey(AdminAgentActivity.connectedDeviceId)) {
+                        String generatedUTicketJson = manufacturerController.getMsgGenerator().generateXxxUTicket(generatedRequest);
+                        manufacturerController.getGeneratedMsgStorer().storeGeneratedXxxUTicket(generatedUTicketJson);
+
+                        UTicket receivedUTicket = UTicket.jsonStrToUTicket(generatedUTicketJson);
+                        deviceController.getReceivedMsgStorer().storeReceivedXxxUTicket(receivedUTicket);
+                        deviceController.getExecutor().executeUpdateTicketOrder("holderGenerateOrReceiveUTicket", receivedUTicket);
+                    } else {
+                        SimpleLogger.simpleLog("info", "FlowIssueUTicket.issuerIssueUTicketToHolder: Device not in device table");
+                    }
+                } catch (Exception e) { // pragma: no cover -> Shouldn't Reach Here
+                    throw new RuntimeException("buttonIssueOwnershipUTicket", e);
+                }
+
+                buttonApplyOwnershipUTicket.setEnabled(true);
+            }
+        });
+
+        buttonApplyOwnershipUTicket.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendNextTicket = false;
+                deviceController.getFlowApplyUTicket().holderApplyUTicket(connectedDeviceId);
+                while (!sendNextTicket) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                buttonGetData.setEnabled(true);
+                buttonApplyConfigUTicket.setEnabled(true);
             }
         });
 
@@ -195,8 +279,8 @@ public class AdminAgentActivity extends AppCompatActivity {
             }
         });
 
-        // buttonApplyInitUTicket: Init the voting machine with the data
-        buttonApplyInitUTicket.setOnClickListener(new View.OnClickListener() {
+        // buttonApplyConfigUTicket: Init the voting machine with the data
+        buttonApplyConfigUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String generatedTaskScope = "{\"ALL\": \"allow\"}";
@@ -268,7 +352,32 @@ public class AdminAgentActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 }
+                buttonPermissionlessAdmin.setEnabled(true);
                 buttonApplyTallyUTicket.setEnabled(true);
+            }
+        });
+
+        // buttonPermissionlessAdmin: Send a permissionless ticket to the voting machine
+        buttonPermissionlessAdmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    sendNextTicket = false;
+                    deviceController.getMsgSender().sendXxxMessage(
+                            Message.MESSAGE_PERMISSIONLESS,
+                            Message.MESSAGE_PERMISSIONLESS,
+                            ""
+                    );
+                    while (!sendNextTicket) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -404,26 +513,14 @@ public class AdminAgentActivity extends AppCompatActivity {
             }
         });
 
+        // buttonDisconnect: Disconnect the Bluetooth and Nearby
         buttonDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                manufacturerController.getBleManager().disconnect();
                 deviceController.getBleManager().disconnect();
                 deviceController.getNearbyManager().stopAllActions();
                 deviceController.getNearbyManager().disconnectFromAllEndpoints();
-            }
-        });
-      
-        buttonPermissionlessAdmin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        buttonOwnershipTransfer.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-            
             }
         });
 

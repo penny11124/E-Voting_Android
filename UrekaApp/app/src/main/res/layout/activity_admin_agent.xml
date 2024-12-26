@@ -38,10 +38,21 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
+            android:id="@+id/buttonScanManufacturer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manufacturer: Connect to VM"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <Button
             android:id="@+id/buttonScan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connect To Voting Machine"
+            android:text="Admin Agent: Connect to VM"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +63,7 @@
             android:id="@+id/buttonAdvertising"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start Advertising for Voter"
+            android:text="Admin Agent: Advertise for Voter"
             tools:ignore="HardcodedText"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
@@ -63,7 +74,30 @@
             android:id="@+id/buttonInit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Init device"
+            android:text="Manufacturer: Init device"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/buttonIssueOwnershipUTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Manufacturer: Issue Ownership UTicket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+
+        <Button
+            android:id="@+id/buttonApplyOwnershipUTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin Agent: Apply Ownership UTicket"
             tools:ignore="HardcodedText"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
@@ -82,10 +116,21 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
-            android:id="@+id/buttonApplyInitUTicket"
+            android:id="@+id/buttonApplyConfigUTicket"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Apply Config UTicket"
+            android:text="Admin Agent: Apply Config UTicket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/buttonPermissionlessAdmin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin Agent: Apply Permissionless UTicket"
             tools:ignore="HardcodedText"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
@@ -96,7 +141,7 @@
             android:id="@+id/buttonApplyTallyUTicket"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Apply Tally UTicket"
+            android:text="Admin Agent: Apply Tally UTicket"
             tools:ignore="HardcodedText"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
@@ -113,34 +158,12 @@
             android:layout_marginBottom="16dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
-      
+
         <Button
             android:id="@+id/buttonDisconnect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Disconnect"
-            tools:ignore="HardcodedText"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <Button
-            android:id="@+id/buttonPermissionlessAdmin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Permissionless Ticket"
-            tools:ignore="HardcodedText"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <Button
-            android:id="@+id/buttonOwnershipTransfer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Transfer Device's Ownership"
             tools:ignore="HardcodedText"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="64dp"

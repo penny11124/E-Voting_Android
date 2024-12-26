@@ -108,7 +108,6 @@ public class MsgSender {
             try {
                 Message newMessage = new Message(messageRequest);
                 String newMessageJson = Message.messageToJsonstr(newMessage);
-                SimpleLogger.simpleLog("info", "MsgSender: message sent = " + newMessageJson);
                 newMessageJson += "$";
 //                if (!bleManager.isConnected()) {
 //                    throw new IllegalStateException("BLE is not connected.");

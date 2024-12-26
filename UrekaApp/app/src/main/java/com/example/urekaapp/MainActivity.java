@@ -38,23 +38,19 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        KeyPair keyPair1, keyPair2;
-        try {
-            keyPair1 = ECC.generateKeyPair();
-            SimpleLogger.simpleLog("info", "PublicKey = " + SerializationUtil.publicKeyToBase64(keyPair1.getPublic()));
-            SimpleLogger.simpleLog("info", "PrivateKey = " + SerializationUtil.privateKeyToBase64(keyPair1.getPrivate()));
-            keyPair2 = ECC.generateKeyPair();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // Fixed generated data
+        String publicKey1 = "VRWuwWlGZ3uyPfVuBpnKi20pK+WG89ePRp46zwbnpQ0=-/qUcFmCE0CuGCXdLD0w9NEzh7CRr8lQDDuGtZOIBp2Q=";
+        String privateKey1 = "MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQgbjndhYEkOgKL1nGW2AWaDuFeB9GglqOIzcR414wd4jWgBwYFK4EEAAqhRANCAARVFa7BaUZne7I99W4GmcqLbSkr5Ybz149GnjrPBuelDf6lHBZghNArhgl3Sw9MPTRM4ewka/JUAw7hrWTiAadk";
+        String publicKey2 = "b6U7if/Qs+ph/V7qHC2spvVq8/oDZzHQ+XjgtSDuWUk=-g4XoiKDF/wV94Rpz9OVoKxyHAcugjcRSroJgBkEwdnY=";
+        String privateKey2 = "MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQgtuM6xlRey5BxPSmNUY4fdVzGdUZdR2GDWFhT4TCS/FagBwYFK4EEAAqhRANCAARvpTuJ/9Cz6mH9XuocLaym9Wrz+gNnMdD5eOC1IO5ZSYOF6Iigxf8FfeEac/TlaCschwHLoI3EUq6CYAZBMHZ2";
 
         Button buttonAdminAgent = findViewById(R.id.buttonAdminAgent);
         buttonAdminAgent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AdminAgentActivity.class);
-                intent.putExtra("key1", "BAtN4eq30YAWTJ1R3oBbanD5ITCBIwisOCiKqM1FU54=-Yk1AFTjtExKup90cO7T06vw/GL7iWxDP29WJmOgoYyc=");
-                intent.putExtra("key2", SerializationUtil.publicKeyToBase64(keyPair2.getPublic()));
+                intent.putExtra("key1", publicKey1);
+                intent.putExtra("key2", publicKey2);
                 startActivity(intent);
             }
         });
@@ -64,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
-                intent.putExtra("publicKey", "BAtN4eq30YAWTJ1R3oBbanD5ITCBIwisOCiKqM1FU54=-Yk1AFTjtExKup90cO7T06vw/GL7iWxDP29WJmOgoYyc=");
-                intent.putExtra("privateKey", "MIGNAgEAMBAGByqGSM49AgEGBSuBBAAKBHYwdAIBAQQgS+3HzKTY80Bk0GiwVdkMh0iqd2EJW6cHwTapqfnbu4ygBwYFK4EEAAqhRANCAAQEC03h6rfRgBZMnVHegFtqcPkhMIEjCKw4KIqozUVTnmJNQBU47RMSrqfdHDu09Or8Pxi+4lsQz9vViZjoKGMn");
+                intent.putExtra("publicKey", publicKey1);
+                intent.putExtra("privateKey", privateKey1);
                 startActivity(intent);
             }
         });
@@ -75,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, VoterAgentActivity.class);
-                intent.putExtra("publicKey", SerializationUtil.publicKeyToBase64(keyPair2.getPublic()));
-                intent.putExtra("privateKey", SerializationUtil.privateKeyToBase64(keyPair2.getPrivate()));
+                intent.putExtra("publicKey", publicKey2);
+                intent.putExtra("privateKey", privateKey2);
                 startActivity(intent);
             }
         });
