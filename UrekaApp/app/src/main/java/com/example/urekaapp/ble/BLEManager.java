@@ -22,6 +22,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
@@ -29,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import ureka.framework.Environment;
+import ureka.framework.resource.crypto.SerializationUtil;
 import ureka.framework.resource.logger.SimpleLogger;
 
 public class BLEManager {
@@ -136,6 +138,8 @@ public class BLEManager {
                         receivedData.postValue(data);
                         callback.onDataReceived(data);
                     } catch (Exception e) {
+                        SimpleLogger.simpleLog("error", "Error(onCharacteristicChanged): message(hex) = " + SerializationUtil.bytesToHex(characteristic.getValue()));
+                        SimpleLogger.simpleLog("error", "Error(onCharacteristicChanged): message(base64) = " + SerializationUtil.bytesToBase64(characteristic.getValue()));
                         callback.onDataReceived("Invalid Data Received");
                     }
                 }

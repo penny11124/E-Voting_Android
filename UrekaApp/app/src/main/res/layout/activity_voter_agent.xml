@@ -82,10 +82,32 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <Button
+            android:id="@+id/buttonPermissionlessVoter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Permissionless Ticket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
             android:id="@+id/buttonShowRTicket"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Show RTicket"
+            tools:ignore="HardcodedText"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <Button
+            android:id="@+id/buttonSendRTicket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send RTicket to Admin Agent"
             tools:ignore="HardcodedText"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
@@ -97,17 +119,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Disconnect"
-            tools:ignore="HardcodedText"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <Button
-            android:id="@+id/buttonPermissionlessVoter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Permissionless Ticket"
             tools:ignore="HardcodedText"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="64dp"

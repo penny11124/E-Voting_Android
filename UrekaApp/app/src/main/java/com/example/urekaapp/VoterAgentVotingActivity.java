@@ -35,7 +35,7 @@ public class VoterAgentVotingActivity extends AppCompatActivity {
 
         ArrayList<String> candidates = getIntent().getStringArrayListExtra("CANDIDATES");
         assert candidates != null;
-        int buttonId = 1;
+        int buttonId = 0;
         for (String candidate : candidates) {
             RadioButton radioButton = new RadioButton(this);
             radioButton.setText(candidate);

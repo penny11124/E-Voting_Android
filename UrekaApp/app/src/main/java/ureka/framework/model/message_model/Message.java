@@ -13,7 +13,8 @@ public class Message {
     //////////////////////////////////////////////////////
     // Message Operation
     //////////////////////////////////////////////////////
-    public static final String MESSAGE_REQUEST = "MESSAGE_REQUEST"; // Only used when voter request UTicket from admin
+    public static final String MESSAGE_REQUEST = "MESSAGE_REQUEST"; // Ued when voter request UTicket from admin
+    public static final String MESSAGE_PERMISSIONLESS = "MESSAGE_PERMISSIONLESS"; // Used when sending permissionless ticket
     public static final String MESSAGE_RECV_AND_STORE = "MESSAGE_RECV_AND_STORE";
     public static final String MESSAGE_VERIFY_AND_EXECUTE = "MESSAGE_VERIFY_AND_EXECUTE";
 

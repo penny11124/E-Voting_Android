@@ -189,11 +189,15 @@ public class MsgReceiver {
         } else if (receivedMessage instanceof RTicket) {
             this.sharedData.setReceivedMessageJson(RTicket.rTicketToJsonStr((RTicket) receivedMessage));
         } else if (receivedMessage instanceof String) {
-            // Handle Request UTicket
-            String receivedMessageStr = (String) receivedMessage;
-            SimpleLogger.simpleLog("info", "MsgReceiver: Message received = " + receivedMessageStr);
-            this.sharedData.setReceivedMessageJson(receivedMessageStr);
-            this.flowIssueUTicket.issuerIssueUTicketToHolder(SerializationUtil.jsonToMap(receivedMessageStr));
+            String messageStr = (String) receivedMessage;
+            if (messageStr.isEmpty()) {
+                // Handle Permissionless
+            } else {
+                // Handle Request UTicket
+                String receivedMessageStr = (String) receivedMessage;
+                this.sharedData.setReceivedMessageJson(receivedMessageStr);
+                this.flowIssueUTicket.issuerIssueUTicketToHolder(SerializationUtil.jsonToMap(receivedMessageStr));
+            }
         }
 
         SimpleLogger.simpleLog("cli", "Received Message: " + this.sharedData.getReceivedMessageJson());

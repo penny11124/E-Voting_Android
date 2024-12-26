@@ -697,7 +697,6 @@ public class Executor {
                 break;
             case "recvCrke3":
             case "recvRToken":
-                SimpleLogger.simpleLog("info", "Start receiving RToken");
                 // Update Session: PS-Cmd (Input: Key)
                 currentSessionKeyBytes = SerializationUtil.base64ToBytes(this.sharedData.getCurrentSession().getCurrentSessionKeyStr());
                 // Update Session: PS-Cmd (Input: This-IV)
@@ -709,7 +708,6 @@ public class Executor {
 
                 // [STAGE: (VTK)]
                 // Update Session: PS-Data (Decryption)
-                SimpleLogger.simpleLog("info", "Start decrypting");
                 String plaintextData = this._executeDecryptCiphertext(
                         this.sharedData.getCurrentSession().getCiphertextData(),
                         this.sharedData.getCurrentSession().getAssociatedPlaintextData(),
