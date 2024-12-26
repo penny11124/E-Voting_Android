@@ -21,5 +21,14 @@ public class BLEViewModel extends ViewModel {
         }
         return bleManager;
     }
+
+    public LiveData<Boolean> getIsConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean connected) {
+        isConnected.setValue(connected);
+    }
+
 }
 

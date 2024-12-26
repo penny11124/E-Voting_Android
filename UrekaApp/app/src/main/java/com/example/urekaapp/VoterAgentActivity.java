@@ -157,6 +157,15 @@ public class VoterAgentActivity extends AppCompatActivity {
             }
         });
 
+        deviceController.getBleViewModel().getIsConnected().observe(this, isConnected -> {
+            SimpleLogger.simpleLog("info", "VoterAgentActivity: Voter Agent isConnected = " + isConnected);
+            if (isConnected != null && isConnected) {
+                textViewConnectingStatus.setText("Voter Agent connected to VM");
+            } else {
+                textViewConnectingStatus.setText("Not connected");
+            }
+        });
+
         buttonConnect.setOnClickListener(view -> {
             if (deviceController.getBleManager()!= null && deviceController.getBleManager().isConnected()) {
                 deviceController.getBleManager().getConnectionState().observe(VoterAgentActivity.this, isConnected -> {

@@ -52,6 +52,8 @@ public class DeviceController {
     private GeneratedMsgStorer generatedMsgStorer;
     private MsgSender msgSender;
     private MsgReceiver msgReceiver;
+
+    private BLEViewModel bleViewModel;
     private BLEManager bleManager;
 
     private NearbyViewModel nearbyViewModel;
@@ -67,7 +69,7 @@ public class DeviceController {
     }
 
     private void _initialize(String deviceType, String deviceName, Context context) {
-        BLEViewModel bleViewModel = new ViewModelProvider((AppCompatActivity) context).get(BLEViewModel.class);
+        this.bleViewModel = new ViewModelProvider((AppCompatActivity) context).get(BLEViewModel.class);
         this.nearbyViewModel = new ViewModelProvider((AppCompatActivity) context).get(NearbyViewModel.class);
 
         this.sharedData = new SharedData(new ThisDevice(), new CurrentSession(), new ThisPerson());
@@ -86,7 +88,8 @@ public class DeviceController {
         this.executor = new Executor(this.sharedData, this.measureHelper, this.simpleStorage, this.msgVerifier);
         this.msgGenerator = new MsgGenerator(this.sharedData, this.measureHelper);
         this.generatedMsgStorer = new GeneratedMsgStorer(this.sharedData, this.measureHelper, this.simpleStorage);
-        this.bleManager = bleViewModel.getBLEManager(context);
+        this.bleManager = this.bleViewModel.getBLEManager(context);
+        this.bleManager.setViewModel(this.bleViewModel);
         this.nearbyManager = this.nearbyViewModel.getNearbyManager(context, this.msgReceiver);
         this.nearbyManager.setViewModel(this.nearbyViewModel);
         this.msgSender = new MsgSender(this.sharedData, this.measureHelper, this.bleManager, this.nearbyManager);
@@ -262,6 +265,12 @@ public class DeviceController {
 
     public void setBleManager(BLEManager bleManager) {
         this.bleManager = bleManager;
+    }
+
+    public BLEViewModel getBleViewModel() {return bleViewModel; }
+
+    public void setBleViewModel(BLEViewModel bleViewModel) {
+        this.bleViewModel = bleViewModel;
     }
 
     public NearbyManager getNearbyManager() {
