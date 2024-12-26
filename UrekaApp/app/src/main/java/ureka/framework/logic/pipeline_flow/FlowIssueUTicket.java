@@ -234,6 +234,7 @@ public class FlowIssueUTicket {
         this.measureHelper.measureProcessPerfStart();
         try {
             // [STAGE: (VL)(L)]
+            SimpleLogger.simpleLog("info", "checkpoint 1.1");
             String storedRTicketJson = this.sharedData.getDeviceTable().get(device_id).getDeviceRTicketForOwner();
 
             // End Process Measurement
@@ -245,11 +246,14 @@ public class FlowIssueUTicket {
             }
 
             // [STAGE: (S)]
-            this.msgSender.sendXxxMessage(
+            SimpleLogger.simpleLog("info", "checkpoint 1.2");
+            this.msgSender.sendXxxMessageByNearby(
                     Message.MESSAGE_RECV_AND_STORE,
                     RTicket.MESSAGE_TYPE,
                     storedRTicketJson
             );
+            VoterAgentActivity.sendNextTicket = true;
+            SimpleLogger.simpleLog("info", "checkpoint 1.3");
         } catch (Exception e) { // pragma: no cover -> Shouldn't Reach Here
             throw new RuntimeException("Shouldn't Reach Here", e);
         }

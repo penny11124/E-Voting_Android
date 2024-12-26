@@ -46,6 +46,7 @@ import ureka.framework.resource.logger.SimpleLogger;
 public class VoterAgentActivity extends AppCompatActivity {
     private DeviceController deviceController;
     public static String connectedDeviceId; // The device_id of the voting machine
+    public static String permissionlessData;
     private int votedCandidate;
 
     private TextView textViewConnectingStatus;
@@ -268,7 +269,9 @@ public class VoterAgentActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sendNextTicket = false;
+                SimpleLogger.simpleLog("info", "checkpoint 1");
                 deviceController.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(connectedDeviceId);
+                SimpleLogger.simpleLog("info", "checkpoint 2");
                 while (!sendNextTicket) {
                     try {
                         Thread.sleep(1000);

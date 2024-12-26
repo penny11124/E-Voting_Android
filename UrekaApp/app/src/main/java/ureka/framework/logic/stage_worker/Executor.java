@@ -801,7 +801,6 @@ public class Executor {
     }
     private String _executeDecryptCiphertext(String ciphertext, String associatedPlaintext, String gcmAuthenticationTag, byte[] sessionKey, String iv) {
         // [STAGE: (VTK)] Verify HMAC before Execution
-        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 0");
         SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: ciphertext = " + ciphertext);
         SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: associatedPlaintext = " + associatedPlaintext);
         SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: gcmAuthenticationTag = " + gcmAuthenticationTag);
@@ -812,18 +811,15 @@ public class Executor {
         byte[] gcmAuthenticationTagByte = SerializationUtil.base64ToBytes(gcmAuthenticationTag);
         byte[] ivBytes = SerializationUtil.base64ToBytes(iv);
 
-        SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 1");
         try {
             // verify_token_through_hmac
             byte[] plaintextByte = ECDH.gcmDecrypt(ciphertextBytes,associatedPlaintextBytes,gcmAuthenticationTagByte,sessionKey,ivBytes);
 
-            SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 2");
             String plaintext = SerializationUtil.bytesToStr(plaintextByte);
 
             this.sharedData.setResultMessage("-> SUCCESS: VERIFY_IV_AND_HMAC");
             SimpleLogger.simpleLog("info", this.sharedData.getResultMessage());
 
-            SimpleLogger.simpleLog("info", "_executeDecryptCiphertext: Checkpoint 3");
             return plaintext;
         } catch (AEADBadTagException error) {
             this.sharedData.setResultMessage("-> FAILURE: VERIFY_IV_AND_HMAC");

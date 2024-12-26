@@ -60,6 +60,7 @@ public class AdminAgentActivity extends AppCompatActivity {
     private ArrayList<String> voters; // The public key of the voters
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
     public static String connectedDeviceId; // The device_id of the voting machine
+    public static String permissionlessData; // The data received from Permissionless RTicket
 
     // Components
     private TextView textViewConnectingStatus;
@@ -375,6 +376,16 @@ public class AdminAgentActivity extends AppCompatActivity {
                             throw new RuntimeException(e);
                         }
                     }
+                    Map<String, String> data = SerializationUtil.jsonToMap(permissionlessData);
+                    ArrayList<String> candidatesList = new ArrayList<>(), votersList = new ArrayList<>();
+                    for (String key : data.keySet()) {
+                        if (key.contains("candidate")) {
+                            candidatesList.add(data.get(key));
+                        } else if (key.contains("voter")) {
+                            votersList.add(data.get(key));
+                        }
+                    }
+                    // TODO: Intent
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
