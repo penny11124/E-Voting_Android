@@ -67,7 +67,11 @@ public class MsgVerifier {
         if (Objects.equals(messageIn.getMessageType(), UTicket.MESSAGE_TYPE)) {
             return this._classifyUTicketIsDefinedType(messageIn.getMessageStr());
         } else if (Objects.equals(messageIn.getMessageType(), RTicket.MESSAGE_TYPE)) {
-            return this._classifyRTicketIsDefinedType(messageIn.getMessageStr());
+            if (Objects.equals(messageIn.getMessageOperation(), Message.MESSAGE_PERMISSIONLESS)) {
+                return messageIn.getMessageStr();
+            } else {
+                return this._classifyRTicketIsDefinedType(messageIn.getMessageStr());
+            }
         } else {
             // Handle Request UTicket
             return messageIn.getMessageStr();

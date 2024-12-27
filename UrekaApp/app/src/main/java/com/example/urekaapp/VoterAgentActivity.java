@@ -147,6 +147,7 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonApplyUTicket.setEnabled(false);
         buttonPermissionlessVoter.setEnabled(false);
         buttonShowRTicket.setEnabled(false);
+        buttonSendRTicket.setEnabled(false);
 
         deviceController.getNearbyViewModel().getIsConnected().observe(this, isConnected -> {
             if (isConnected != null && isConnected) {
@@ -260,7 +261,36 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonPermissionlessVoter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                try {
+                    sendNextTicket = false;
+                    deviceController.getMsgSender().sendXxxMessage(
+                            Message.MESSAGE_PERMISSIONLESS,
+                            Message.MESSAGE_PERMISSIONLESS,
+                            ""
+                    );
+                    while (!sendNextTicket) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    Map<String, String> data = SerializationUtil.jsonToMap(permissionlessData);
+                    ArrayList<String> candidatesList = new ArrayList<>(), votersList = new ArrayList<>();
+                    for (String key : data.keySet()) {
+                        if (key.contains("candidate")) {
+                            candidatesList.add(data.get(key));
+                        } else if (key.contains("voter")) {
+                            votersList.add(data.get(key));
+                        }
+                    }
+                    Intent intent = new Intent(VoterAgentActivity.this, PermissionlessActivity.class);
+                    intent.putStringArrayListExtra("candidatesList", candidatesList);
+                    intent.putStringArrayListExtra("votersList", votersList);
+                    startActivity(intent);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 

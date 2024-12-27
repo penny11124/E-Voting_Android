@@ -100,14 +100,14 @@ public class BLEManager {
                 public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
                     if (newState == BluetoothProfile.STATE_CONNECTED) {
                         connectionState.postValue(true);
-                        bleViewModel.setConnected(true);
+//                        bleViewModel.setConnected(true);
                         if (ActivityCompat.checkSelfPermission(BLEManager.this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                             return;
                         }
                         gatt.discoverServices();
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                         connectionState.postValue(false);
-                        bleViewModel.setConnected(false);
+//                        bleViewModel.setConnected(false);
                         callback.onDisconnected();
                     }
                 }
@@ -149,8 +149,6 @@ public class BLEManager {
                         receivedData.postValue(data);
                         callback.onDataReceived(data);
                     } catch (Exception e) {
-                        SimpleLogger.simpleLog("error", "Error(onCharacteristicChanged): message(hex) = " + SerializationUtil.bytesToHex(characteristic.getValue()));
-                        SimpleLogger.simpleLog("error", "Error(onCharacteristicChanged): message(base64) = " + SerializationUtil.bytesToBase64(characteristic.getValue()));
                         callback.onDataReceived("Invalid Data Received");
                     }
                 }

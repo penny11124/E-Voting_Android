@@ -97,8 +97,9 @@ public class MsgSender {
     }
     private void _sendXxxMessage(String messageOperation, String messageType, String sentMessageJson) throws InterruptedException {
         // Generate Message
-        if ((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) || messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
-                (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) {
+        if (((messageOperation.equals(Message.MESSAGE_RECV_AND_STORE) || messageOperation.equals(Message.MESSAGE_VERIFY_AND_EXECUTE)) &&
+                (messageType.equals(UTicket.MESSAGE_TYPE) || messageType.equals(RTicket.MESSAGE_TYPE))) ||
+                (messageOperation.equals(Message.MESSAGE_PERMISSIONLESS) && messageType.equals(Message.MESSAGE_PERMISSIONLESS))) {
 
             Map<String, String> messageRequest = new LinkedHashMap<>();
             messageRequest.put("message_operation", messageOperation);

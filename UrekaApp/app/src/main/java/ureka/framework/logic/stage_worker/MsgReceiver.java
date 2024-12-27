@@ -190,7 +190,8 @@ public class MsgReceiver {
             this.sharedData.setReceivedMessageJson(RTicket.rTicketToJsonStr((RTicket) receivedMessage));
         } else if (receivedMessage instanceof String) {
             String messageStr = (String) receivedMessage;
-            if (messageStr.isEmpty()) {
+            Map<String, String> messageMap = SerializationUtil.jsonToMap(messageStr);
+            if (messageMap.containsKey("candidate_0")) {
                 // Handle Permissionless
                 AdminAgentActivity.sendNextTicket = true;
                 VoterAgentActivity.sendNextTicket = true;

@@ -296,18 +296,18 @@ public class DeviceController {
                 @Override
                 public void onConnected() {
                     SimpleLogger.simpleLog("info", "Device connected!");
-                    new Handler(Looper.getMainLooper()).post(() ->
-                            textView.setText("Device connected!")
-                    );
+//                    new Handler(Looper.getMainLooper()).post(() ->
+//                            textView.setText("Device connected!")
+//                    );
                     onConnected.run();
                 }
 
                 @Override
                 public void onDisconnected() {
                     SimpleLogger.simpleLog("info", "Device disconnected!");
-                    new Handler(Looper.getMainLooper()).post(() ->
-                            textView.setText("Device disconnected!")
-                    );
+//                    new Handler(Looper.getMainLooper()).post(() ->
+//                            textView.setText("Device disconnected!")
+//                    );
                     onDisconnected.run();
                 }
 

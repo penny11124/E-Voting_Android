@@ -61,6 +61,14 @@ public class AdminAgentActivity extends AppCompatActivity {
     private ArrayList<Boolean> voterVoted; // Whether the voters had voted
     public static String connectedDeviceId; // The device_id of the voting machine
     public static String permissionlessData; // The data received from Permissionless RTicket
+    private int stage = 0;
+    // Stage indicates the actions taken:
+    // 0: Before manufacturer init
+    // 1: Before Issue Ownership UTicket
+    // 2: Before Apply Ownership UTicket
+    // 3: Before Apply Config UTicket
+    // 4: Before Apply Tally UTicket
+    // 5: After Apply Tally UTicket
 
     // Components
     private TextView textViewConnectingStatus;
@@ -104,7 +112,6 @@ public class AdminAgentActivity extends AppCompatActivity {
         deviceController.getNearbyManager().setMsgReceiver(deviceController.getMsgReceiver());
         manufacturerController = new DeviceController(ThisDevice.USER_AGENT_OR_CLOUD_SERVER, "Manufacturer");
         manufacturerController.getExecutor()._executeOneTimeInitializeAgentOrServer();
-//        manufacturerController.getNearbyManager().setMsgReceiver(manufacturerController.getMsgReceiver());
 
         textViewConnectingStatus = findViewById(R.id.textViewConnectingStatus);
         buttonScanManufacturer = findViewById(R.id.buttonScanManufacturer);
@@ -138,20 +145,44 @@ public class AdminAgentActivity extends AppCompatActivity {
             }
         });
 
-        deviceController.getBleViewModel().getIsConnected().observe(this, isConnected -> {
-            SimpleLogger.simpleLog("info", "AdminAgentActivity: Admin Agent isConnected = " + isConnected);
+        manufacturerController.getBleViewModel().getIsConnected().observe(this, isConnected -> {
+            SimpleLogger.simpleLog("info", "AdminAgentActivity: manufacturer isConnected = " + isConnected);
             if (isConnected != null && isConnected) {
-                textViewConnectingStatus.setText("Admin Agent connected to VM");
-                buttonInit.setEnabled(true);
+                textViewConnectingStatus.setText("Manufacturer connected to VM");
+                if (stage == 0) {
+                    buttonInit.setEnabled(true);
+                } else if (stage >= 1) {
+                    buttonIssueOwnershipUTicket.setEnabled(true);
+                }
             } else {
                 textViewConnectingStatus.setText("Not connected");
                 buttonInit.setEnabled(false);
                 buttonIssueOwnershipUTicket.setEnabled(false);
+            }
+        });
+
+        deviceController.getBleViewModel().getIsConnected().observe(this, isConnected -> {
+            SimpleLogger.simpleLog("info", "AdminAgentActivity: Admin Agent isConnected = " + isConnected);
+            if (isConnected != null && isConnected) {
+                textViewConnectingStatus.setText("Admin Agent connected to VM");
+                buttonGetData.setEnabled(true);
+                if (stage == 2) {
+                    buttonApplyOwnershipUTicket.setEnabled(true);
+                } else if (stage == 3) {
+                    buttonApplyConfigUTicket.setEnabled(true);
+                } else if (stage == 4) {
+                    buttonPermissionlessAdmin.setEnabled(true);
+                    buttonApplyTallyUTicket.setEnabled(true);
+                } else if (stage == 5) {
+                    buttonPermissionlessAdmin.setEnabled(true);
+                }
+            } else {
+                textViewConnectingStatus.setText("Not connected");
                 buttonApplyOwnershipUTicket.setEnabled(false);
                 buttonGetData.setEnabled(false);
                 buttonApplyConfigUTicket.setEnabled(false);
-                buttonApplyTallyUTicket.setEnabled(false);
                 buttonPermissionlessAdmin.setEnabled(false);
+                buttonApplyTallyUTicket.setEnabled(false);
             }
         });
 
@@ -159,17 +190,18 @@ public class AdminAgentActivity extends AppCompatActivity {
             manufacturerController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
                         Toast.makeText(AdminAgentActivity.this, "Manufacturer connected to VM", Toast.LENGTH_SHORT).show();
-                        buttonInit.setEnabled(true);
+                        textViewConnectingStatus.setText("Manufacturer connected to VM");
+                        if (stage == 0) {
+                            buttonInit.setEnabled(true);
+                        } else if (stage >= 1) {
+                            buttonIssueOwnershipUTicket.setEnabled(true);
+                        }
                     }),
                     () -> runOnUiThread(() -> {
                         Toast.makeText(AdminAgentActivity.this, "Manufacturer disconnected", Toast.LENGTH_SHORT).show();
+                        textViewConnectingStatus.setText("Not connected");
                         buttonInit.setEnabled(false);
                         buttonIssueOwnershipUTicket.setEnabled(false);
-                        buttonApplyOwnershipUTicket.setEnabled(false);
-                        buttonGetData.setEnabled(false);
-                        buttonApplyConfigUTicket.setEnabled(false);
-                        buttonApplyTallyUTicket.setEnabled(false);
-                        buttonPermissionlessAdmin.setEnabled(false);
                     }),
                     textViewConnectingStatus
             );
@@ -181,12 +213,22 @@ public class AdminAgentActivity extends AppCompatActivity {
             deviceController.connectToDevice("HC-04BLE",
                     () -> runOnUiThread(() -> {
                         Toast.makeText(AdminAgentActivity.this, "Admin Agent connected to VM", Toast.LENGTH_SHORT).show();
-                        buttonInit.setEnabled(true);
+                        textViewConnectingStatus.setText("Admin Agent connected to VM");
+                        buttonGetData.setEnabled(true);
+                        if (stage == 2) {
+                            buttonApplyOwnershipUTicket.setEnabled(true);
+                        } else if (stage == 3) {
+                            buttonApplyConfigUTicket.setEnabled(true);
+                        } else if (stage == 4) {
+                            buttonPermissionlessAdmin.setEnabled(true);
+                            buttonApplyTallyUTicket.setEnabled(true);
+                        } else if (stage == 5) {
+                            buttonPermissionlessAdmin.setEnabled(true);
+                        }
                     }),
                     () -> runOnUiThread(() -> {
                         Toast.makeText(AdminAgentActivity.this, "Admin Agent disconnected", Toast.LENGTH_SHORT).show();
-                        buttonInit.setEnabled(false);
-                        buttonIssueOwnershipUTicket.setEnabled(false);
+                        textViewConnectingStatus.setText("Not connected");
                         buttonApplyOwnershipUTicket.setEnabled(false);
                         buttonGetData.setEnabled(false);
                         buttonApplyConfigUTicket.setEnabled(false);
@@ -214,12 +256,6 @@ public class AdminAgentActivity extends AppCompatActivity {
                     return;
                 }
 
-//                Map<String, String> arbitraryDict = new HashMap<>();
-//                arbitraryDict.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
-//                arbitraryDict.put("device_id", "no_id");
-//                arbitraryDict.put("holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr());
-//                deviceController.getFlowIssuerIssueUTicket().issuerIssueUTicketToHerself("no_id", arbitraryDict);
-//                deviceController.getFlowApplyUTicket().holderApplyUTicket("no_id");
                 Map<String, String> arbitraryDict = new HashMap<>();
                 arbitraryDict.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
                 arbitraryDict.put("device_id", "no_id");
@@ -234,7 +270,9 @@ public class AdminAgentActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 }
+                buttonInit.setEnabled(false);
                 buttonIssueOwnershipUTicket.setEnabled(true);
+                stage = 1; // Before Issue Ownership UTicket
             }
         });
 
@@ -263,6 +301,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 }
 
                 buttonApplyOwnershipUTicket.setEnabled(true);
+                stage = 2; // Before Apply Ownership UTicket
             }
         });
 
@@ -280,6 +319,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                 }
                 buttonGetData.setEnabled(true);
                 buttonApplyConfigUTicket.setEnabled(true);
+                stage = 3; // Before Apply Config UTicket
             }
         });
 
@@ -293,7 +333,7 @@ public class AdminAgentActivity extends AppCompatActivity {
 
                 voters = new ArrayList<>();
                 voters.add(getIntent().getStringExtra("key1"));
-//                voters.add(getIntent().getStringExtra("key2"));
+                voters.add(getIntent().getStringExtra("key2"));
             }
         });
 
@@ -370,8 +410,10 @@ public class AdminAgentActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 }
+                buttonApplyConfigUTicket.setEnabled(false);
                 buttonPermissionlessAdmin.setEnabled(true);
                 buttonApplyTallyUTicket.setEnabled(true);
+                stage = 4; // Before Apply Tally UTicket
             }
         });
 
@@ -402,7 +444,10 @@ public class AdminAgentActivity extends AppCompatActivity {
                             votersList.add(data.get(key));
                         }
                     }
-                    // TODO: Intent
+                    Intent intent = new Intent(AdminAgentActivity.this, PermissionlessActivity.class);
+                    intent.putStringArrayListExtra("candidatesList", candidatesList);
+                    intent.putStringArrayListExtra("votersList", votersList);
+                    startActivity(intent);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -514,7 +559,9 @@ public class AdminAgentActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 }
+                buttonApplyTallyUTicket.setEnabled(false);
                 buttonShowRTickets.setEnabled(true);
+                stage = 5; // After Apply Tally UTicket
             }
         });
 
