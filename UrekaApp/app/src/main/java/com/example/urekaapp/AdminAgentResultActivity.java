@@ -32,19 +32,18 @@ public class AdminAgentResultActivity extends AppCompatActivity {
         // Set the candidates and their votes
         Map<String, Integer> candidateVotesMap = (Map<String, Integer>) getIntent().getSerializableExtra("mapSerializable");
         if (candidateVotesMap != null) {
-            StringBuilder candidateListText = new StringBuilder();
             for (Map.Entry<String, Integer> entry : candidateVotesMap.entrySet()) {
-                candidateListText.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n\n");
-            }
+                String candidateListText = entry.getKey() + ": " + entry.getValue() + "\n";
 
-            TextView candidateListView = new TextView(this);
-            candidateListView.setTextSize(14);
-            candidateListView.setText(candidateListText.toString());
-            candidateListView.setLayoutParams(new LinearLayout.LayoutParams(
+                TextView candidateListView = new TextView(this);
+                candidateListView.setTextSize(20);
+                candidateListView.setText(candidateListText);
+                candidateListView.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            candidateList.addView(candidateListView);
+                ));
+                candidateList.addView(candidateListView, 0);
+            }
         }
 
         // Set the public keys of the voters

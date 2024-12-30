@@ -17,9 +17,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import ureka.framework.Environment;
 import ureka.framework.resource.crypto.ECC;
@@ -175,7 +179,37 @@ public class MainActivity extends AppCompatActivity {
         buttonTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, TestActivity.class);
+//                Intent intent = new Intent(MainActivity.this, TestActivity.class);
+//                startActivity(intent);
+
+                ArrayList<String> candidates = new ArrayList<>(); // The names of the candidates
+                ArrayList<Integer> candidateVotes = new ArrayList<>(); // The votes of the candidates
+                ArrayList<String> voters = new ArrayList<>(); // The public key of the voters
+                ArrayList<Boolean> voterVoted = new ArrayList<>(); // Whether the voters had voted
+
+                candidates.add("Alice");
+                candidates.add("Bob");
+                candidateVotes.add(3);
+                candidateVotes.add(2);
+                voters.add("Carol");
+                voters.add("Dean");
+                voterVoted.add(true);
+                voterVoted.add(true);
+
+                Intent intent = new Intent(MainActivity.this, AdminAgentResultActivity.class);
+                Map<String, Integer> candidateVotesMap = new HashMap<>();
+                for (int i = 0; i < candidates.size(); i++) {
+                    candidateVotesMap.put(candidates.get(i), candidateVotes.get(i));
+                }
+
+                ArrayList<String> rticketList = new ArrayList<>();
+                for (int i = 0; i < voters.size(); i++) {
+                    if (voterVoted.get(i)) {
+                        rticketList.add(voters.get(i));
+                    }
+                }
+                intent.putExtra("mapSerializable", (Serializable) candidateVotesMap);
+                intent.putStringArrayListExtra("RTICKET_LIST", rticketList);
                 startActivity(intent);
             }
         });
