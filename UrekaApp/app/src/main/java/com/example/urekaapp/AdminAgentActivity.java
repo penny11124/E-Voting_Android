@@ -334,6 +334,12 @@ public class AdminAgentActivity extends AppCompatActivity {
                 voters = new ArrayList<>();
                 voters.add(getIntent().getStringExtra("key1"));
                 voters.add(getIntent().getStringExtra("key2"));
+                voters.add(getIntent().getStringExtra("key3"));
+                voters.add(getIntent().getStringExtra("key4"));
+                voters.add(getIntent().getStringExtra("key5"));
+                voters.add(getIntent().getStringExtra("key6"));
+                voters.add(getIntent().getStringExtra("key7"));
+                voters.add(getIntent().getStringExtra("key8"));
             }
         });
 
