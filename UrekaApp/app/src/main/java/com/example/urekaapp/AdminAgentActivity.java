@@ -255,6 +255,7 @@ public class AdminAgentActivity extends AppCompatActivity {
                     Toast.makeText(v.getContext(), errorMessage, Toast.LENGTH_SHORT).show();
                     return;
                 }
+                long startTime = System.nanoTime();
 
                 Map<String, String> arbitraryDict = new HashMap<>();
                 arbitraryDict.put("u_ticket_type", UTicket.TYPE_INITIALIZATION_UTICKET);
@@ -273,6 +274,9 @@ public class AdminAgentActivity extends AppCompatActivity {
                 buttonInit.setEnabled(false);
                 buttonIssueOwnershipUTicket.setEnabled(true);
                 stage = 1; // Before Issue Ownership UTicket
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: buttonInit execution time: " + duration + " ns");
             }
         });
 
@@ -308,6 +312,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyOwnershipUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                long startTime = System.nanoTime();
                 sendNextTicket = false;
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(connectedDeviceId);
                 while (!sendNextTicket) {
@@ -320,6 +325,9 @@ public class AdminAgentActivity extends AppCompatActivity {
                 buttonGetData.setEnabled(true);
                 buttonApplyConfigUTicket.setEnabled(true);
                 stage = 3; // Before Apply Config UTicket
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: buttonApplyOwnershipUTicket execution time: " + duration + " ns");
             }
         });
 
@@ -341,6 +349,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyConfigUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                long startTime = System.nanoTime();
                 String generatedTaskScope = "{\"ALL\": \"allow\"}";
                 Map<String, String> generatedRequest = Map.of(
                         "device_id", connectedDeviceId,
@@ -414,6 +423,9 @@ public class AdminAgentActivity extends AppCompatActivity {
                 buttonPermissionlessAdmin.setEnabled(true);
                 buttonApplyTallyUTicket.setEnabled(true);
                 stage = 4; // Before Apply Tally UTicket
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: buttonConfigUTicket execution time: " + duration + " ns");
             }
         });
 
@@ -422,6 +434,7 @@ public class AdminAgentActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
+                    long startTime = System.nanoTime();
                     sendNextTicket = false;
                     deviceController.getMsgSender().sendXxxMessage(
                             Message.MESSAGE_PERMISSIONLESS,
@@ -444,6 +457,9 @@ public class AdminAgentActivity extends AppCompatActivity {
                             votersList.add(data.get(key));
                         }
                     }
+                    long endTime = System.nanoTime();
+                    long duration = endTime - startTime;
+                    SimpleLogger.simpleLog("info", "AdminAgentActivity: buttonPermissionlessAdmin execution time: " + duration + " ns");
                     Intent intent = new Intent(AdminAgentActivity.this, PermissionlessActivity.class);
                     intent.putStringArrayListExtra("candidatesList", candidatesList);
                     intent.putStringArrayListExtra("votersList", votersList);
@@ -458,6 +474,7 @@ public class AdminAgentActivity extends AppCompatActivity {
         buttonApplyTallyUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                long startTime = System.nanoTime();
                 String generatedTaskScope = "{\"ALL\": \"allow\"}";
                 Map<String, String> generatedRequest = Map.of(
                         "device_id", connectedDeviceId,
@@ -562,6 +579,9 @@ public class AdminAgentActivity extends AppCompatActivity {
                 buttonApplyTallyUTicket.setEnabled(false);
                 buttonShowRTickets.setEnabled(true);
                 stage = 5; // After Apply Tally UTicket
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                SimpleLogger.simpleLog("info", "AdminAgentActivity: buttonTally execution time: " + duration + " ns");
             }
         });
 

@@ -63,6 +63,7 @@ public class VoterAgentActivity extends AppCompatActivity {
 
     private final ActivityResultLauncher<Intent> activityResultLauncher =
         registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+            long startTime = System.nanoTime();
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Intent data = result.getData();
                 if (data != null) {
@@ -98,6 +99,9 @@ public class VoterAgentActivity extends AppCompatActivity {
                     throw new RuntimeException("Invalid vote.");
                 }
             }
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            SimpleLogger.simpleLog("info", "VoterAgentActivity: buttonApplyUTicket(PostVote) execution time: " + duration + " ns");
         });
 
 
@@ -186,6 +190,7 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonRequestUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                long startTime = System.nanoTime();
                 String generatedTaskScope = "{\"ALL\": \"allow\"}";
                 Map<String, String> generatedRequest = Map.of(
                         "holder_id", deviceController.getSharedData().getThisPerson().getPersonPubKeyStr(),
@@ -201,6 +206,9 @@ public class VoterAgentActivity extends AppCompatActivity {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                SimpleLogger.simpleLog("info", "VoterAgentActivity: buttonRequestUTicket execution time: " + duration + " ns");
             }
         });
 
@@ -210,10 +218,12 @@ public class VoterAgentActivity extends AppCompatActivity {
                     () -> runOnUiThread(() -> {
                         Toast.makeText(VoterAgentActivity.this, "Device connected!", Toast.LENGTH_SHORT).show();
                         buttonApplyUTicket.setEnabled(true);
+                        buttonPermissionlessVoter.setEnabled(true);
                     }),
                     () -> runOnUiThread(() -> {
                         Toast.makeText(VoterAgentActivity.this, "Device disconnected!", Toast.LENGTH_SHORT).show();
                         buttonApplyUTicket.setEnabled(false);
+                        buttonPermissionlessVoter.setEnabled(false);
                     }),
                     textViewConnectingStatus
             );
@@ -222,6 +232,7 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonApplyUTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                long startTime = System.nanoTime();
                 String targetDeviceId = connectedDeviceId;
                 String generatedCommand = "HELLO-1";
                 deviceController.getFlowApplyUTicket().holderApplyUTicket(targetDeviceId,generatedCommand);
@@ -252,6 +263,9 @@ public class VoterAgentActivity extends AppCompatActivity {
                 }
                 SimpleLogger.simpleLog("info", "candidate list = " + candidates);
 
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                SimpleLogger.simpleLog("info", "VoterAgentActivity: buttonApplyUTicket(PreVote) execution time: " + duration + " ns");
                 Intent intent = new Intent(VoterAgentActivity.this, VoterAgentVotingActivity.class);
                 intent.putStringArrayListExtra("CANDIDATES", candidates);
                 activityResultLauncher.launch(intent);
@@ -262,6 +276,7 @@ public class VoterAgentActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
+                    long startTime = System.nanoTime();
                     sendNextTicket = false;
                     deviceController.getMsgSender().sendXxxMessage(
                             Message.MESSAGE_PERMISSIONLESS,
@@ -284,6 +299,9 @@ public class VoterAgentActivity extends AppCompatActivity {
                             votersList.add(data.get(key));
                         }
                     }
+                    long endTime = System.nanoTime();
+                    long duration = endTime - startTime;
+                    SimpleLogger.simpleLog("info", "VoterAgentActivity: buttonPermissionlessVoter execution time: " + duration + " ns");
                     Intent intent = new Intent(VoterAgentActivity.this, PermissionlessActivity.class);
                     intent.putStringArrayListExtra("candidatesList", candidatesList);
                     intent.putStringArrayListExtra("votersList", votersList);
@@ -307,6 +325,7 @@ public class VoterAgentActivity extends AppCompatActivity {
         buttonSendRTicket.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                long startTime = System.nanoTime();
                 sendNextTicket = false;
                 deviceController.getFlowIssuerIssueUTicket().holderSendRTicketToIssuer(connectedDeviceId);
                 while (!sendNextTicket) {
@@ -316,6 +335,9 @@ public class VoterAgentActivity extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 }
+                long endTime = System.nanoTime();
+                long duration = endTime - startTime;
+                SimpleLogger.simpleLog("info", "VoterAgentActivity: buttonSendRTicket execution time: " + duration + " ns");
             }
         });
 
